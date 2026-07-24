@@ -1,0 +1,58 @@
+/* Tailwind entrypoint + theme tokens as CSS variables (RGB triplets for <alpha-value>).
+   Dark values come from the Smena design; light values are a derived warm palette.
+   The .dark class is toggled by ThemeProvider via NativeWind's colorScheme API. */
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  /* Light theme (derived — same hues, light surfaces / dark text) */
+  :root {
+    --bg-canvas: 250 247 242;
+    --bg-screen: 244 239 232;
+    --bg-surface: 255 255 255;
+    --bg-surface-alt: 240 234 225;
+    --bg-icon-tint: 251 231 223;
+    --border-default: 231 224 214;
+    --border-muted: 217 209 197;
+    --brand: 255 92 57;
+    --brand-dark: 226 61 28;
+    --text-primary: 27 23 18;
+    --text-secondary: 74 66 58;
+    --text-tertiary: 110 103 92;
+    --text-muted: 147 139 127;
+    --text-faint: 167 159 146;
+    --success: 46 154 91;
+    --success-bg: 227 245 233;
+    --warning: 194 94 31;
+    --warning-bg: 252 235 221;
+    --accent-badge: 232 153 26;
+    --on-brand: 255 255 255;
+    --on-accent: 27 23 18;
+  }
+
+  /* Dark theme (design source of truth) */
+  .dark:root {
+    --bg-canvas: 13 11 9;
+    --bg-screen: 23 20 15;
+    --bg-surface: 34 29 25;
+    --bg-surface-alt: 42 36 32;
+    --bg-icon-tint: 58 36 28;
+    --border-default: 50 43 37;
+    --border-muted: 58 51 44;
+    --brand: 255 92 57;
+    --brand-dark: 226 61 28;
+    --text-primary: 241 236 227;
+    --text-secondary: 201 194 183;
+    --text-tertiary: 156 149 138;
+    --text-muted: 126 120 110;
+    --text-faint: 110 104 94;
+    --success: 99 196 137;
+    --success-bg: 21 40 28;
+    --warning: 240 137 74;
+    --warning-bg: 51 33 26;
+    --accent-badge: 255 194 75;
+    --on-brand: 255 255 255;
+    --on-accent: 13 11 9;
+  }
+}

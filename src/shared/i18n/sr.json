@@ -1,0 +1,150 @@
+{
+  "common": {
+    "appName": "Smena",
+    "cancel": "Otkaži",
+    "save": "Sačuvaj",
+    "continue": "Nastavi",
+    "next": "Dalje",
+    "back": "Nazad",
+    "retry": "Pokušaj ponovo",
+    "loading": "Učitavanje…",
+    "search": "Pretraga",
+    "seeAll": "Prikaži sve",
+    "remove": "Ukloni",
+    "close": "Zatvori",
+    "confirm": "Potvrdi",
+    "error": "Greška",
+    "somethingWrong": "Nešto je pošlo naopako",
+    "tryAgain": "Pokušajte ponovo.",
+    "comingSoon": "Uskoro"
+  },
+  "validation": {
+    "required": "Ovo polje je obavezno",
+    "emailInvalid": "Unesite ispravan email",
+    "passwordMin": "Lozinka mora imati najmanje 8 znakova",
+    "passwordsDontMatch": "Lozinke se ne poklapaju",
+    "nameMin": "Unesite ime i prezime"
+  },
+  "nav": {
+    "home": "Početna",
+    "listings": "Poslovi",
+    "saved": "Sačuvano",
+    "profile": "Profil"
+  },
+  "onboarding": {
+    "title": "Pronađi svoj posao",
+    "subtitle": "Smena brzo povezuje ugostiteljske radnike sa lokalima kojima treba ispomoć.",
+    "chooseRole": "Kako ćeš koristiti Smenu?",
+    "worker": "Tražim posao",
+    "workerDesc": "Konobar, šanker, barista, kuvar, hostesa — nađi smene u blizini.",
+    "venue": "Tražim radnike",
+    "venueDesc": "Kafić, bar, restoran, klub — objavi smene i brzo zaposli.",
+    "getStarted": "Započni"
+  },
+  "auth": {
+    "signIn": "Prijava",
+    "signUp": "Registracija",
+    "signInSubtitle": "Dobrodošli nazad na Smenu.",
+    "email": "Email",
+    "password": "Lozinka",
+    "confirmPassword": "Potvrdi lozinku",
+    "fullName": "Ime i prezime",
+    "phone": "Broj telefona",
+    "phoneOptional": "Telefon (opciono)",
+    "city": "Grad",
+    "workerSignUpTitle": "Napravi radnički profil",
+    "venueSignUpTitle": "Registruj svoj lokal",
+    "venueName": "Naziv lokala",
+    "venueType": "Tip lokala",
+    "alreadyHaveAccount": "Već imaš nalog?",
+    "noAccount": "Nemaš nalog?",
+    "createAccount": "Napravi nalog",
+    "confirmEmail": "Proveri email da potvrdiš nalog, pa se prijavi."
+  },
+  "home": {
+    "greeting": "Zdravo",
+    "recommendedNearYou": "Preporučeno u blizini",
+    "urgent": "Hitno",
+    "forWorkers": "Smene za tebe",
+    "forVenues": "Tvoj lokal",
+    "yourListings": "Tvoji aktivni oglasi",
+    "postShift": "Objavi smenu",
+    "applicationsReceived": "Pristigle prijave",
+    "empty": "Ovde još nema ničega"
+  },
+  "listings": {
+    "title": "Oglasi",
+    "browse": "Pregledaj smene",
+    "filterAll": "Sve",
+    "applyNow": "Prijavi se",
+    "applied": "Prijavljeno",
+    "viewDetails": "Detalji",
+    "noResults": "Nema oglasa za izabrane filtere",
+    "urgent": "Hitno"
+  },
+  "listingDetail": {
+    "about": "O ovoj smeni",
+    "requirements": "Uslovi",
+    "aboutVenue": "O lokalu",
+    "pay": "Plata",
+    "schedule": "Raspored",
+    "apply": "Prijavi se",
+    "applied": "Prijava poslata",
+    "saveListing": "Sačuvaj",
+    "savedListing": "Sačuvano",
+    "notFound": "Oglas nije pronađen",
+    "applicants": "{count} prijava"
+  },
+  "saved": {
+    "title": "Sačuvano",
+    "empty": "Nema sačuvanih oglasa",
+    "emptyDesc": "Dodirni oznaku na bilo kojoj smeni da je sačuvaš za kasnije."
+  },
+  "profile": {
+    "title": "Profil",
+    "editProfile": "Izmeni profil",
+    "myApplications": "Moje prijave",
+    "myListings": "Moji oglasi",
+    "settings": "Podešavanja",
+    "language": "Jezik",
+    "theme": "Izgled",
+    "themeSystem": "Sistemski",
+    "themeLight": "Svetlo",
+    "themeDark": "Tamno",
+    "logOut": "Odjava",
+    "logOutConfirm": "Da li ste sigurni da želite da se odjavite?",
+    "memberSince": "Član od",
+    "worker": "Radnik",
+    "venue": "Lokal"
+  },
+  "pay": {
+    "hour": "/h",
+    "shift": "/smena",
+    "month": "/mes"
+  },
+  "employment": {
+    "fill_in": "Ispomoć",
+    "part_time": "Skraćeno",
+    "full_time": "Puno radno"
+  },
+  "roles": {
+    "waiter": "Konobar",
+    "bartender": "Šanker",
+    "barista": "Barista",
+    "cook": "Kuvar",
+    "host": "Hostesa",
+    "kitchen_helper": "Pomoćni kuvar"
+  },
+  "venueTypes": {
+    "cafe": "Kafić",
+    "bar": "Bar",
+    "restaurant": "Restoran",
+    "club": "Klub",
+    "bakery": "Pekara"
+  },
+  "errors": {
+    "network": "Problem sa mrežom. Proverite konekciju.",
+    "auth": "Prijava nije uspela. Proverite podatke.",
+    "generic": "Nešto je pošlo naopako. Pokušajte ponovo."
+  }
+}

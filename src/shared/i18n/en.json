@@ -1,0 +1,150 @@
+{
+  "common": {
+    "appName": "Smena",
+    "cancel": "Cancel",
+    "save": "Save",
+    "continue": "Continue",
+    "next": "Next",
+    "back": "Back",
+    "retry": "Retry",
+    "loading": "Loading…",
+    "search": "Search",
+    "seeAll": "See all",
+    "remove": "Remove",
+    "close": "Close",
+    "confirm": "Confirm",
+    "error": "Error",
+    "somethingWrong": "Something went wrong",
+    "tryAgain": "Please try again.",
+    "comingSoon": "Coming soon"
+  },
+  "validation": {
+    "required": "This field is required",
+    "emailInvalid": "Enter a valid email",
+    "passwordMin": "Password must be at least 8 characters",
+    "passwordsDontMatch": "Passwords do not match",
+    "nameMin": "Enter your full name"
+  },
+  "nav": {
+    "home": "Home",
+    "listings": "Jobs",
+    "saved": "Saved",
+    "profile": "Profile"
+  },
+  "onboarding": {
+    "title": "Find your job",
+    "subtitle": "Smena connects hospitality workers with venues that need coverage — fast.",
+    "chooseRole": "How will you use Smena?",
+    "worker": "Looking for work",
+    "workerDesc": "Waiter, bartender, barista, cook, host — find shifts near you.",
+    "venue": "Looking for workers",
+    "venueDesc": "Café, bar, restaurant, club — post shifts and hire fast.",
+    "getStarted": "Get started"
+  },
+  "auth": {
+    "signIn": "Sign in",
+    "signUp": "Sign up",
+    "signInSubtitle": "Welcome back to Smena.",
+    "email": "Email",
+    "password": "Password",
+    "confirmPassword": "Confirm password",
+    "fullName": "Full name",
+    "phone": "Phone number",
+    "phoneOptional": "Phone (optional)",
+    "city": "City",
+    "workerSignUpTitle": "Create your worker profile",
+    "venueSignUpTitle": "Register your venue",
+    "venueName": "Venue name",
+    "venueType": "Venue type",
+    "alreadyHaveAccount": "Already have an account?",
+    "noAccount": "Don't have an account?",
+    "createAccount": "Create account",
+    "confirmEmail": "Check your email to confirm your account, then sign in."
+  },
+  "home": {
+    "greeting": "Hi",
+    "recommendedNearYou": "Recommended near you",
+    "urgent": "Urgent",
+    "forWorkers": "Shifts for you",
+    "forVenues": "Your venue",
+    "yourListings": "Your active listings",
+    "postShift": "Post a shift",
+    "applicationsReceived": "Applications received",
+    "empty": "Nothing here yet"
+  },
+  "listings": {
+    "title": "Listings",
+    "browse": "Browse shifts",
+    "filterAll": "All",
+    "applyNow": "Apply now",
+    "applied": "Applied",
+    "viewDetails": "View details",
+    "noResults": "No listings match your filters",
+    "urgent": "Urgent"
+  },
+  "listingDetail": {
+    "about": "About this shift",
+    "requirements": "Requirements",
+    "aboutVenue": "About the venue",
+    "pay": "Pay",
+    "schedule": "Schedule",
+    "apply": "Apply",
+    "applied": "Application sent",
+    "saveListing": "Save",
+    "savedListing": "Saved",
+    "notFound": "Listing not found",
+    "applicants": "{count} applicants"
+  },
+  "saved": {
+    "title": "Saved",
+    "empty": "No saved listings",
+    "emptyDesc": "Tap the bookmark on any shift to save it for later."
+  },
+  "profile": {
+    "title": "Profile",
+    "editProfile": "Edit profile",
+    "myApplications": "My applications",
+    "myListings": "My listings",
+    "settings": "Settings",
+    "language": "Language",
+    "theme": "Appearance",
+    "themeSystem": "System",
+    "themeLight": "Light",
+    "themeDark": "Dark",
+    "logOut": "Log out",
+    "logOutConfirm": "Are you sure you want to log out?",
+    "memberSince": "Member since",
+    "worker": "Worker",
+    "venue": "Venue"
+  },
+  "pay": {
+    "hour": "/hr",
+    "shift": "/shift",
+    "month": "/mo"
+  },
+  "employment": {
+    "fill_in": "Fill-in",
+    "part_time": "Part-time",
+    "full_time": "Full-time"
+  },
+  "roles": {
+    "waiter": "Waiter",
+    "bartender": "Bartender",
+    "barista": "Barista",
+    "cook": "Cook",
+    "host": "Host",
+    "kitchen_helper": "Kitchen helper"
+  },
+  "venueTypes": {
+    "cafe": "Café",
+    "bar": "Bar",
+    "restaurant": "Restaurant",
+    "club": "Club",
+    "bakery": "Bakery"
+  },
+  "errors": {
+    "network": "Network problem. Check your connection.",
+    "auth": "Could not sign you in. Check your details.",
+    "generic": "Something went wrong. Please try again."
+  }
+}
