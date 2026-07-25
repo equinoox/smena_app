@@ -15,6 +15,7 @@ type ListingListProps = {
   header?: React.ReactElement;
   emptyTitle: string;
   emptyDescription?: string;
+  cardVariant?: "photo" | "compact";
 };
 
 export function ListingList({
@@ -25,6 +26,7 @@ export function ListingList({
   header,
   emptyTitle,
   emptyDescription,
+  cardVariant = "photo",
 }: ListingListProps) {
   const colors = useThemeColors();
 
@@ -59,6 +61,7 @@ export function ListingList({
           onToggleSave={
             onToggleSave ? () => onToggleSave(item) : undefined
           }
+          variant={cardVariant}
         />
       )}
     />

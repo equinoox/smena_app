@@ -27,6 +27,7 @@ module.exports = {
         warning: "rgb(var(--warning) / <alpha-value>)",
         "warning-bg": "rgb(var(--warning-bg) / <alpha-value>)",
         "accent-badge": "rgb(var(--accent-badge) / <alpha-value>)",
+        info: "rgb(var(--info) / <alpha-value>)",
         "on-brand": "rgb(var(--on-brand) / <alpha-value>)",
         "on-accent": "rgb(var(--on-accent) / <alpha-value>)",
       },

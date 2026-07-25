@@ -10,8 +10,8 @@ export function HomeScreen() {
   if (isLoading) return <Loader />;
 
   return role === "venue" ? (
-    <VenueHomeView name={profile?.full_name} />
+    <VenueHomeView />
   ) : (
-    <WorkerHomeView name={profile?.full_name} />
+    <WorkerHomeView profile={profile} />
   );
 }

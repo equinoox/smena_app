@@ -19,6 +19,7 @@ type Palette = {
   success: string;
   warning: string;
   accentBadge: string;
+  info: string;
   onBrand: string;
   onAccent: string;
 };
@@ -42,11 +43,12 @@ export const themeColors: { light: Palette; dark: Palette } = {
     success: "#2E9A5B",
     warning: "#C25E1F",
     accentBadge: "#E8991A",
+    info: "#1E82C8",
     onBrand: "#FFFFFF",
     onAccent: "#1B1712",
   },
   dark: {
-    bgCanvas: "#0D0B09",
+    bgCanvas: "#000000",
     bgScreen: "#17140F",
     bgSurface: "#221D19",
     bgSurfaceAlt: "#2A2420",
@@ -63,6 +65,7 @@ export const themeColors: { light: Palette; dark: Palette } = {
     success: "#63C489",
     warning: "#F0894A",
     accentBadge: "#FFC24B",
+    info: "#6EBEFF",
     onBrand: "#FFFFFF",
     onAccent: "#0D0B09",
   },

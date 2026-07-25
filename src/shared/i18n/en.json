@@ -23,13 +23,15 @@
     "emailInvalid": "Enter a valid email",
     "passwordMin": "Password must be at least 8 characters",
     "passwordsDontMatch": "Passwords do not match",
-    "nameMin": "Enter your full name"
+    "nameMin": "Enter your full name",
+    "selectPosition": "Select at least one position"
   },
   "nav": {
     "home": "Home",
     "listings": "Jobs",
     "saved": "Saved",
-    "profile": "Profile"
+    "profile": "Profile",
+    "venueProfile": "Venue profile"
   },
   "onboarding": {
     "title": "Find your job",
@@ -52,10 +54,22 @@
     "phone": "Phone number",
     "phoneOptional": "Phone (optional)",
     "city": "City",
-    "workerSignUpTitle": "Create your worker profile",
+    "workerSignUpTitle": "Create your profile",
+    "workerSignUpSubtitle": "Venues find you based on this info.",
+    "position": "Position",
+    "positionHint": "choose one or more",
+    "experience": "Experience",
     "venueSignUpTitle": "Register your venue",
+    "venueDetailsTitle": "Venue details",
+    "venueDetailsSubtitle": "This is how workers will see you in listings.",
+    "venueLogo": "Venue logo",
+    "addPhoto": "Add photo",
     "venueName": "Venue name",
     "venueType": "Venue type",
+    "address": "Address",
+    "pib": "Tax ID (PIB)",
+    "venuePhone": "Contact phone",
+    "description": "Short description",
     "alreadyHaveAccount": "Already have an account?",
     "noAccount": "Don't have an account?",
     "createAccount": "Create account",
@@ -63,27 +77,45 @@
   },
   "home": {
     "greeting": "Hi",
+    "greetingMorning": "Good morning",
+    "greetingAfternoon": "Good afternoon",
+    "greetingEvening": "Good evening",
     "recommendedNearYou": "Recommended near you",
     "urgent": "Urgent",
     "forWorkers": "Shifts for you",
     "forVenues": "Your venue",
-    "yourListings": "Your active listings",
+    "yourListings": "Your listings",
     "postShift": "Post a shift",
+    "postShiftTitle": "Post a new listing",
+    "postShiftSubtitle": "Find a worker for a shift in a few steps",
+    "activeListings": "Active listings",
+    "newApplications": "Applications",
+    "viewsThisWeek": "Views this week",
+    "candidates": "{count} candidates",
     "applicationsReceived": "Applications received",
-    "empty": "Nothing here yet"
+    "empty": "Nothing here yet",
+    "searchPlaceholder": "Search position or venue"
   },
   "listings": {
     "title": "Listings",
     "browse": "Browse shifts",
     "filterAll": "All",
+    "filters": "Filters",
+    "nearMe": "Near me",
+    "activeCount": "{count} active",
     "applyNow": "Apply now",
     "applied": "Applied",
-    "viewDetails": "View details",
+    "viewDetails": "Details",
     "noResults": "No listings match your filters",
-    "urgent": "Urgent"
+    "urgent": "Urgent",
+    "venuePhotoPlaceholder": "Venue photo",
+    "postedMinutesAgo": "Posted {count}m ago",
+    "postedHoursAgo": "Posted {count}h ago",
+    "postedYesterday": "Posted yesterday",
+    "postedDaysAgo": "Posted {count}d ago"
   },
   "listingDetail": {
-    "about": "About this shift",
+    "about": "Job description",
     "requirements": "Requirements",
     "aboutVenue": "About the venue",
     "pay": "Pay",
@@ -93,7 +125,17 @@
     "saveListing": "Save",
     "savedListing": "Saved",
     "notFound": "Listing not found",
-    "applicants": "{count} applicants"
+    "applicants": "{count} applicants",
+    "views": "{count} views",
+    "workingHours": "Working hours",
+    "location": "Location",
+    "callVenue": "Call venue",
+    "edit": "Edit",
+    "noPhone": "Venue has no contact phone on file",
+    "deleteTitle": "Delete listing?",
+    "deleteMessage": "This action cannot be undone.",
+    "deleteConfirm": "Delete",
+    "deleteSuccess": "Listing deleted"
   },
   "saved": {
     "title": "Saved",
@@ -102,6 +144,7 @@
   },
   "profile": {
     "title": "Profile",
+    "venueProfileTitle": "Venue profile",
     "editProfile": "Edit profile",
     "myApplications": "My applications",
     "myListings": "My listings",
@@ -135,6 +178,11 @@
     "host": "Host",
     "kitchen_helper": "Kitchen helper"
   },
+  "experience": {
+    "none": "None",
+    "1_3_years": "1-3 yrs",
+    "3plus_years": "3+ yrs"
+  },
   "venueTypes": {
     "cafe": "Café",
     "bar": "Bar",
@@ -146,5 +194,31 @@
     "network": "Network problem. Check your connection.",
     "auth": "Could not sign you in. Check your details.",
     "generic": "Something went wrong. Please try again."
+  },
+  "createListing": {
+    "title": "New listing",
+    "editTitle": "Edit listing",
+    "saveChanges": "Save changes",
+    "updateSuccess": "Listing updated",
+    "positionQuestion": "Which position do you need?",
+    "titleLabel": "Listing title",
+    "titleHint": "Short and clear — this is what workers see first.",
+    "employmentLabel": "Employment type",
+    "dateAndShift": "Date and shift",
+    "compensation": "Compensation",
+    "optional": "optional",
+    "descriptionLabel": "Job description",
+    "requirementsLabel": "Requirements",
+    "addRequirement": "Add requirement",
+    "requirementPlaceholder": "e.g. Bar experience",
+    "markUrgent": "Mark as urgent",
+    "markUrgentHint": "Listing goes to the top of nearby workers' feed.",
+    "preview": "Preview",
+    "publish": "Publish listing",
+    "selectDate": "Select date",
+    "selectTime": "Select time",
+    "from": "From",
+    "to": "To",
+    "publishSuccess": "Listing published"
   }
 }

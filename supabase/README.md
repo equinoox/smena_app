@@ -6,6 +6,8 @@ or via the Supabase CLI (`supabase db push`).
 1. `migrations/0001_init.sql` — enums, tables, triggers (incl. auto-profile on signup).
 2. `migrations/0002_rls.sql` — Row Level Security policies (role/ownership scoped).
 3. `migrations/0003_storage.sql` — `avatars` + `venue-logos` storage buckets & policies.
+4. `migrations/0004_worker_profile_fields.sql` — `profiles.worker_roles` + `profiles.experience_level`.
+5. `migrations/0005_listing_views.sql` — `listing_views` table (a worker opening a listing logs a view; powers venue home stats).
 
 ## Notes
 

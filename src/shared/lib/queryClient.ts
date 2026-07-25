@@ -13,10 +13,18 @@ export function setQueryErrorHandler(handler: ErrorHandler) {
 
 export const queryClient = new QueryClient({
   queryCache: new QueryCache({
-    onError: (error) => handleError(error),
+    onError: (error) => {
+      // Always visible in the Metro terminal / device logs, regardless of what the
+      // toast ends up showing — the full Supabase error (message, code, details, hint).
+      console.error("[Query error]", error);
+      handleError(error);
+    },
   }),
   mutationCache: new MutationCache({
-    onError: (error) => handleError(error),
+    onError: (error) => {
+      console.error("[Mutation error]", error);
+      handleError(error);
+    },
   }),
   defaultOptions: {
     queries: {

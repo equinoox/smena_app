@@ -27,13 +27,14 @@
     --warning: 194 94 31;
     --warning-bg: 252 235 221;
     --accent-badge: 232 153 26;
+    --info: 30 130 200;
     --on-brand: 255 255 255;
     --on-accent: 27 23 18;
   }
 
   /* Dark theme (design source of truth) */
   .dark:root {
-    --bg-canvas: 13 11 9;
+    --bg-canvas: 0 0 0;
     --bg-screen: 23 20 15;
     --bg-surface: 34 29 25;
     --bg-surface-alt: 42 36 32;
@@ -52,6 +53,7 @@
     --warning: 240 137 74;
     --warning-bg: 51 33 26;
     --accent-badge: 255 194 75;
+    --info: 110 190 255;
     --on-brand: 255 255 255;
     --on-accent: 13 11 9;
   }

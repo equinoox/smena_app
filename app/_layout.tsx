@@ -11,8 +11,7 @@ import {
 } from "@expo-google-fonts/plus-jakarta-sans";
 import { QueryClientProvider } from "@tanstack/react-query";
 import { StatusBar } from "expo-status-bar";
-import { Stack, useRouter, useSegments } from "expo-router";
-import { useEffect } from "react";
+import { Stack } from "expo-router";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
 import { SafeAreaProvider } from "react-native-safe-area-context";
 import { ErrorBoundary } from "@shared/components/ErrorBoundary";
@@ -23,41 +22,41 @@ import { AuthProvider, useAuth } from "@shared/providers/AuthProvider";
 import { ThemeProvider } from "@shared/providers/ThemeProvider";
 import { queryClient } from "@shared/lib/queryClient";
 
-// Redirects between onboarding / auth / tabs based on onboarding flag + session.
+// Gates onboarding / auth / tabs based on onboarding flag + session. Stack.Protected
+// (unlike the old manual router.replace effect) also purges history entries for a
+// screen the moment its guard flips false, so a signed-up user can't gesture/back
+// their way into onboarding or auth again.
+//
+// `completed` only decides whether onboarding is still reachable — it must NOT gate
+// (auth) too, since the sign-up screens (which live in (auth)) are exactly what flips
+// `completed` to true. Gating (auth) on `completed` would block the role-selection
+// buttons from ever navigating anywhere pre-signup. (auth) is reachable any time
+// there's no session, independent of onboarding status.
 function RootNavigator() {
   const { session, initializing } = useAuth();
   const { completed } = useOnboardingStatus();
-  const segments = useSegments();
-  const router = useRouter();
 
-  useEffect(() => {
-    if (initializing || completed === null) return;
+  // Hold render until we know both flags — avoids briefly mounting the wrong guard.
+  if (initializing || completed === null) return null;
 
-    const group = segments[0];
-    const inAuth = group === "(auth)";
-    const inOnboarding = group === "onboarding";
-
-    if (!completed) {
-      // Mid sign-up (picked a role, filling the form) counts as "not yet completed" but
-      // must not be bounced back to onboarding on every render — only a fresh app open
-      // outside onboarding/auth does that.
-      if (!inOnboarding && !inAuth) router.replace("/onboarding");
-      return;
-    }
-    if (!session) {
-      if (!inAuth && !inOnboarding) router.replace("/sign-in");
-      return;
-    }
-    // Signed in: keep the user out of onboarding/auth.
-    if (inAuth || inOnboarding) router.replace("/");
-  }, [session, initializing, completed, segments, router]);
+  const isSignedIn = !!session;
 
   return (
     <Stack screenOptions={{ headerShown: false }}>
-      <Stack.Screen name="onboarding" />
-      <Stack.Screen name="(auth)" />
-      <Stack.Screen name="(tabs)" />
-      <Stack.Screen name="listing/[id]" />
+      <Stack.Protected guard={!completed && !isSignedIn}>
+        <Stack.Screen name="onboarding" />
+      </Stack.Protected>
+
+      <Stack.Protected guard={!isSignedIn}>
+        <Stack.Screen name="(auth)" />
+      </Stack.Protected>
+
+      <Stack.Protected guard={isSignedIn}>
+        <Stack.Screen name="(tabs)" />
+        <Stack.Screen name="listing/[id]" />
+        <Stack.Screen name="profile-edit" />
+        <Stack.Screen name="listing-create" options={{ presentation: "modal" }} />
+      </Stack.Protected>
     </Stack>
   );
 }

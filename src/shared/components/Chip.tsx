@@ -10,11 +10,24 @@ type ChipVariant =
   | "urgent"
   | "outline";
 
+type ChipSize = "md" | "lg";
+
 type ChipProps = {
   label: string;
   variant?: ChipVariant;
+  size?: ChipSize;
   onPress?: () => void;
   leftIcon?: React.ReactNode;
+};
+
+const containerBySize: Record<ChipSize, string> = {
+  md: "px-3 py-1.5",
+  lg: "px-4 py-2.5",
+};
+
+const textBySize: Record<ChipSize, string> = {
+  md: "text-xs",
+  lg: "text-sm",
 };
 
 const containerByVariant: Record<ChipVariant, string> = {
@@ -38,20 +51,28 @@ const textByVariant: Record<ChipVariant, string> = {
 export function Chip({
   label,
   variant = "neutral",
+  size = "md",
   onPress,
   leftIcon,
 }: ChipProps) {
   const content = (
     <View className="flex-row items-center gap-1.5">
       {leftIcon}
-      <Text className={cn("font-sans-semibold text-xs", textByVariant[variant])}>
+      <Text
+        className={cn(
+          "font-sans-semibold",
+          textBySize[size],
+          textByVariant[variant],
+        )}
+      >
         {label}
       </Text>
     </View>
   );
 
   const base = cn(
-    "px-3 py-1.5 rounded-chip self-start",
+    "rounded-chip self-start",
+    containerBySize[size],
     containerByVariant[variant],
   );
 

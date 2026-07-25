@@ -16,7 +16,7 @@ export function Card({
   padded = true,
 }: CardProps) {
   const base = cn(
-    "bg-bg-surface border border-border-default rounded-card",
+    "bg-bg-surface border border-border-default rounded-card overflow-hidden",
     padded && "p-4",
     className,
   );

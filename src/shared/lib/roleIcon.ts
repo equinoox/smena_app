@@ -16,3 +16,14 @@ export const roleIcon: Record<WorkerRole, typeof Coffee> = {
   host: UsersThree,
   kitchen_helper: ForkKnife,
 };
+
+export const WORKER_ROLES: WorkerRole[] = [
+  "waiter",
+  "bartender",
+  "barista",
+  "cook",
+  "host",
+  "kitchen_helper",
+];
+
+export const EXPERIENCE_LEVELS = ["none", "1_3_years", "3plus_years"] as const;

@@ -1,6 +1,9 @@
-// Profile — role-aware: identity header, venue block (venues only), settings, logout.
+// Profile — identity header, settings, logout. Venue business info lives in its own
+// "venue-profile" tab now, not here (see VenueProfileScreen).
+import { useRouter } from "expo-router";
+import { PencilSimple } from "phosphor-react-native";
 import { useState } from "react";
-import { ScrollView, Text, View } from "react-native";
+import { Pressable, ScrollView, Text, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { Avatar } from "@shared/components/Avatar";
 import { Button } from "@shared/components/Button";
@@ -8,12 +11,14 @@ import { Chip } from "@shared/components/Chip";
 import { ConfirmationModal } from "@shared/components/ConfirmationModal";
 import { Loader } from "@shared/components/Loader";
 import { useAuth } from "@shared/hooks/useAuth";
+import { useThemeColors } from "@shared/hooks/useThemeColors";
 import { useUserRole } from "@shared/hooks/useUserRole";
 import { useTranslation } from "@shared/i18n/I18nProvider";
 import { ProfileSettings } from "@features/profile/components/ProfileSettings";
-import { VenueProfileSection } from "@features/profile/components/VenueProfileSection";
 
 export function ProfileScreen() {
+  const router = useRouter();
+  const colors = useThemeColors();
   const { t } = useTranslation();
   const { signOut } = useAuth();
   const { profile, role, isLoading } = useUserRole();
@@ -45,20 +50,26 @@ export function ProfileScreen() {
                 {profile.city}
               </Text>
             ) : null}
-            <View className="mt-2">
+            <View className="mt-2 flex-row items-center gap-2">
               <Chip
                 label={isVenue ? t("profile.venue") : t("profile.worker")}
                 variant="outline"
               />
+              {!isVenue ? (
+                <Pressable
+                  onPress={() => router.push("/profile-edit")}
+                  hitSlop={8}
+                  className="flex-row items-center gap-1"
+                >
+                  <PencilSimple size={13} color={colors.brand} />
+                  <Text className="font-sans-bold text-xs text-brand">
+                    {t("profile.editProfile")}
+                  </Text>
+                </Pressable>
+              ) : null}
             </View>
           </View>
         </View>
-
-        {isVenue ? (
-          <View className="mb-6">
-            <VenueProfileSection />
-          </View>
-        ) : null}
 
         <View className="mb-8">
           <ProfileSettings />

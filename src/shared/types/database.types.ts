@@ -10,6 +10,7 @@ export type WorkerRole =
   | "cook"
   | "host"
   | "kitchen_helper";
+export type ExperienceLevel = "none" | "1_3_years" | "3plus_years";
 export type EmploymentType = "fill_in" | "part_time" | "full_time";
 export type PayPeriod = "hour" | "shift" | "month";
 export type ListingStatus = "open" | "closed" | "filled";
@@ -31,6 +32,8 @@ export interface Database {
           avatar_url: string | null;
           bio: string | null;
           city: string | null;
+          worker_roles: WorkerRole[];
+          experience_level: ExperienceLevel | null;
           created_at: string;
           updated_at: string;
         };
@@ -42,6 +45,8 @@ export interface Database {
           avatar_url?: string | null;
           bio?: string | null;
           city?: string | null;
+          worker_roles?: WorkerRole[];
+          experience_level?: ExperienceLevel | null;
           created_at?: string;
           updated_at?: string;
         };
@@ -57,6 +62,8 @@ export interface Database {
           description: string | null;
           address: string | null;
           city: string | null;
+          pib: string | null;
+          phone: string | null;
           lat: number | null;
           lng: number | null;
           logo_url: string | null;
@@ -71,6 +78,8 @@ export interface Database {
           description?: string | null;
           address?: string | null;
           city?: string | null;
+          pib?: string | null;
+          phone?: string | null;
           lat?: number | null;
           lng?: number | null;
           logo_url?: string | null;
@@ -95,6 +104,7 @@ export interface Database {
           ends_at: string | null;
           is_urgent: boolean;
           status: ListingStatus;
+          requirements: string[];
           created_at: string;
           updated_at: string;
         };
@@ -112,6 +122,7 @@ export interface Database {
           ends_at?: string | null;
           is_urgent?: boolean;
           status?: ListingStatus;
+          requirements?: string[];
           created_at?: string;
           updated_at?: string;
         };
@@ -156,6 +167,22 @@ export interface Database {
         Update: Partial<Database["public"]["Tables"]["saved_listings"]["Insert"]>;
         Relationships: [];
       };
+      listing_views: {
+        Row: {
+          id: string;
+          listing_id: string;
+          viewer_id: string | null;
+          created_at: string;
+        };
+        Insert: {
+          id?: string;
+          listing_id: string;
+          viewer_id?: string | null;
+          created_at?: string;
+        };
+        Update: Partial<Database["public"]["Tables"]["listing_views"]["Insert"]>;
+        Relationships: [];
+      };
     };
     Views: Record<string, never>;
     Functions: Record<string, never>;
@@ -179,3 +206,4 @@ export type Listing = Database["public"]["Tables"]["listings"]["Row"];
 export type Application = Database["public"]["Tables"]["applications"]["Row"];
 export type SavedListing =
   Database["public"]["Tables"]["saved_listings"]["Row"];
+export type ListingView = Database["public"]["Tables"]["listing_views"]["Row"];

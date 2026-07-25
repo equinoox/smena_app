@@ -23,13 +23,15 @@
     "emailInvalid": "Unesite ispravan email",
     "passwordMin": "Lozinka mora imati najmanje 8 znakova",
     "passwordsDontMatch": "Lozinke se ne poklapaju",
-    "nameMin": "Unesite ime i prezime"
+    "nameMin": "Unesite ime i prezime",
+    "selectPosition": "Izaberite bar jednu poziciju"
   },
   "nav": {
     "home": "Početna",
     "listings": "Poslovi",
     "saved": "Sačuvano",
-    "profile": "Profil"
+    "profile": "Profil",
+    "venueProfile": "Profil lokala"
   },
   "onboarding": {
     "title": "Pronađi svoj posao",
@@ -52,39 +54,69 @@
     "phone": "Broj telefona",
     "phoneOptional": "Telefon (opciono)",
     "city": "Grad",
-    "workerSignUpTitle": "Napravi radnički profil",
+    "workerSignUpTitle": "Napravi svoj profil",
+    "workerSignUpSubtitle": "Lokali te pronalaze na osnovu ovih podataka.",
+    "position": "Pozicija",
+    "positionHint": "izaberi jednu ili više",
+    "experience": "Iskustvo",
     "venueSignUpTitle": "Registruj svoj lokal",
+    "venueDetailsTitle": "Podaci o lokalu",
+    "venueDetailsSubtitle": "Ovako će te radnici videti u oglasima.",
+    "venueLogo": "Logo lokala",
+    "addPhoto": "Dodaj fotografiju",
     "venueName": "Naziv lokala",
     "venueType": "Tip lokala",
+    "address": "Adresa",
+    "pib": "PIB",
+    "venuePhone": "Kontakt tel.",
+    "description": "Kratak opis",
     "alreadyHaveAccount": "Već imaš nalog?",
     "noAccount": "Nemaš nalog?",
     "createAccount": "Napravi nalog",
     "confirmEmail": "Proveri email da potvrdiš nalog, pa se prijavi."
   },
   "home": {
-    "greeting": "Zdravo",
-    "recommendedNearYou": "Preporučeno u blizini",
+    "greeting": "Ćao",
+    "greetingMorning": "Dobro jutro",
+    "greetingAfternoon": "Dobar dan",
+    "greetingEvening": "Dobro veče",
+    "recommendedNearYou": "Preporučeno blizu tebe",
     "urgent": "Hitno",
     "forWorkers": "Smene za tebe",
     "forVenues": "Tvoj lokal",
-    "yourListings": "Tvoji aktivni oglasi",
+    "yourListings": "Tvoji oglasi",
     "postShift": "Objavi smenu",
+    "postShiftTitle": "Objavi novi oglas",
+    "postShiftSubtitle": "Nađi radnika za smenu u par koraka",
+    "activeListings": "Aktivni oglasi",
+    "newApplications": "Prijave",
+    "viewsThisWeek": "Pregledi",
+    "candidates": "{count} kandidata",
     "applicationsReceived": "Pristigle prijave",
-    "empty": "Ovde još nema ničega"
+    "empty": "Ovde još nema ničega",
+    "searchPlaceholder": "Pretraži poziciju ili lokal"
   },
   "listings": {
     "title": "Oglasi",
     "browse": "Pregledaj smene",
     "filterAll": "Sve",
+    "filters": "Filteri",
+    "nearMe": "Blizu mene",
+    "activeCount": "{count} aktivnih",
     "applyNow": "Prijavi se",
     "applied": "Prijavljeno",
-    "viewDetails": "Detalji",
+    "viewDetails": "Detaljnije",
     "noResults": "Nema oglasa za izabrane filtere",
-    "urgent": "Hitno"
+    "urgent": "Hitno",
+    "venuePhotoPlaceholder": "Foto lokala",
+    "postedMinutesAgo": "Objavljeno pre {count} min",
+    "postedHoursAgo": "Objavljeno pre {count}h",
+    "postedYesterday": "Objavljeno juče",
+    "postedDaysAgo": "Objavljeno pre {count} dana"
   },
   "listingDetail": {
-    "about": "O ovoj smeni",
-    "requirements": "Uslovi",
+    "about": "Opis posla",
+    "requirements": "Traženo",
     "aboutVenue": "O lokalu",
     "pay": "Plata",
     "schedule": "Raspored",
@@ -93,7 +125,17 @@
     "saveListing": "Sačuvaj",
     "savedListing": "Sačuvano",
     "notFound": "Oglas nije pronađen",
-    "applicants": "{count} prijava"
+    "applicants": "{count} prijava",
+    "views": "{count} pregleda",
+    "workingHours": "Radno vreme",
+    "location": "Lokacija",
+    "callVenue": "Pozovi lokal",
+    "edit": "Izmeni",
+    "noPhone": "Lokal nema uneti kontakt telefon",
+    "deleteTitle": "Obriši oglas?",
+    "deleteMessage": "Ova akcija se ne može opozvati.",
+    "deleteConfirm": "Obriši",
+    "deleteSuccess": "Oglas je obrisan"
   },
   "saved": {
     "title": "Sačuvano",
@@ -102,6 +144,7 @@
   },
   "profile": {
     "title": "Profil",
+    "venueProfileTitle": "Profil lokala",
     "editProfile": "Izmeni profil",
     "myApplications": "Moje prijave",
     "myListings": "Moji oglasi",
@@ -124,8 +167,8 @@
   },
   "employment": {
     "fill_in": "Ispomoć",
-    "part_time": "Skraćeno",
-    "full_time": "Puno radno"
+    "part_time": "Honorarno",
+    "full_time": "Stalno"
   },
   "roles": {
     "waiter": "Konobar",
@@ -133,7 +176,12 @@
     "barista": "Barista",
     "cook": "Kuvar",
     "host": "Hostesa",
-    "kitchen_helper": "Pomoćni kuvar"
+    "kitchen_helper": "Pomoćni radnik"
+  },
+  "experience": {
+    "none": "Bez",
+    "1_3_years": "1-3 god.",
+    "3plus_years": "3+ god."
   },
   "venueTypes": {
     "cafe": "Kafić",
@@ -146,5 +194,31 @@
     "network": "Problem sa mrežom. Proverite konekciju.",
     "auth": "Prijava nije uspela. Proverite podatke.",
     "generic": "Nešto je pošlo naopako. Pokušajte ponovo."
+  },
+  "createListing": {
+    "title": "Novi oglas",
+    "editTitle": "Izmeni oglas",
+    "saveChanges": "Sačuvaj izmene",
+    "updateSuccess": "Oglas je izmenjen",
+    "positionQuestion": "Koja pozicija ti treba?",
+    "titleLabel": "Naslov oglasa",
+    "titleHint": "Kratko i jasno — ovo radnici prvo vide.",
+    "employmentLabel": "Tip angažmana",
+    "dateAndShift": "Datum i smena",
+    "compensation": "Nadoknada",
+    "optional": "opciono",
+    "descriptionLabel": "Opis posla",
+    "requirementsLabel": "Uslovi",
+    "addRequirement": "Dodaj uslov",
+    "requirementPlaceholder": "npr. Iskustvo sa šankom",
+    "markUrgent": "Označi kao hitno",
+    "markUrgentHint": "Oglas ide na vrh feeda radnika u blizini.",
+    "preview": "Pregled",
+    "publish": "Objavi oglas",
+    "selectDate": "Izaberi datum",
+    "selectTime": "Izaberi vreme",
+    "from": "Od",
+    "to": "Do",
+    "publishSuccess": "Oglas je objavljen"
   }
 }

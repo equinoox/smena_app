@@ -37,6 +37,23 @@ const textByType: Record<ToastType, string> = {
   info: "text-text-primary",
 };
 
+// Supabase/Postgrest errors are plain objects with a `message` field, not real
+// `Error` instances — `err instanceof Error` misses them and silently falls back
+// to the generic string. Handle both shapes so the toast shows the real reason.
+function extractErrorMessage(err: unknown): string | null {
+  if (err instanceof Error && err.message) return err.message;
+  if (
+    typeof err === "object" &&
+    err !== null &&
+    "message" in err &&
+    typeof (err as { message: unknown }).message === "string" &&
+    (err as { message: string }).message
+  ) {
+    return (err as { message: string }).message;
+  }
+  return null;
+}
+
 export function ToastProvider({ children }: { children: React.ReactNode }) {
   const insets = useSafeAreaInsets();
   const { t } = useTranslation();
@@ -59,9 +76,7 @@ export function ToastProvider({ children }: { children: React.ReactNode }) {
   // Route React Query failures through the toast layer.
   useEffect(() => {
     setQueryErrorHandler((err) => {
-      const message =
-        err instanceof Error && err.message ? err.message : t("errors.generic");
-      show(message, "error");
+      show(extractErrorMessage(err) ?? t("errors.generic"), "error");
     });
   }, [show, t]);
 

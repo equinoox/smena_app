@@ -1,5 +1,5 @@
 // Input — labelled text field with error state and icon slots. Presentational (pairs with RHF Controller).
-import { forwardRef, useState } from "react";
+import { forwardRef, useRef, useState } from "react";
 import {
   Text,
   TextInput,
@@ -8,6 +8,7 @@ import {
 } from "react-native";
 import { cn } from "@shared/lib/cn";
 import { useThemeColors } from "@shared/hooks/useThemeColors";
+import { useScrollIntoView, type MeasurableInstance } from "@shared/lib/scrollIntoView";
 
 type InputProps = TextInputProps & {
   label?: string;
@@ -18,10 +19,12 @@ type InputProps = TextInputProps & {
 
 export const Input = forwardRef<TextInput, InputProps>(function Input(
   { label, error, leftIcon, rightIcon, onFocus, onBlur, className, ...rest },
-  ref,
+  forwardedRef,
 ) {
   const [focused, setFocused] = useState(false);
   const colors = useThemeColors();
+  const scrollIntoView = useScrollIntoView();
+  const inputRef = useRef<TextInput>(null);
 
   return (
     <View className="gap-1.5 self-stretch">
@@ -33,21 +36,28 @@ export const Input = forwardRef<TextInput, InputProps>(function Input(
 
       <View
         className={cn(
-          "h-12 flex-row items-center gap-2 rounded-input border bg-bg-surface px-3",
+          "flex-row gap-2 rounded-input border bg-bg-surface px-3",
+          rest.multiline ? "h-24 items-start py-3" : "h-12 items-center",
           focused ? "border-brand" : "border-border-default",
           error && "border-warning",
         )}
       >
         {leftIcon}
         <TextInput
-          ref={ref}
+          ref={(node) => {
+            inputRef.current = node;
+            if (typeof forwardedRef === "function") forwardedRef(node);
+            else if (forwardedRef) forwardedRef.current = node;
+          }}
           placeholderTextColor={colors.textMuted}
+          textAlignVertical={rest.multiline ? "top" : "center"}
           className={cn(
             "flex-1 font-sans text-base text-text-primary",
             className,
           )}
           onFocus={(e) => {
             setFocused(true);
+            scrollIntoView?.(inputRef.current as unknown as MeasurableInstance | null);
             onFocus?.(e);
           }}
           onBlur={(e) => {

@@ -1,9 +1,11 @@
 // Central React Query key factory so caches stay consistent across features.
-import type { EmploymentType } from "@shared/types/database.types";
+import type { EmploymentType, WorkerRole } from "@shared/types/database.types";
 
 export type ListingFilters = {
   employmentType?: EmploymentType | "all";
   city?: string;
+  roleNeeded?: WorkerRole;
+  search?: string;
 };
 
 export const queryKeys = {
@@ -17,4 +19,9 @@ export const queryKeys = {
     ["applications", "worker", userId] as const,
   listingApplications: (listingId: string) =>
     ["applications", "listing", listingId] as const,
+  venueStats: (venueId: string) => ["venueStats", venueId] as const,
+  listingCounts: (listingIds: string[]) =>
+    ["listingCounts", [...listingIds].sort()] as const,
+  openListingsCount: () => ["listings", "openCount"] as const,
+  listingViews: (listingId: string) => ["views", "listing", listingId] as const,
 };

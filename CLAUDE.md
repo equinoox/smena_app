@@ -37,12 +37,20 @@ restaurants, clubs, bakeries) that need shift coverage.
   No logic or JSX beyond that. Exceptions: `_layout.tsx` files (navigators + root providers +
   redirect logic).
 - Feature code lives in `src/features/<feature>/{screens,components,hooks,services,validation,store}`.
-- **Features never import another feature's internals.** Cross-cutting code goes in `src/shared`
-  (`components`, `hooks`, `lib`, `providers`, `i18n`, `types`). If two features need it, it's shared.
+  Only create the sub-folders a feature actually needs — don't scaffold empty ones. Never put
+  feature code directly under `src/features/<feature>/` outside these sub-folders.
+- **Features never import another feature's internals** (no `src/features/a/... ` imports from
+  inside `src/features/b`). Cross-cutting code goes in `src/shared`
+  (`components`, `hooks`, `lib`, `providers`, `i18n`, `types`). If two features need it, it's shared —
+  move it the first time a second feature needs it, don't pre-emptively shared-ify on a guess.
+- A feature communicates with another feature (if ever needed) only through a route (navigation)
+  or through `src/shared` — never through a direct import or a shared mutable module.
 - Role-sensitive screens are **one route** that renders a `WorkerXView` / `VenueXView` based on
   `useUserRole()` — never duplicate routes per role.
 - Prefer small, reusable components (`Button`, `Card`, `Chip`, `Input`, `ListingCard`,
   `ListingList`, `EmptyState`, …) over one-off markup.
+- Before adding a new file, check whether it belongs in an existing feature folder, `src/shared`,
+  or is genuinely a new feature — don't invent new top-level folders or naming conventions.
 
 ### Data & state
 - Server data → TanStack Query with keys from `src/shared/lib/queryKeys.ts`. Query/mutation
@@ -58,6 +66,31 @@ restaurants, clubs, bakeries) that need shift coverage.
 
 ### Errors
 - `ErrorBoundary` wraps the app. Surface recoverable/service errors with `useToast()`.
+
+### Responsiveness — every screen, every device
+- Screens must work across phone sizes (small Android to large Pro Max) **and** tablets, in both
+  orientations where the OS allows rotation. Never hardcode a layout for one mockup dimension.
+- Use `useResponsive()` (`src/shared/lib/responsive.ts`) for scaling spacing, font size, and
+  geometry. Never paste fixed pixel values copied from a design mockup.
+- Prefer flexible layouts (`flex`, `gap`, `%`-based sizing, NativeWind responsive-ish patterns)
+  over fixed widths/heights. Reserve fixed pixel `style` values for cases that truly can't be
+  relative (see Styling rule above).
+- Long lists/content must scroll safely with the keyboard and safe-area insets on all device
+  sizes; test that nothing clips on the smallest and largest supported screens.
+
+### Code quality & coupling
+- Keep logic simple and linear. If a function needs more than a couple of nested
+  conditionals/branches to explain, split it or extract named helpers instead of piling on
+  complexity.
+- No premature abstractions, config flags, or generic "just in case" layers. Solve the problem
+  in front of you; generalize only when a second real caller shows up.
+- Keep functions and components small and single-purpose. A screen component orchestrates;
+  business logic belongs in hooks/services, not inlined in JSX.
+- Minimize coupling everywhere, not just across features: a component shouldn't reach into
+  another component's internals, and a hook/service shouldn't depend on UI state. Depend on
+  the narrowest thing you actually need (a prop, not a whole store; a type, not a whole module).
+- If two features start needing the same logic, extract it to `src/shared` once — don't
+  duplicate it and don't reach across features to reuse it.
 
 ## Conventions
 - All code and comments in English.

@@ -6,6 +6,7 @@ import { Pressable, Text, View } from "react-native";
 import { Button } from "@shared/components/Button";
 import { ControlledInput } from "@shared/components/ControlledInput";
 import { Screen } from "@shared/components/Screen";
+import { useOnboardingStatus } from "@shared/hooks/useOnboardingStatus";
 import { useTranslation } from "@shared/i18n/I18nProvider";
 import {
   signInSchema,
@@ -16,6 +17,7 @@ import { useSignIn } from "@features/auth/hooks/useAuthMutations";
 export function SignInScreen() {
   const router = useRouter();
   const { t } = useTranslation();
+  const { complete } = useOnboardingStatus();
   const signIn = useSignIn();
 
   const { control, handleSubmit } = useForm<SignInValues>({
@@ -23,7 +25,15 @@ export function SignInScreen() {
     defaultValues: { email: "", password: "" },
   });
 
-  const onSubmit = handleSubmit((values) => signIn.mutate(values));
+  const onSubmit = handleSubmit((values) =>
+    signIn.mutate(values, {
+      // A successful sign-in (e.g. a returning user, or any account not created
+      // through this device's own sign-up flow) also means onboarding never needs
+      // to show again here — otherwise logging out would re-expose it (`completed`
+      // would still be false since only the sign-up screens used to set it).
+      onSuccess: () => void complete(),
+    }),
+  );
 
   return (
     <Screen scroll className="justify-center py-10">
