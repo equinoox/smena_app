@@ -26,7 +26,14 @@
     "plugins": [
       "expo-router",
       "expo-font",
-      "expo-secure-store"
+      "expo-secure-store",
+      [
+        "expo-image-picker",
+        {
+          "photosPermission": "Allow Smena to access your photos so you can add a profile or venue picture.",
+          "cameraPermission": false
+        }
+      ]
     ],
     "experiments": {
       "typedRoutes": true

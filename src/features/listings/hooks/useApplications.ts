@@ -5,6 +5,7 @@ import { queryKeys } from "@shared/lib/queryKeys";
 import {
   applyToListing,
   countListingApplications,
+  fetchListingApplications,
   fetchMyApplication,
 } from "@features/listings/services/applicationsService";
 
@@ -38,6 +39,14 @@ export function useListingApplicationsCount(listingId: string) {
   return useQuery({
     queryKey: queryKeys.listingApplications(listingId),
     queryFn: () => countListingApplications(listingId),
+    enabled: !!listingId,
+  });
+}
+
+export function useListingApplications(listingId: string) {
+  return useQuery({
+    queryKey: queryKeys.listingApplicationsList(listingId),
+    queryFn: () => fetchListingApplications(listingId),
     enabled: !!listingId,
   });
 }

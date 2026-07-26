@@ -1,6 +1,7 @@
 // Applications data access — apply to a listing, check own application, count per listing.
 import { supabase } from "@shared/lib/supabase";
 import type { Application } from "@shared/types/database.types";
+import type { ApplicationWithWorker } from "@shared/types/domain.types";
 
 export async function applyToListing(
   listingId: string,
@@ -29,6 +30,19 @@ export async function fetchMyApplication(
     .maybeSingle();
   if (error) throw error;
   return data ?? null;
+}
+
+// Full applicant list for a listing (venue-facing), joined with each worker's profile.
+export async function fetchListingApplications(
+  listingId: string,
+): Promise<ApplicationWithWorker[]> {
+  const { data, error } = await supabase
+    .from("applications")
+    .select("*, worker:profiles(*)")
+    .eq("listing_id", listingId)
+    .order("created_at", { ascending: false });
+  if (error) throw error;
+  return (data ?? []) as unknown as ApplicationWithWorker[];
 }
 
 export async function countListingApplications(

@@ -68,3 +68,21 @@ export function formatPostedAt(createdAtIso: string, t: Translate): string {
   if (days === 1) return t("listings.postedYesterday");
   return t("listings.postedDaysAgo", { count: days });
 }
+
+// "Sačuvano pre 2h" / "Sačuvano juče" / "Sačuvano pre 3 dana" — relative save age.
+export function formatSavedAt(savedAtIso: string, t: Translate): string {
+  const minutes = Math.max(
+    0,
+    Math.floor((Date.now() - new Date(savedAtIso).getTime()) / 60000),
+  );
+  if (minutes < 60) {
+    return t("saved.savedMinutesAgo", { count: minutes });
+  }
+  const hours = Math.floor(minutes / 60);
+  if (hours < 24) {
+    return t("saved.savedHoursAgo", { count: hours });
+  }
+  const days = Math.floor(hours / 24);
+  if (days === 1) return t("saved.savedYesterday");
+  return t("saved.savedDaysAgo", { count: days });
+}

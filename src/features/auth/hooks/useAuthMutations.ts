@@ -1,6 +1,7 @@
 // Auth mutations (sign-in / sign-up). Errors surface via the global React Query toast handler.
 // On success the auth state change updates the session and the root layout redirects.
-import { useMutation } from "@tanstack/react-query";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { queryKeys } from "@shared/lib/queryKeys";
 import {
   signInWithEmail,
   signUpVenue,
@@ -13,17 +14,39 @@ export function useSignIn() {
   return useMutation({
     mutationFn: (vars: { email: string; password: string }) =>
       signInWithEmail(vars.email, vars.password),
+    // Shown inline on the sign-in screen instead of the global error toast.
+    meta: { suppressToast: true },
   });
 }
 
 export function useSignUpWorker() {
+  const client = useQueryClient();
+
   return useMutation({
     mutationFn: (input: WorkerSignUpInput) => signUpWorker(input),
+    onSuccess: (data) => {
+      // Seed the profile cache with the row we just created — the worker landing on
+      // their own Profile tab right after signing up shouldn't have to wait for a
+      // fresh network fetch of data we already have in hand.
+      if (data.profile) {
+        client.setQueryData(queryKeys.profile(data.profile.id), data.profile);
+      }
+    },
   });
 }
 
 export function useSignUpVenue() {
+  const client = useQueryClient();
+
   return useMutation({
     mutationFn: (input: VenueSignUpInput) => signUpVenue(input),
+    onSuccess: (data) => {
+      // Same idea as useSignUpWorker — seed the venue (and its empty listings list)
+      // so "Profil lokala" renders instantly instead of waiting on a first fetch.
+      if (data.venue) {
+        client.setQueryData(queryKeys.myVenue(data.venue.owner_id), data.venue);
+        client.setQueryData(queryKeys.venueListingsByOwner(data.venue.owner_id), []);
+      }
+    },
   });
 }

@@ -5,7 +5,6 @@
 import { useEffect, useState } from "react";
 import { useLocalSearchParams, useRouter } from "expo-router";
 import {
-  BookmarkSimple,
   CaretLeft,
   ChatCircle,
   CheckCircle,
@@ -34,7 +33,10 @@ import { Button } from "@shared/components/Button";
 import { Chip } from "@shared/components/Chip";
 import { ConfirmationModal } from "@shared/components/ConfirmationModal";
 import { EmptyState } from "@shared/components/EmptyState";
+import { InfoCard } from "@shared/components/InfoCard";
 import { Loader } from "@shared/components/Loader";
+import { SaveToggle } from "@shared/components/SaveToggle";
+import { SmartCoverImage } from "@shared/components/SmartCoverImage";
 import { useAuth } from "@shared/hooks/useAuth";
 import { useMyVenue } from "@shared/hooks/useMyVenue";
 import { useSavedIds, useToggleSaved } from "@shared/hooks/useSaved";
@@ -62,30 +64,6 @@ import {
   useDeleteListing,
   useListing,
 } from "@features/listings/hooks/useListings";
-
-function InfoCard({
-  icon,
-  label,
-  value,
-}: {
-  icon: React.ReactNode;
-  label: string;
-  value: string;
-}) {
-  return (
-    <View className="flex-1 rounded-input border border-border-default bg-bg-surface p-3">
-      <View className="flex-row items-center gap-1.5">
-        {icon}
-        <Text className="font-sans-medium text-xs text-text-tertiary">
-          {label}
-        </Text>
-      </View>
-      <Text className="mt-1 font-sans-bold text-base text-text-primary" numberOfLines={1}>
-        {value}
-      </Text>
-    </View>
-  );
-}
 
 function Section({ title, children }: { title: string; children: React.ReactNode }) {
   return (
@@ -147,6 +125,11 @@ export function ListingDetailScreen() {
   const hasApplied = !!myApplication.data;
   const isSaved = savedIds.has(listing.id);
   const venuePhone = listing.venue?.phone;
+  // `venue.city` is never collected at sign-up/edit — `address` is what's actually
+  // set, so that's the real location to show here.
+  const venueLocation = [listing.venue?.address, listing.venue?.city]
+    .filter(Boolean)
+    .join(", ");
 
   const onApply = () =>
     apply.mutate(undefined, {
@@ -185,7 +168,14 @@ export function ListingDetailScreen() {
         contentContainerClassName="pb-6"
         showsVerticalScrollIndicator={false}
       >
-        <View className="h-64 w-full items-end justify-start bg-bg-surface-alt p-3">
+        <View style={{ aspectRatio: 1.8 }} className="w-full bg-bg-surface-alt">
+          {listing.venue?.cover_photo_url ? (
+            <SmartCoverImage
+              uri={listing.venue.cover_photo_url}
+              aspectRatio={1.8}
+              style={{ position: "absolute", top: 0, left: 0, right: 0, bottom: 0 }}
+            />
+          ) : null}
           <Pressable
             onPress={() => router.back()}
             hitSlop={10}
@@ -194,24 +184,20 @@ export function ListingDetailScreen() {
             <CaretLeft size={20} color={colors.textPrimary} />
           </Pressable>
           {!isVenue ? (
-            <Pressable
+            <SaveToggle
+              saved={isSaved}
               onPress={() =>
                 toggleSaved.mutate({ listingId: listing.id, saved: isSaved })
               }
-              hitSlop={10}
-              className="h-10 w-10 items-center justify-center rounded-input bg-bg-canvas/70"
-            >
-              <BookmarkSimple
-                size={20}
-                weight={isSaved ? "fill" : "regular"}
-                color={isSaved ? colors.brand : colors.textPrimary}
-              />
-            </Pressable>
-          ) : (
-            <Text className="font-sans-bold text-[10px] tracking-widest text-text-muted">
+              size={20}
+              inactiveColor={colors.textPrimary}
+              className="absolute right-3 top-3 h-10 w-10 items-center justify-center rounded-input bg-bg-canvas/70"
+            />
+          ) : !listing.venue?.cover_photo_url ? (
+            <Text className="absolute right-3 top-3 font-sans-bold text-[10px] tracking-widest text-text-muted">
               {t("listings.venuePhotoPlaceholder").toUpperCase()}
             </Text>
-          )}
+          ) : null}
         </View>
 
         <View className="px-4">
@@ -227,14 +213,16 @@ export function ListingDetailScreen() {
               </View>
             )}
             <View className="min-w-0 flex-1 justify-center">
-              <Text className="font-sans-bold text-lg text-text-primary" numberOfLines={1}>
-                {listing.venue?.name ?? ""}
-              </Text>
-              {listing.venue?.venue_type ? (
-                <Text className="mt-0.5 font-sans-semibold text-sm text-text-tertiary">
-                  {t(`venueTypes.${listing.venue.venue_type}` as TranslationKey)}
+              <View className="self-start rounded-input bg-bg-canvas/80 px-3 py-2">
+                <Text className="font-sans-bold text-lg text-text-primary" numberOfLines={1}>
+                  {listing.venue?.name ?? ""}
                 </Text>
-              ) : null}
+                {listing.venue?.venue_type ? (
+                  <Text className="mt-0.5 font-sans-semibold text-sm text-text-tertiary">
+                    {t(`venueTypes.${listing.venue.venue_type}` as TranslationKey)}
+                  </Text>
+                ) : null}
+              </View>
             </View>
           </View>
 
@@ -265,14 +253,22 @@ export function ListingDetailScreen() {
                   {t("listingDetail.views", { count: viewCount.data ?? 0 })}
                 </Text>
               </View>
-              <View className="flex-1 flex-row items-center gap-2 rounded-input border border-border-default bg-bg-surface p-3">
+              <Pressable
+                onPress={() =>
+                  router.push({
+                    pathname: "/listing-applicants/[id]",
+                    params: { id: listing.id },
+                  })
+                }
+                className="flex-1 flex-row items-center gap-2 rounded-input border border-border-default bg-bg-surface p-3"
+              >
                 <Users size={16} color={colors.brand} />
                 <Text className="font-sans-bold text-sm text-text-primary">
                   {t("listingDetail.applicants", {
                     count: applicantCount.data ?? 0,
                   })}
                 </Text>
-              </View>
+              </Pressable>
             </View>
           ) : null}
 
@@ -293,7 +289,7 @@ export function ListingDetailScreen() {
               <InfoCard
                 icon={<MapPin size={14} color={colors.brand} />}
                 label={t("listingDetail.location")}
-                value={listing.venue?.city ?? "—"}
+                value={venueLocation || "—"}
               />
               <InfoCard
                 icon={<Users size={14} color={colors.brand} />}
@@ -333,9 +329,9 @@ export function ListingDetailScreen() {
           <>
             <Pressable
               onPress={() => setDeleteConfirmVisible(true)}
-              className="h-12 w-12 items-center justify-center rounded-button border border-warning bg-warning-bg"
+              className="h-12 w-12 items-center justify-center rounded-button border border-danger bg-danger-bg"
             >
-              <TrashSimple size={20} color={colors.warning} />
+              <TrashSimple size={20} color={colors.danger} />
             </Pressable>
             <View className="flex-1">
               <Button

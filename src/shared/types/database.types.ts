@@ -34,6 +34,8 @@ export interface Database {
           city: string | null;
           worker_roles: WorkerRole[];
           experience_level: ExperienceLevel | null;
+          skills: string[];
+          is_available: boolean;
           created_at: string;
           updated_at: string;
         };
@@ -47,6 +49,8 @@ export interface Database {
           city?: string | null;
           worker_roles?: WorkerRole[];
           experience_level?: ExperienceLevel | null;
+          skills?: string[];
+          is_available?: boolean;
           created_at?: string;
           updated_at?: string;
         };
@@ -67,6 +71,7 @@ export interface Database {
           lat: number | null;
           lng: number | null;
           logo_url: string | null;
+          cover_photo_url: string | null;
           created_at: string;
           updated_at: string;
         };
@@ -83,6 +88,7 @@ export interface Database {
           lat?: number | null;
           lng?: number | null;
           logo_url?: string | null;
+          cover_photo_url?: string | null;
           created_at?: string;
           updated_at?: string;
         };

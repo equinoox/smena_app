@@ -4,19 +4,29 @@ import type { ListingWithVenue } from "@shared/types/domain.types";
 
 const VENUE_SELECT = "id, name, venue_type, city, logo_url, lat, lng";
 
+// A saved listing, tagged with when it was bookmarked (for the Saved screen's
+// "Saved 2h ago" label — distinct from the listing's own posted-at timestamp).
+export type SavedListing = ListingWithVenue & { savedAt: string };
+
 export async function fetchSavedListings(
   workerId: string,
-): Promise<ListingWithVenue[]> {
+): Promise<SavedListing[]> {
   const { data, error } = await supabase
     .from("saved_listings")
-    .select(`listing:listings(*, venue:venues(${VENUE_SELECT}))`)
+    .select(`created_at, listing:listings(*, venue:venues(${VENUE_SELECT}))`)
     .eq("worker_id", workerId)
     .order("created_at", { ascending: false });
   if (error) throw error;
 
   return (data ?? [])
-    .map((row) => (row as unknown as { listing: ListingWithVenue | null }).listing)
-    .filter((listing): listing is ListingWithVenue => listing != null);
+    .map((row) => {
+      const typed = row as unknown as {
+        created_at: string;
+        listing: ListingWithVenue | null;
+      };
+      return typed.listing ? { ...typed.listing, savedAt: typed.created_at } : null;
+    })
+    .filter((listing): listing is SavedListing => listing != null);
 }
 
 export async function fetchSavedIds(workerId: string): Promise<string[]> {

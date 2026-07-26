@@ -1,5 +1,8 @@
-// Card — surface container with border + radius. Optional press behavior for tappable cards.
+// Card — surface container with border + radius. Optional press behavior for tappable cards,
+// which get a subtle scale-down while held (see usePressScale).
 import { Pressable, View } from "react-native";
+import Animated from "react-native-reanimated";
+import { usePressScale } from "@shared/hooks/usePressScale";
 import { cn } from "@shared/lib/cn";
 
 type CardProps = {
@@ -15,6 +18,8 @@ export function Card({
   className,
   padded = true,
 }: CardProps) {
+  const press = usePressScale();
+
   const base = cn(
     "bg-bg-surface border border-border-default rounded-card overflow-hidden",
     padded && "p-4",
@@ -23,13 +28,17 @@ export function Card({
 
   if (onPress) {
     return (
-      <Pressable
-        onPress={onPress}
-        className={cn(base, "active:opacity-90")}
-        accessibilityRole="button"
-      >
-        {children}
-      </Pressable>
+      <Animated.View style={press.style}>
+        <Pressable
+          onPress={onPress}
+          onPressIn={press.onPressIn}
+          onPressOut={press.onPressOut}
+          className={base}
+          accessibilityRole="button"
+        >
+          {children}
+        </Pressable>
+      </Animated.View>
     );
   }
 

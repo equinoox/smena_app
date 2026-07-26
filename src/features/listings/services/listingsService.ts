@@ -9,7 +9,8 @@ import type {
 } from "@shared/types/database.types";
 import type { ListingWithVenue } from "@shared/types/domain.types";
 
-const VENUE_SELECT = "id, name, venue_type, city, logo_url, lat, lng, phone";
+const VENUE_SELECT =
+  "id, name, venue_type, city, address, logo_url, cover_photo_url, lat, lng, phone";
 
 export async function fetchListings(
   filters: ListingFilters,
@@ -54,7 +55,7 @@ export async function fetchListingById(
 ): Promise<ListingWithVenue | null> {
   const { data, error } = await supabase
     .from("listings")
-    .select(`*, venue:venues(${VENUE_SELECT}, description, address)`)
+    .select(`*, venue:venues(${VENUE_SELECT}, description)`)
     .eq("id", id)
     .maybeSingle();
   if (error) throw error;
@@ -68,6 +69,22 @@ export async function fetchVenueListings(
     .from("listings")
     .select(`*, venue:venues(${VENUE_SELECT})`)
     .eq("venue_id", venueId)
+    .order("created_at", { ascending: false });
+  if (error) throw error;
+  return (data ?? []) as unknown as ListingWithVenue[];
+}
+
+// Same as fetchVenueListings, but keyed by the venue's owner id instead of the venue's
+// own id — lets the venue-profile screen fetch its venue and that venue's listings in
+// parallel (both keyed off the signed-in user) instead of waiting for the venue fetch
+// to resolve first before it even knows which venue_id to filter on.
+export async function fetchVenueListingsByOwner(
+  ownerId: string,
+): Promise<ListingWithVenue[]> {
+  const { data, error } = await supabase
+    .from("listings")
+    .select(`*, venue:venues!inner(${VENUE_SELECT})`)
+    .eq("venue.owner_id", ownerId)
     .order("created_at", { ascending: false });
   if (error) throw error;
   return (data ?? []) as unknown as ListingWithVenue[];

@@ -18,6 +18,7 @@ type Palette = {
   textFaint: string;
   success: string;
   warning: string;
+  danger: string;
   accentBadge: string;
   info: string;
   onBrand: string;
@@ -42,6 +43,7 @@ export const themeColors: { light: Palette; dark: Palette } = {
     textFaint: "#A79F92",
     success: "#2E9A5B",
     warning: "#C25E1F",
+    danger: "#C82626",
     accentBadge: "#E8991A",
     info: "#1E82C8",
     onBrand: "#FFFFFF",
@@ -64,6 +66,7 @@ export const themeColors: { light: Palette; dark: Palette } = {
     textFaint: "#6E685E",
     success: "#63C489",
     warning: "#F0894A",
+    danger: "#F05A5A",
     accentBadge: "#FFC24B",
     info: "#6EBEFF",
     onBrand: "#FFFFFF",

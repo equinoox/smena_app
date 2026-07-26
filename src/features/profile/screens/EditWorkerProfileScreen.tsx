@@ -6,6 +6,7 @@ import { useState } from "react";
 import { Pressable, Text, View } from "react-native";
 import { Button } from "@shared/components/Button";
 import { Chip } from "@shared/components/Chip";
+import { ImagePickerField } from "@shared/components/ImagePickerField";
 import { Loader } from "@shared/components/Loader";
 import { Screen } from "@shared/components/Screen";
 import { useThemeColors } from "@shared/hooks/useThemeColors";
@@ -27,6 +28,7 @@ export function EditWorkerProfileScreen() {
 
   const [positions, setPositions] = useState<WorkerRole[]>([]);
   const [experienceLevel, setExperienceLevel] = useState<ExperienceLevel | null>(null);
+  const [avatarUri, setAvatarUri] = useState<string | undefined>(undefined);
   const [initialized, setInitialized] = useState(false);
 
   if (!isLoading && !initialized && profile) {
@@ -48,14 +50,14 @@ export function EditWorkerProfileScreen() {
       return;
     }
     if (!experienceLevel) {
-      toast.error(t("validation.required"));
+      toast.error(t("validation.selectExperience"));
       return;
     }
     update.mutate(
-      { workerRoles: positions, experienceLevel },
+      { workerRoles: positions, experienceLevel, avatarUri },
       {
         onSuccess: () => {
-          toast.success(t("common.save"));
+          toast.success(t("common.saveSuccess"));
           router.back();
         },
       },
@@ -75,6 +77,17 @@ export function EditWorkerProfileScreen() {
       <Text className="mt-6 font-sans-extrabold text-2xl text-text-primary">
         {t("profile.editProfile")}
       </Text>
+
+      <View className="mt-6">
+        <ImagePickerField
+          value={avatarUri}
+          existingUri={profile?.avatar_url}
+          onChange={setAvatarUri}
+          label={t("auth.profilePicture")}
+          recommendedSize={t("imagePicker.squareSizeHint")}
+          aspect={[1, 1]}
+        />
+      </View>
 
       <View className="mt-6 gap-2">
         <View className="flex-row items-baseline gap-1.5">

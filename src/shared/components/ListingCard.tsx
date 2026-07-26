@@ -2,22 +2,18 @@
 // "photo" (venue photo banner, default) and "compact" (role icon, tighter — worker
 // listings browse). Both share the same labeling/formatting logic below.
 import { useRouter } from "expo-router";
-import {
-  ArrowRight,
-  BookmarkSimple,
-  Clock,
-  Lightning,
-  MapPin,
-} from "phosphor-react-native";
-import { Image as RNImage, Pressable, Text, View } from "react-native";
+import { ArrowRight, Clock, Lightning, MapPin } from "phosphor-react-native";
+import { Image as RNImage, Text, View } from "react-native";
 import { Avatar } from "@shared/components/Avatar";
 import { Card } from "@shared/components/Card";
 import { Chip } from "@shared/components/Chip";
+import { SaveToggle } from "@shared/components/SaveToggle";
 import { useThemeColors } from "@shared/hooks/useThemeColors";
 import { useTranslation, type TranslationKey } from "@shared/i18n/I18nProvider";
 import {
   employmentChipVariant,
   formatPostedAt,
+  formatSavedAt,
   formatTimeRange,
 } from "@shared/lib/format";
 import { roleIcon } from "@shared/lib/roleIcon";
@@ -26,6 +22,9 @@ import type { ListingWithVenue } from "@shared/types/domain.types";
 type ListingCardProps = {
   listing: ListingWithVenue;
   saved?: boolean;
+  // When set (Saved screen only), the bottom-left timestamp shows "Saved Xh ago"
+  // instead of the listing's own posted-at date.
+  savedAt?: string;
   onToggleSave?: () => void;
   variant?: "photo" | "compact";
   // Preview usage (e.g. the create-listing form) renders a card for a listing that
@@ -36,6 +35,7 @@ type ListingCardProps = {
 export function ListingCard({
   listing,
   saved,
+  savedAt,
   onToggleSave,
   variant = "photo",
   disableNavigation,
@@ -50,6 +50,11 @@ export function ListingCard({
   );
   const time = formatTimeRange(listing.starts_at, listing.ends_at, language);
   const title = listing.title || roleLabel;
+  // `venue.city` is never collected at sign-up/edit — `address` is what's actually set.
+  const venueLocation = listing.venue?.address || listing.venue?.city;
+  const ageLabel = savedAt
+    ? formatSavedAt(savedAt, t)
+    : formatPostedAt(listing.created_at, t);
   const onPress = disableNavigation
     ? undefined
     : () => router.push(`/listing/${listing.id}`);
@@ -79,13 +84,7 @@ export function ListingCard({
             </View>
           </View>
           {onToggleSave ? (
-            <Pressable onPress={onToggleSave} hitSlop={10} className="pl-2">
-              <BookmarkSimple
-                size={19}
-                weight={saved ? "fill" : "regular"}
-                color={saved ? colors.brand : colors.textMuted}
-              />
-            </Pressable>
+            <SaveToggle saved={!!saved} onPress={onToggleSave} className="pl-2" />
           ) : null}
         </View>
 
@@ -94,6 +93,14 @@ export function ListingCard({
             label={employmentLabel}
             variant={employmentChipVariant(listing.employment_type)}
           />
+          {venueLocation ? (
+            <View className="flex-row items-center gap-1 rounded-chip bg-bg-surface-alt px-2.5 py-1.5">
+              <MapPin size={13} weight="fill" color={colors.textMuted} />
+              <Text className="font-sans-semibold text-xs text-text-secondary">
+                {venueLocation}
+              </Text>
+            </View>
+          ) : null}
           {time ? (
             <View className="flex-row items-center gap-1 rounded-chip bg-bg-surface-alt px-2.5 py-1.5">
               <Clock size={13} color={colors.textMuted} />
@@ -104,19 +111,8 @@ export function ListingCard({
           ) : null}
         </View>
 
-        {listing.venue?.city ? (
-          <View className="mt-2 flex-row items-center gap-1">
-            <MapPin size={13} weight="fill" color={colors.textMuted} />
-            <Text className="font-sans-semibold text-xs text-text-tertiary">
-              {listing.venue.city}
-            </Text>
-          </View>
-        ) : null}
-
         <View className="mt-3 flex-row items-center justify-between border-t border-border-default pt-3">
-          <Text className="font-sans text-xs text-text-muted">
-            {formatPostedAt(listing.created_at, t)}
-          </Text>
+          <Text className="font-sans text-xs text-text-muted">{ageLabel}</Text>
           <View className="flex-row items-center gap-1.5">
             <Text className="font-sans-bold text-sm text-brand">
               {t("listings.viewDetails")}
@@ -131,9 +127,9 @@ export function ListingCard({
   return (
     <Card onPress={onPress} padded={false} className="mx-1.5">
       <View className="h-40 w-full items-center justify-center bg-bg-surface-alt">
-        {listing.venue?.logo_url ? (
+        {listing.venue?.cover_photo_url ? (
           <RNImage
-            source={{ uri: listing.venue.logo_url }}
+            source={{ uri: listing.venue.cover_photo_url }}
             resizeMode="cover"
             className="h-40 w-full"
           />
@@ -147,8 +143,7 @@ export function ListingCard({
             <Chip
               label={t("listings.urgent")}
               variant="urgent"
-              size="lg"
-              leftIcon={<Lightning size={14} weight="fill" color={colors.onAccent} />}
+              leftIcon={<Lightning size={12} weight="fill" color={colors.onAccent} />}
             />
           </View>
         ) : null}
@@ -166,13 +161,7 @@ export function ListingCard({
             </Text>
           </View>
           {onToggleSave ? (
-            <Pressable onPress={onToggleSave} hitSlop={10} className="pl-2">
-              <BookmarkSimple
-                size={19}
-                weight={saved ? "fill" : "regular"}
-                color={saved ? colors.brand : colors.textMuted}
-              />
-            </Pressable>
+            <SaveToggle saved={!!saved} onPress={onToggleSave} className="pl-2" />
           ) : null}
         </View>
 
@@ -188,11 +177,11 @@ export function ListingCard({
             label={employmentLabel}
             variant={employmentChipVariant(listing.employment_type)}
           />
-          {listing.venue?.city ? (
+          {venueLocation ? (
             <View className="flex-row items-center gap-1 rounded-chip bg-bg-surface-alt px-2.5 py-1.5">
               <MapPin size={13} weight="fill" color={colors.textMuted} />
               <Text className="font-sans-semibold text-xs text-text-secondary">
-                {listing.venue.city}
+                {venueLocation}
               </Text>
             </View>
           ) : null}
@@ -207,9 +196,7 @@ export function ListingCard({
         </View>
 
         <View className="mt-3 flex-row items-center justify-between border-t border-border-default pt-3">
-          <Text className="font-sans text-xs text-text-muted">
-            {formatPostedAt(listing.created_at, t)}
-          </Text>
+          <Text className="font-sans text-xs text-text-muted">{ageLabel}</Text>
           <View className="flex-row items-center gap-1.5">
             <Text className="font-sans-bold text-sm text-brand">
               {t("listings.viewDetails")}

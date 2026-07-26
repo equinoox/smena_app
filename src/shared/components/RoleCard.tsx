@@ -1,4 +1,4 @@
-// RoleCard — tap-to-proceed worker/venue option on onboarding (icon, text, arrow).
+// RoleCard — tap-to-proceed worker/venue option (icon, text, arrow). Used by onboarding and register role-select screens.
 import { ArrowRight } from "phosphor-react-native";
 import { Text, View } from "react-native";
 import { Card } from "@shared/components/Card";

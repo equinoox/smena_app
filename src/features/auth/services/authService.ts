@@ -1,7 +1,14 @@
 // Auth service — email/password sign-in/up via Supabase. Role goes in signup metadata
 // so the DB trigger (handle_new_user) creates the matching profile row.
+import { uploadImage } from "@shared/lib/imageUpload";
 import { supabase } from "@shared/lib/supabase";
-import type { ExperienceLevel, VenueType } from "@shared/types/database.types";
+import type {
+  ExperienceLevel,
+  Profile,
+  Venue,
+  VenueType,
+  WorkerRole,
+} from "@shared/types/database.types";
 
 export type WorkerSignUpInput = {
   email: string;
@@ -10,12 +17,17 @@ export type WorkerSignUpInput = {
   phone: string;
   city: string;
   experienceLevel: ExperienceLevel;
+  bio?: string;
+  skills: string[];
+  workerRoles: WorkerRole[];
+  avatarUri?: string; // local file picked before the account existed; uploaded after signUp
 };
 
 export type VenueSignUpInput = {
   email: string;
   password: string;
   fullName: string; // contact person
+  ownerPhone?: string; // contact person's own phone, distinct from the venue's public phone
   venueName: string;
   venueType: VenueType;
   address: string;
@@ -23,6 +35,7 @@ export type VenueSignUpInput = {
   phone: string; // venue's own public contact number, not the owner's
   description?: string;
   logoUri?: string; // local file picked before the account existed; uploaded after signUp
+  coverPhotoUri?: string;
 };
 
 export async function signInWithEmail(email: string, password: string) {
@@ -45,16 +58,29 @@ export async function signUpWorker(input: WorkerSignUpInput) {
   if (error) throw error;
 
   // Fill in the rest of the profile once we have a session (auto-created by the trigger).
+  let profile: Profile | null = null;
   if (data.session && data.user) {
-    await supabase
+    const avatarUrl = input.avatarUri
+      ? await uploadImage("avatars", data.user.id, "avatar", input.avatarUri)
+      : null;
+
+    const { data: profileData, error: profileError } = await supabase
       .from("profiles")
       .update({
         city: input.city,
         experience_level: input.experienceLevel,
+        bio: input.bio || null,
+        skills: input.skills,
+        worker_roles: input.workerRoles,
+        avatar_url: avatarUrl,
       })
-      .eq("id", data.user.id);
+      .eq("id", data.user.id)
+      .select()
+      .single();
+    if (profileError) throw profileError;
+    profile = profileData;
   }
-  return data;
+  return { ...data, profile };
 }
 
 export async function signUpVenue(input: VenueSignUpInput) {
@@ -65,52 +91,45 @@ export async function signUpVenue(input: VenueSignUpInput) {
       data: {
         role: "venue",
         full_name: input.fullName,
+        phone: input.ownerPhone || null,
       },
     },
   });
   if (error) throw error;
 
   // Create the venue record (requires a session — MVP assumes email confirmation is off).
+  let venue: Venue | null = null;
   if (data.session && data.user) {
-    const logoUrl = input.logoUri
-      ? await uploadVenueLogo(data.user.id, input.logoUri)
-      : null;
+    // Upload logo + cover in parallel — sequentially awaiting each one just doubles
+    // the wait when a venue picks both photos at sign-up.
+    const [logoUrl, coverPhotoUrl] = await Promise.all([
+      input.logoUri
+        ? uploadImage("venue-logos", data.user.id, "logo", input.logoUri)
+        : Promise.resolve(null),
+      input.coverPhotoUri
+        ? uploadImage("venue-logos", data.user.id, "cover", input.coverPhotoUri)
+        : Promise.resolve(null),
+    ]);
 
-    const { error: venueError } = await supabase.from("venues").insert({
-      owner_id: data.user.id,
-      name: input.venueName,
-      venue_type: input.venueType,
-      address: input.address,
-      pib: input.pib,
-      phone: input.phone,
-      description: input.description ?? null,
-      logo_url: logoUrl,
-    });
+    const { data: venueData, error: venueError } = await supabase
+      .from("venues")
+      .insert({
+        owner_id: data.user.id,
+        name: input.venueName,
+        venue_type: input.venueType,
+        address: input.address,
+        pib: input.pib,
+        phone: input.phone,
+        description: input.description ?? null,
+        logo_url: logoUrl,
+        cover_photo_url: coverPhotoUrl,
+      })
+      .select()
+      .single();
     if (venueError) throw venueError;
+    venue = venueData;
   }
-  return data;
-}
-
-// Uploads the locally-picked logo image to the venue-logos bucket. Runs after signUp
-// (not at picker time) since the storage path needs the real auth uid, which only
-// exists once the account has been created.
-async function uploadVenueLogo(ownerId: string, localUri: string) {
-  const ext = localUri.split(".").pop()?.toLowerCase() ?? "jpg";
-  const response = await fetch(localUri);
-  const arrayBuffer = await response.arrayBuffer();
-
-  const { error } = await supabase.storage
-    .from("venue-logos")
-    .upload(`${ownerId}/logo.${ext}`, arrayBuffer, {
-      contentType: `image/${ext}`,
-      upsert: true,
-    });
-  if (error) throw error;
-
-  const { data } = supabase.storage
-    .from("venue-logos")
-    .getPublicUrl(`${ownerId}/logo.${ext}`);
-  return data.publicUrl;
+  return { ...data, venue };
 }
 
 export async function signOut() {

@@ -3,6 +3,7 @@
     "appName": "Smena",
     "cancel": "Otkaži",
     "save": "Sačuvaj",
+    "saveSuccess": "Uspešno sačuvano!",
     "continue": "Nastavi",
     "next": "Dalje",
     "back": "Nazad",
@@ -12,19 +13,21 @@
     "seeAll": "Prikaži sve",
     "remove": "Ukloni",
     "close": "Zatvori",
+    "clear": "Obriši",
     "confirm": "Potvrdi",
     "error": "Greška",
     "somethingWrong": "Nešto je pošlo naopako",
     "tryAgain": "Pokušajte ponovo.",
-    "comingSoon": "Uskoro"
+    "comingSoon": "Uskoro stiže!"
   },
   "validation": {
-    "required": "Ovo polje je obavezno",
+    "required": "Ovo polje je obavezno.",
     "emailInvalid": "Unesite ispravan email",
     "passwordMin": "Lozinka mora imati najmanje 8 znakova",
     "passwordsDontMatch": "Lozinke se ne poklapaju",
     "nameMin": "Unesite ime i prezime",
-    "selectPosition": "Izaberite bar jednu poziciju"
+    "selectPosition": "Molimo izaberite bar jednu poziciju.",
+    "selectExperience": "Molimo izaberite nivo iskustva."
   },
   "nav": {
     "home": "Početna",
@@ -44,9 +47,13 @@
     "getStarted": "Započni"
   },
   "auth": {
-    "signIn": "Prijava",
-    "signUp": "Registracija",
-    "signInSubtitle": "Dobrodošli nazad na Smenu.",
+    "signIn": "Prijavi se",
+    "welcomeBack": "Dobro došao nazad",
+    "signInSubtitle": "Prijavi se i nastavi tamo gde si stao.",
+    "forgotPassword": "Zaboravljena lozinka?",
+    "or": "ili",
+    "continueWithApple": "Apple",
+    "continueWithGoogle": "Google",
     "email": "Email",
     "password": "Lozinka",
     "confirmPassword": "Potvrdi lozinku",
@@ -54,16 +61,27 @@
     "phone": "Broj telefona",
     "phoneOptional": "Telefon (opciono)",
     "city": "Grad",
+    "profilePicture": "Profilna slika",
     "workerSignUpTitle": "Napravi svoj profil",
-    "workerSignUpSubtitle": "Lokali te pronalaze na osnovu ovih podataka.",
+    "workerDetailsTitle": "Radni podaci",
+    "workerDetailsSubtitle": "Lokali te pronalaze na osnovu ovih podataka.",
     "position": "Pozicija",
     "positionHint": "izaberi jednu ili više",
     "experience": "Iskustvo",
-    "venueSignUpTitle": "Registruj svoj lokal",
+    "workerExperienceTitle": "Tvoje iskustvo",
+    "workerExperienceSubtitle": "Pomozi lokalima da te bolje upoznaju.",
+    "bio": "O tebi",
+    "bioPlaceholder": "Ispričaj lokalima nešto o sebi",
+    "skills": "Veštine",
+    "addSkill": "Dodaj veštinu",
+    "skillPlaceholder": "npr. Pravljenje kafe",
+    "venueSignUpTitle": "Unesite vaše podatke",
     "venueDetailsTitle": "Podaci o lokalu",
+    "venueContactTitle": "Kontakt i opis",
     "venueDetailsSubtitle": "Ovako će te radnici videti u oglasima.",
     "venueLogo": "Logo lokala",
     "addPhoto": "Dodaj fotografiju",
+    "changePhoto": "Promeni fotografiju",
     "venueName": "Naziv lokala",
     "venueType": "Tip lokala",
     "address": "Adresa",
@@ -72,8 +90,17 @@
     "description": "Kratak opis",
     "alreadyHaveAccount": "Već imaš nalog?",
     "noAccount": "Nemaš nalog?",
+    "registerNow": "Registruj se odmah!",
     "createAccount": "Napravi nalog",
     "confirmEmail": "Proveri email da potvrdiš nalog, pa se prijavi."
+  },
+  "imagePicker": {
+    "chooseFromDevice": "Izaberi sa telefona",
+    "chooseDifferent": "Izaberi drugu fotografiju",
+    "usePhoto": "Koristi ovu fotografiju",
+    "permissionDenied": "Potreban je pristup galeriji da bismo nastavili.",
+    "squareSizeHint": "Za najbolji izgled koristi kvadratnu sliku približno 400×400px — druge proporcije mogu biti isečene ili dopunjene pozadinom.",
+    "coverSizeHint": "Za najbolji izgled koristi široku sliku približno 1080×600px (9:5) — druge proporcije mogu biti isečene ili dopunjene pozadinom."
   },
   "home": {
     "greeting": "Ćao",
@@ -94,7 +121,12 @@
     "candidates": "{count} kandidata",
     "applicationsReceived": "Pristigle prijave",
     "empty": "Ovde još nema ničega",
-    "searchPlaceholder": "Pretraži poziciju ili lokal"
+    "noSearchResults": "Nijedan lokal ne odgovara upitu „{query}“",
+    "noSearchResultsHint": "Probaj drugi naziv ili obriši pretragu.",
+    "searchPlaceholder": "Pretraži lokal",
+    "availableWorkers": "Dostupni radnici",
+    "noWorkersAvailable": "Trenutno nema dostupnih radnika",
+    "availableTag": "DOSTUPAN"
   },
   "listings": {
     "title": "Oglasi",
@@ -121,7 +153,7 @@
     "pay": "Plata",
     "schedule": "Raspored",
     "apply": "Prijavi se",
-    "applied": "Prijava poslata",
+    "applied": "Tvoja prijava je uspešno poslata!",
     "saveListing": "Sačuvaj",
     "savedListing": "Sačuvano",
     "notFound": "Oglas nije pronađen",
@@ -131,34 +163,49 @@
     "location": "Lokacija",
     "callVenue": "Pozovi lokal",
     "edit": "Izmeni",
-    "noPhone": "Lokal nema uneti kontakt telefon",
+    "noPhone": "Lokal nema uneti kontakt telefon.",
     "deleteTitle": "Obriši oglas?",
     "deleteMessage": "Ova akcija se ne može opozvati.",
     "deleteConfirm": "Obriši",
-    "deleteSuccess": "Oglas je obrisan"
+    "deleteSuccess": "Oglas je uspešno obrisan.",
+    "applicantsTitle": "Prijave",
+    "noApplicants": "Još niko se nije prijavio"
+  },
+  "workerDetail": {
+    "notFound": "Radnik nije pronađen",
+    "phone": "Telefon",
+    "call": "Pozovi radnika",
+    "noPhone": "Radnik nema uneti kontakt telefon."
   },
   "saved": {
     "title": "Sačuvano",
+    "subtitle": "Oglasi koje si sačuvao za kasnije",
+    "count": "{count} oglasa",
     "empty": "Nema sačuvanih oglasa",
-    "emptyDesc": "Dodirni oznaku na bilo kojoj smeni da je sačuvaš za kasnije."
+    "emptyDesc": "Dodirni oznaku na bilo kojoj smeni da je sačuvaš za kasnije.",
+    "savedMinutesAgo": "Sačuvano pre {count} min",
+    "savedHoursAgo": "Sačuvano pre {count}h",
+    "savedYesterday": "Sačuvano juče",
+    "savedDaysAgo": "Sačuvano pre {count} dana"
   },
   "profile": {
     "title": "Profil",
     "venueProfileTitle": "Profil lokala",
+    "coverPhoto": "Naslovna fotografija",
     "editProfile": "Izmeni profil",
     "myApplications": "Moje prijave",
     "myListings": "Moji oglasi",
     "settings": "Podešavanja",
     "language": "Jezik",
     "theme": "Izgled",
-    "themeSystem": "Sistemski",
-    "themeLight": "Svetlo",
-    "themeDark": "Tamno",
     "logOut": "Odjava",
     "logOutConfirm": "Da li ste sigurni da želite da se odjavite?",
     "memberSince": "Član od",
     "worker": "Radnik",
-    "venue": "Lokal"
+    "venue": "Lokal",
+    "about": "O meni",
+    "availableForWork": "Dostupan za posao",
+    "experienceLabel": "iskustva"
   },
   "pay": {
     "hour": "/h",
@@ -199,7 +246,8 @@
     "title": "Novi oglas",
     "editTitle": "Izmeni oglas",
     "saveChanges": "Sačuvaj izmene",
-    "updateSuccess": "Oglas je izmenjen",
+    "updateSuccess": "Oglas je uspešno izmenjen!",
+    "dateTimeRequired": "Molimo izaberite datum i vreme smene.",
     "positionQuestion": "Koja pozicija ti treba?",
     "titleLabel": "Naslov oglasa",
     "titleHint": "Kratko i jasno — ovo radnici prvo vide.",
@@ -219,6 +267,6 @@
     "selectTime": "Izaberi vreme",
     "from": "Od",
     "to": "Do",
-    "publishSuccess": "Oglas je objavljen"
+    "publishSuccess": "Oglas je uspešno objavljen!"
   }
 }

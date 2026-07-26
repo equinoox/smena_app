@@ -8,8 +8,11 @@ import {
   useState,
 } from "react";
 import { Pressable, Text, View } from "react-native";
+import Animated, { FadeInDown, FadeOutDown } from "react-native-reanimated";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { cn } from "@shared/lib/cn";
+import { extractErrorMessage } from "@shared/lib/errors";
+import { motion } from "@shared/lib/motion";
 import { setQueryErrorHandler } from "@shared/lib/queryClient";
 import { useTranslation } from "@shared/i18n/I18nProvider";
 
@@ -28,7 +31,7 @@ const ToastContext = createContext<ToastContextValue | null>(null);
 const styleByType: Record<ToastType, string> = {
   success: "bg-success-bg border-success",
   error: "bg-warning-bg border-warning",
-  info: "bg-bg-surface-alt border-border-default",
+  info: "bg-bg-surface-alt border-brand",
 };
 
 const textByType: Record<ToastType, string> = {
@@ -36,23 +39,6 @@ const textByType: Record<ToastType, string> = {
   error: "text-warning",
   info: "text-text-primary",
 };
-
-// Supabase/Postgrest errors are plain objects with a `message` field, not real
-// `Error` instances — `err instanceof Error` misses them and silently falls back
-// to the generic string. Handle both shapes so the toast shows the real reason.
-function extractErrorMessage(err: unknown): string | null {
-  if (err instanceof Error && err.message) return err.message;
-  if (
-    typeof err === "object" &&
-    err !== null &&
-    "message" in err &&
-    typeof (err as { message: unknown }).message === "string" &&
-    (err as { message: string }).message
-  ) {
-    return (err as { message: string }).message;
-  }
-  return null;
-}
 
 export function ToastProvider({ children }: { children: React.ReactNode }) {
   const insets = useSafeAreaInsets();
@@ -89,25 +75,31 @@ export function ToastProvider({ children }: { children: React.ReactNode }) {
   return (
     <ToastContext.Provider value={value}>
       {children}
-      {toast ? (
-        <View
-          pointerEvents="box-none"
-          className="absolute inset-x-0 items-center px-4"
-          style={{ bottom: insets.bottom + 16 }}
-        >
-          <Pressable
-            onPress={() => setToast(null)}
-            className={cn(
-              "w-full max-w-md rounded-card border px-4 py-3",
-              styleByType[toast.type],
-            )}
+      {/* The wrapper stays mounted so the toast itself can play an exit animation. */}
+      <View
+        pointerEvents="box-none"
+        className="absolute inset-x-0 px-4"
+        style={{ bottom: insets.bottom + 100 }}
+      >
+        {toast ? (
+          <Animated.View
+            entering={FadeInDown.duration(motion.duration.slow)}
+            exiting={FadeOutDown.duration(motion.duration.base)}
           >
-            <Text className={cn("font-sans-medium text-sm", textByType[toast.type])}>
-              {toast.message}
-            </Text>
-          </Pressable>
-        </View>
-      ) : null}
+            <Pressable
+              onPress={() => setToast(null)}
+              className={cn(
+                "w-full max-w-md self-center rounded-card border-2 px-4 py-3",
+                styleByType[toast.type],
+              )}
+            >
+              <Text className={cn("font-sans-medium text-sm", textByType[toast.type])}>
+                {toast.message}
+              </Text>
+            </Pressable>
+          </Animated.View>
+        ) : null}
+      </View>
     </ToastContext.Provider>
   );
 }

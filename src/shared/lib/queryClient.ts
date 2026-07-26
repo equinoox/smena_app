@@ -21,8 +21,11 @@ export const queryClient = new QueryClient({
     },
   }),
   mutationCache: new MutationCache({
-    onError: (error) => {
+    onError: (error, _variables, _context, mutation) => {
       console.error("[Mutation error]", error);
+      // A mutation can opt out (meta: { suppressToast: true }) when its screen
+      // shows the error inline instead (e.g. sign-in) — skip the toast then.
+      if (mutation.options.meta?.suppressToast) return;
       handleError(error);
     },
   }),

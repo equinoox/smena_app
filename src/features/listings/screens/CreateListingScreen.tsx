@@ -6,11 +6,9 @@ import { useLocalSearchParams, useRouter } from "expo-router";
 import {
   Briefcase,
   CalendarBlank,
-  Check,
   Clock,
   Lightning,
   PaperPlaneRight,
-  Plus,
   Wallet,
   X,
 } from "phosphor-react-native";
@@ -25,6 +23,7 @@ import { Loader } from "@shared/components/Loader";
 import { Modal } from "@shared/components/Modal";
 import { Screen } from "@shared/components/Screen";
 import { ListingCard } from "@shared/components/ListingCard";
+import { TagInput } from "@shared/components/TagInput";
 import { useMyVenue } from "@shared/hooks/useMyVenue";
 import { useThemeColors } from "@shared/hooks/useThemeColors";
 import { useToast } from "@shared/hooks/useToast";
@@ -89,8 +88,6 @@ export function CreateListingScreen() {
   const [datePickerOpen, setDatePickerOpen] = useState(false);
   const [timePickerOpen, setTimePickerOpen] = useState(false);
   const [requirements, setRequirements] = useState<string[]>([]);
-  const [addingRequirement, setAddingRequirement] = useState(false);
-  const [requirementDraft, setRequirementDraft] = useState("");
   const [isUrgent, setIsUrgent] = useState(false);
   const [previewOpen, setPreviewOpen] = useState(false);
 
@@ -135,17 +132,10 @@ export function CreateListingScreen() {
   const employmentType = watch("employmentType");
   const payPeriod = DEFAULT_PAY_PERIOD[employmentType];
 
-  const commitRequirement = () => {
-    const value = requirementDraft.trim();
-    if (value) setRequirements((prev) => [...prev, value]);
-    setRequirementDraft("");
-    setAddingRequirement(false);
-  };
-
   const onSubmit = handleSubmit((values) => {
     if (!venue?.id) return;
     if (!date || fromHour === null || toHour === null) {
-      toast.error(t("validation.required"));
+      toast.error(t("createListing.dateTimeRequired"));
       return;
     }
     const startsAt = new Date(
@@ -237,7 +227,9 @@ export function CreateListingScreen() {
           name: venue.name,
           venue_type: venue.venue_type,
           city: venue.city,
+          address: venue.address,
           logo_url: venue.logo_url,
+          cover_photo_url: venue.cover_photo_url,
           lat: venue.lat,
           lng: venue.lng,
           phone: venue.phone,
@@ -405,47 +397,12 @@ export function CreateListingScreen() {
         <Text className="font-sans-medium text-sm text-text-tertiary">
           {t("createListing.requirementsLabel")}
         </Text>
-        <View className="flex-row flex-wrap gap-2">
-          {requirements.map((req) => (
-            <Chip
-              key={req}
-              label={req}
-              variant="active"
-              leftIcon={<Check size={13} weight="bold" color={colors.onBrand} />}
-              onPress={() =>
-                setRequirements((prev) => prev.filter((r) => r !== req))
-              }
-            />
-          ))}
-          {!addingRequirement ? (
-            <Chip
-              label={t("createListing.addRequirement")}
-              variant="neutral"
-              leftIcon={<Plus size={13} weight="bold" color={colors.textMuted} />}
-              onPress={() => setAddingRequirement(true)}
-            />
-          ) : null}
-        </View>
-        {addingRequirement ? (
-          <View className="flex-row items-center gap-2">
-            <View className="flex-1">
-              <Input
-                value={requirementDraft}
-                onChangeText={setRequirementDraft}
-                placeholder={t("createListing.requirementPlaceholder")}
-                autoFocus
-                returnKeyType="done"
-                onSubmitEditing={commitRequirement}
-              />
-            </View>
-            <Pressable
-              onPress={commitRequirement}
-              className="h-12 w-12 items-center justify-center rounded-input bg-brand"
-            >
-              <Check size={20} weight="bold" color={colors.onBrand} />
-            </Pressable>
-          </View>
-        ) : null}
+        <TagInput
+          tags={requirements}
+          onChange={setRequirements}
+          addLabel={t("createListing.addRequirement")}
+          placeholder={t("createListing.requirementPlaceholder")}
+        />
       </View>
 
       <View className="mt-5 flex-row items-center justify-between gap-3 rounded-input border border-border-default bg-bg-surface p-3">

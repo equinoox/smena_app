@@ -10,8 +10,11 @@ export function useUpdateWorkerProfile() {
   const client = useQueryClient();
 
   return useMutation({
-    mutationFn: (input: { workerRoles: WorkerRole[]; experienceLevel: ExperienceLevel }) =>
-      updateWorkerProfile(user!.id, input),
+    mutationFn: (input: {
+      workerRoles: WorkerRole[];
+      experienceLevel: ExperienceLevel;
+      avatarUri?: string;
+    }) => updateWorkerProfile(user!.id, input),
     onSuccess: () => {
       client.invalidateQueries({ queryKey: queryKeys.profile(user?.id ?? "anon") });
     },

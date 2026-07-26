@@ -3,14 +3,14 @@
 // first (same ordering fetchListings always uses) — only search (by venue name) and
 // the role chips are real filters.
 import { useRouter } from "expo-router";
-import { Bell, MagnifyingGlass, MapPin } from "phosphor-react-native";
+import { Bell, MagnifyingGlass, X } from "phosphor-react-native";
 import { useEffect, useState } from "react";
-import { Pressable, ScrollView, Text, View } from "react-native";
-import { SafeAreaView } from "react-native-safe-area-context";
-import { Avatar } from "@shared/components/Avatar";
+import { ActivityIndicator, Pressable, ScrollView, Text, View } from "react-native";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { Chip } from "@shared/components/Chip";
 import { Input } from "@shared/components/Input";
 import { ListingList } from "@shared/components/ListingList";
+import { WorkerIdentityBar } from "@shared/components/WorkerIdentityBar";
 import { useSavedIds, useToggleSaved } from "@shared/hooks/useSaved";
 import { useThemeColors } from "@shared/hooks/useThemeColors";
 import { useToast } from "@shared/hooks/useToast";
@@ -25,6 +25,7 @@ export function WorkerHomeView({ profile }: { profile: Profile | null }) {
   const colors = useThemeColors();
   const toast = useToast();
   const { t } = useTranslation();
+  const insets = useSafeAreaInsets();
 
   const [searchInput, setSearchInput] = useState("");
   const [search, setSearch] = useState("");
@@ -44,46 +45,66 @@ export function WorkerHomeView({ profile }: { profile: Profile | null }) {
   const savedIds = useSavedIds();
   const toggleSaved = useToggleSaved();
 
+  // Feedback starts on the keystroke, not when the debounce fires — otherwise the field
+  // looks idle for 300ms. `isPlaceholderData` covers the fetch that follows (see useListings:
+  // the old results stay visible meanwhile, so this indicator is the only "working" cue).
+  const isSearching = searchInput !== search || listings.isPlaceholderData;
+
+  // "Recommended near you" / "See all" don't make sense above a "nothing matches your
+  // search" result — only show them once we have a confirmed (non-stale, non-loading)
+  // zero-result count for an actual search term.
+  const searchHasNoResults =
+    !!search && !listings.isLoading && !listings.isPlaceholderData &&
+    (listings.data?.length ?? 0) === 0;
+
   const onToggleSave = (listing: ListingWithVenue) =>
     toggleSaved.mutate({ listingId: listing.id, saved: savedIds.has(listing.id) });
 
   const header = (
     <View className="pb-4">
-      {/* Slightly different background than the screen — visually groups identity/search/filters. */}
-      <View className="-mx-4 bg-bg-surface px-4 pb-4 pt-4">
-        <View className="flex-row items-center justify-between">
-          <View className="flex-1 flex-row items-center gap-3">
-            <Avatar uri={profile?.avatar_url} name={profile?.full_name} size={44} />
-            <View className="min-w-0 flex-1">
-              <Text className="font-sans text-base text-text-tertiary" numberOfLines={1}>
-                {t("home.greeting")}
-                {profile?.full_name ? `, ${profile.full_name}` : ""} 👋
-              </Text>
-              {profile?.city ? (
-                <View className="mt-0.5 flex-row items-center gap-1">
-                  <MapPin size={13} weight="fill" color={colors.brand} />
-                  <Text className="font-sans-semibold text-xs text-brand" numberOfLines={1}>
-                    {profile.city}
-                  </Text>
-                </View>
-              ) : null}
-            </View>
-          </View>
-          <Pressable
-            onPress={() => toast.info(t("common.comingSoon"))}
-            hitSlop={8}
-            className="h-11 w-11 items-center justify-center rounded-input border border-border-default bg-bg-surface-alt"
-          >
-            <Bell size={20} color={colors.textPrimary} />
-          </Pressable>
-        </View>
+      {/* Slightly different background than the screen — visually groups identity/search/filters.
+          Its own top padding (rather than a SafeAreaView on the screen) absorbs the status bar
+          inset, so this surface color extends up behind it on Android's edge-to-edge display
+          instead of leaving a seam where the screen's bg-bg-screen would otherwise show through. */}
+      <View
+        className="-mx-4 bg-bg-surface px-4 pb-4"
+        style={{ paddingTop: insets.top + 16 }}
+      >
+        <WorkerIdentityBar
+          profile={profile}
+          right={
+            <Pressable
+              onPress={() => toast.info(t("common.comingSoon"))}
+              hitSlop={8}
+              className="h-11 w-11 items-center justify-center rounded-input border border-border-default bg-bg-surface-alt"
+            >
+              <Bell size={20} color={colors.textPrimary} />
+            </Pressable>
+          }
+        />
 
         <View className="mt-4">
           <Input
             value={searchInput}
             onChangeText={setSearchInput}
             placeholder={t("home.searchPlaceholder")}
+            returnKeyType="search"
+            autoCorrect={false}
             leftIcon={<MagnifyingGlass size={18} color={colors.textMuted} />}
+            rightIcon={
+              isSearching ? (
+                <ActivityIndicator size="small" color={colors.textMuted} />
+              ) : searchInput ? (
+                <Pressable
+                  onPress={() => setSearchInput("")}
+                  hitSlop={10}
+                  accessibilityRole="button"
+                  accessibilityLabel={t("common.clear")}
+                >
+                  <X size={16} weight="bold" color={colors.textMuted} />
+                </Pressable>
+              ) : undefined
+            }
           />
         </View>
 
@@ -115,29 +136,34 @@ export function WorkerHomeView({ profile }: { profile: Profile | null }) {
         </ScrollView>
       </View>
 
-      <View className="mt-5 flex-row items-center justify-between">
-        <Text className="font-sans-bold text-xl text-text-primary">
-          {t("home.recommendedNearYou")}
-        </Text>
-        <Pressable onPress={() => router.push("/listings")} hitSlop={8}>
-          <Text className="font-sans-bold text-sm text-brand">
-            {t("common.seeAll")}
+      {!searchHasNoResults ? (
+        <View className="mt-5 flex-row items-center justify-between">
+          <Text className="font-sans-bold text-xl text-text-primary">
+            {t("home.recommendedNearYou")}
           </Text>
-        </Pressable>
-      </View>
+          <Pressable onPress={() => router.push("/listings")} hitSlop={8}>
+            <Text className="font-sans-bold text-sm text-brand">
+              {t("common.seeAll")}
+            </Text>
+          </Pressable>
+        </View>
+      ) : null}
     </View>
   );
 
   return (
-    <SafeAreaView edges={["top"]} className="flex-1 bg-bg-screen">
+    <View className="flex-1 bg-bg-screen">
       <ListingList
         listings={listings.data ?? []}
         isLoading={listings.isLoading}
         savedIds={savedIds}
         onToggleSave={onToggleSave}
         header={header}
-        emptyTitle={t("home.empty")}
+        emptyTitle={
+          search ? t("home.noSearchResults", { query: search }) : t("home.empty")
+        }
+        emptyDescription={search ? t("home.noSearchResultsHint") : undefined}
       />
-    </SafeAreaView>
+    </View>
   );
 }

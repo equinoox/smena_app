@@ -4,9 +4,11 @@ import { useMemo } from "react";
 import { useRouter } from "expo-router";
 import { ArrowRight, Bell, Coffee, Plus } from "phosphor-react-native";
 import { ActivityIndicator, Pressable, ScrollView, Text, View } from "react-native";
-import { SafeAreaView } from "react-native-safe-area-context";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { Avatar } from "@shared/components/Avatar";
+import { Chip } from "@shared/components/Chip";
 import { EmptyState } from "@shared/components/EmptyState";
+import { WorkerRow } from "@shared/components/WorkerRow";
 import { useMyVenue } from "@shared/hooks/useMyVenue";
 import { useThemeColors } from "@shared/hooks/useThemeColors";
 import { useToast } from "@shared/hooks/useToast";
@@ -14,6 +16,7 @@ import { useUserRole } from "@shared/hooks/useUserRole";
 import { useTranslation, type TranslationKey } from "@shared/i18n/I18nProvider";
 import { useListingCounts } from "@features/listings/hooks/useListingViews";
 import { useVenueListings, useVenueStats } from "@features/listings/hooks/useListings";
+import { useAvailableWorkers } from "@features/home/hooks/useAvailableWorkers";
 import { VenueListingRow } from "@features/home/components/VenueListingRow";
 import { cn } from "@shared/lib/cn";
 
@@ -57,10 +60,12 @@ export function VenueHomeView() {
   const { t } = useTranslation();
   const toast = useToast();
   const colors = useThemeColors();
+  const insets = useSafeAreaInsets();
   const { venue } = useMyVenue();
   const { profile } = useUserRole();
   const listings = useVenueListings(venue?.id);
   const stats = useVenueStats(venue?.id);
+  const availableWorkers = useAvailableWorkers();
 
   const recentListings = useMemo(
     () => (listings.data ?? []).slice(0, 2),
@@ -75,14 +80,20 @@ export function VenueHomeView() {
   const comingSoon = () => toast.info(t("common.comingSoon"));
 
   return (
-    <SafeAreaView edges={["top"]} className="flex-1 bg-bg-screen">
+    <View className="flex-1 bg-bg-screen">
       <ScrollView
         className="flex-1"
         contentContainerClassName="px-4 pb-8"
         showsVerticalScrollIndicator={false}
       >
-        {/* Slightly different background than the screen — visually groups identity/stats. */}
-        <View className="-mx-4 bg-bg-surface px-4 pb-5 pt-4">
+        {/* Slightly different background than the screen — visually groups identity/stats.
+            Its own top padding (rather than a SafeAreaView on the screen) absorbs the status
+            bar inset, so this surface color extends up behind it on Android's edge-to-edge
+            display instead of leaving a seam where bg-bg-screen would otherwise show through. */}
+        <View
+          className="-mx-4 bg-bg-surface px-4 pb-5"
+          style={{ paddingTop: insets.top + 16 }}
+        >
           <View className="flex-row items-center justify-between pb-4">
             <View className="flex-row items-center gap-3">
               {venue?.logo_url ? (
@@ -175,7 +186,27 @@ export function VenueHomeView() {
             ))
           )}
         </View>
+
+        <View className="mt-6">
+          <Text className="font-sans-bold text-xl text-text-primary">
+            {t("home.availableWorkers")}
+          </Text>
+        </View>
+
+        <View className="mt-3 gap-3">
+          {(availableWorkers.data ?? []).length === 0 && !availableWorkers.isLoading ? (
+            <EmptyState title={t("home.noWorkersAvailable")} />
+          ) : (
+            (availableWorkers.data ?? []).map((worker) => (
+              <WorkerRow
+                key={worker.id}
+                worker={worker}
+                trailing={<Chip label={t("home.availableTag")} variant="success" />}
+              />
+            ))
+          )}
+        </View>
       </ScrollView>
-    </SafeAreaView>
+    </View>
   );
 }

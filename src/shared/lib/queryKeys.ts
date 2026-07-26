@@ -14,14 +14,20 @@ export const queryKeys = {
   listings: (filters: ListingFilters) => ["listings", filters] as const,
   listing: (id: string) => ["listing", id] as const,
   venueListings: (venueId: string) => ["listings", "venue", venueId] as const,
+  venueListingsByOwner: (ownerId: string) =>
+    ["listings", "venue-owner", ownerId] as const,
   savedListings: (userId: string) => ["saved", userId] as const,
   workerApplications: (userId: string) =>
     ["applications", "worker", userId] as const,
   listingApplications: (listingId: string) =>
     ["applications", "listing", listingId] as const,
+  listingApplicationsList: (listingId: string) =>
+    ["applications", "listing", listingId, "list"] as const,
   venueStats: (venueId: string) => ["venueStats", venueId] as const,
   listingCounts: (listingIds: string[]) =>
     ["listingCounts", [...listingIds].sort()] as const,
   openListingsCount: () => ["listings", "openCount"] as const,
   listingViews: (listingId: string) => ["views", "listing", listingId] as const,
+  availableWorkers: () => ["profiles", "available"] as const,
+  workerProfile: (id: string) => ["profiles", "worker", id] as const,
 };

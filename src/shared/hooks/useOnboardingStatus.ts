@@ -39,3 +39,10 @@ export function useOnboardingStatus() {
 
   return { completed, complete };
 }
+
+// Imperative escape hatch for call sites that aren't components (e.g. the sign-out
+// action) — anyone who has ever had a session on this device must never see
+// onboarding again, so sign-out marks it complete too, not just sign-up/sign-in.
+export async function markOnboardingComplete() {
+  await useOnboardingStore.getState().complete();
+}

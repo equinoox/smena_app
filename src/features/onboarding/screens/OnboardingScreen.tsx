@@ -9,7 +9,7 @@ import { ThemeToggle } from "@shared/components/ThemeToggle";
 import { useThemeColors } from "@shared/hooks/useThemeColors";
 import { useTranslation } from "@shared/i18n/I18nProvider";
 import type { UserRole } from "@shared/types/database.types";
-import { RoleCard } from "@features/onboarding/components/RoleCard";
+import { RoleCard } from "@shared/components/RoleCard";
 import { useOnboardingStore } from "@features/onboarding/store/onboardingStore";
 
 export function OnboardingScreen() {

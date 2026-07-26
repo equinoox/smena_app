@@ -1,9 +1,9 @@
 // Theme toggle — sun/moon; tapping sets light or dark (persisted).
 import { Moon, Sun } from "phosphor-react-native";
-import { Pressable, View } from "react-native";
+import { View } from "react-native";
+import { SegmentedOption } from "@shared/components/SegmentedOption";
 import { useThemeColors } from "@shared/hooks/useThemeColors";
 import { useTheme } from "@shared/providers/ThemeProvider";
-import { cn } from "@shared/lib/cn";
 
 export function ThemeToggle() {
   const { colorScheme, setPreference } = useTheme();
@@ -12,22 +12,12 @@ export function ThemeToggle() {
 
   return (
     <View className="flex-row items-center gap-1 rounded-chip bg-bg-surface-alt p-1">
-      <Pressable
-        onPress={() => setPreference("light")}
-        accessibilityRole="button"
-        accessibilityState={{ selected: !isDark }}
-        className={cn("rounded-[7px] p-1.5", !isDark ? "bg-bg-surface" : "opacity-40")}
-      >
+      <SegmentedOption selected={!isDark} onPress={() => setPreference("light")}>
         <Sun size={18} weight="fill" color={!isDark ? colors.brand : colors.textMuted} />
-      </Pressable>
-      <Pressable
-        onPress={() => setPreference("dark")}
-        accessibilityRole="button"
-        accessibilityState={{ selected: isDark }}
-        className={cn("rounded-[7px] p-1.5", isDark ? "bg-bg-surface" : "opacity-40")}
-      >
+      </SegmentedOption>
+      <SegmentedOption selected={isDark} onPress={() => setPreference("dark")}>
         <Moon size={18} weight="fill" color={isDark ? colors.brand : colors.textMuted} />
-      </Pressable>
+      </SegmentedOption>
     </View>
   );
 }

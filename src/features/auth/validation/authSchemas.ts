@@ -1,11 +1,9 @@
 // Zod schemas for auth forms. Factories take the translator so messages are localized.
 import { z } from "zod";
-import { EXPERIENCE_LEVELS } from "@shared/lib/roleIcon";
+import { EXPERIENCE_LEVELS, VENUE_TYPES, WORKER_ROLES } from "@shared/lib/roleIcon";
 import type { TranslationKey } from "@shared/i18n/I18nProvider";
 
 type Translate = (key: TranslationKey) => string;
-
-const VENUE_TYPES = ["cafe", "bar", "restaurant", "club", "bakery"] as const;
 
 export function signInSchema(t: Translate) {
   return z.object({
@@ -26,6 +24,17 @@ function baseSignUp(t: Translate) {
   };
 }
 
+// Step 1 (credentials) fields — used to trigger partial validation before advancing.
+export const WORKER_STEP1_FIELDS = [
+  "fullName",
+  "email",
+  "password",
+  "confirmPassword",
+] as const;
+
+// Step 2 (profile basics) fields — used to trigger partial validation before advancing.
+export const WORKER_STEP2_FIELDS = ["city", "phone", "experienceLevel"] as const;
+
 export function workerSignUpSchema(t: Translate) {
   return z
     .object({
@@ -35,6 +44,13 @@ export function workerSignUpSchema(t: Translate) {
       experienceLevel: z.enum(EXPERIENCE_LEVELS, {
         message: t("validation.required"),
       }),
+      avatarUri: z.string().optional(),
+      // Step 3 — bio + skills + the positions the worker takes shifts for.
+      bio: z.string().optional(),
+      skills: z.array(z.string()),
+      workerRoles: z
+        .array(z.enum(WORKER_ROLES))
+        .min(1, t("validation.selectPosition")),
     })
     .refine((v) => v.password === v.confirmPassword, {
       message: t("validation.passwordsDontMatch"),
@@ -51,6 +67,9 @@ export const VENUE_STEP1_FIELDS = [
   "confirmPassword",
 ] as const;
 
+// Step 2 (venue identity) fields — used to trigger partial validation before advancing.
+export const VENUE_STEP2_FIELDS = ["venueName", "venueType"] as const;
+
 export function venueSignUpSchema(t: Translate) {
   return z
     .object({
@@ -58,6 +77,7 @@ export function venueSignUpSchema(t: Translate) {
       password: z.string().min(8, t("validation.passwordMin")),
       confirmPassword: z.string(),
       fullName: z.string().min(2, t("validation.nameMin")),
+      ownerPhone: z.string().optional(),
       // Step 2 — venue details.
       venueName: z.string().min(2, t("validation.required")),
       venueType: z.enum(VENUE_TYPES),
@@ -66,6 +86,7 @@ export function venueSignUpSchema(t: Translate) {
       phone: z.string().min(1, t("validation.required")),
       description: z.string().optional(),
       logoUri: z.string().optional(),
+      coverPhotoUri: z.string().optional(),
     })
     .refine((v) => v.password === v.confirmPassword, {
       message: t("validation.passwordsDontMatch"),

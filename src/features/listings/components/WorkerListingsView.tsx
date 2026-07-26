@@ -1,8 +1,10 @@
 // Worker listings — browse open shifts: title + platform-wide active count, quick filter
 // chips (employment type; "Filters"/"Near me" are placeholders — see below), compact cards.
+// Reached only via "See all" pushes (no tab bar item), so it carries its own back arrow.
 import { useState } from "react";
-import { MapPin, Sliders } from "phosphor-react-native";
-import { ScrollView, Text, View } from "react-native";
+import { useRouter } from "expo-router";
+import { CaretLeft, MapPin, Sliders } from "phosphor-react-native";
+import { Pressable, ScrollView, Text, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { Chip } from "@shared/components/Chip";
 import { ListingList } from "@shared/components/ListingList";
@@ -18,6 +20,7 @@ type Filter = EmploymentType | "all";
 const FILTERS: Filter[] = ["all", "fill_in", "part_time", "full_time"];
 
 export function WorkerListingsView() {
+  const router = useRouter();
   const { t } = useTranslation();
   const toast = useToast();
   const colors = useThemeColors();
@@ -37,7 +40,15 @@ export function WorkerListingsView() {
 
   const header = (
     <View className="pb-4 pt-2">
-      <View className="flex-row items-end justify-between">
+      <Pressable
+        onPress={() => router.back()}
+        hitSlop={10}
+        className="h-10 w-10 items-center justify-center rounded-input border border-border-default bg-bg-surface"
+      >
+        <CaretLeft size={20} color={colors.textPrimary} />
+      </Pressable>
+
+      <View className="mt-4 flex-row items-end justify-between">
         <Text className="font-sans-extrabold text-2xl text-text-primary">
           {t("listings.title")}
         </Text>

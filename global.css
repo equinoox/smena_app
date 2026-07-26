@@ -26,6 +26,8 @@
     --success-bg: 227 245 233;
     --warning: 194 94 31;
     --warning-bg: 252 235 221;
+    --danger: 200 38 38;
+    --danger-bg: 252 231 231;
     --accent-badge: 232 153 26;
     --info: 30 130 200;
     --on-brand: 255 255 255;
@@ -52,6 +54,8 @@
     --success-bg: 21 40 28;
     --warning: 240 137 74;
     --warning-bg: 51 33 26;
+    --danger: 240 90 90;
+    --danger-bg: 58 31 31;
     --accent-badge: 255 194 75;
     --info: 110 190 255;
     --on-brand: 255 255 255;

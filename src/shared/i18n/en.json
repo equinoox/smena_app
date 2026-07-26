@@ -3,6 +3,7 @@
     "appName": "Smena",
     "cancel": "Cancel",
     "save": "Save",
+    "saveSuccess": "Saved successfully!",
     "continue": "Continue",
     "next": "Next",
     "back": "Back",
@@ -12,19 +13,21 @@
     "seeAll": "See all",
     "remove": "Remove",
     "close": "Close",
+    "clear": "Clear",
     "confirm": "Confirm",
     "error": "Error",
     "somethingWrong": "Something went wrong",
     "tryAgain": "Please try again.",
-    "comingSoon": "Coming soon"
+    "comingSoon": "Coming soon!"
   },
   "validation": {
-    "required": "This field is required",
+    "required": "This field is required.",
     "emailInvalid": "Enter a valid email",
     "passwordMin": "Password must be at least 8 characters",
     "passwordsDontMatch": "Passwords do not match",
     "nameMin": "Enter your full name",
-    "selectPosition": "Select at least one position"
+    "selectPosition": "Please select at least one position.",
+    "selectExperience": "Please select your experience level."
   },
   "nav": {
     "home": "Home",
@@ -45,8 +48,12 @@
   },
   "auth": {
     "signIn": "Sign in",
-    "signUp": "Sign up",
-    "signInSubtitle": "Welcome back to Smena.",
+    "welcomeBack": "Welcome back",
+    "signInSubtitle": "Sign in and continue where you left off.",
+    "forgotPassword": "Forgot password?",
+    "or": "or",
+    "continueWithApple": "Apple",
+    "continueWithGoogle": "Google",
     "email": "Email",
     "password": "Password",
     "confirmPassword": "Confirm password",
@@ -54,16 +61,27 @@
     "phone": "Phone number",
     "phoneOptional": "Phone (optional)",
     "city": "City",
+    "profilePicture": "Profile picture",
     "workerSignUpTitle": "Create your profile",
-    "workerSignUpSubtitle": "Venues find you based on this info.",
+    "workerDetailsTitle": "Work details",
+    "workerDetailsSubtitle": "Venues find you based on this info.",
     "position": "Position",
     "positionHint": "choose one or more",
     "experience": "Experience",
-    "venueSignUpTitle": "Register your venue",
+    "workerExperienceTitle": "Your experience",
+    "workerExperienceSubtitle": "Help venues get to know you better.",
+    "bio": "About you",
+    "bioPlaceholder": "Tell venues a bit about yourself",
+    "skills": "Skills",
+    "addSkill": "Add skill",
+    "skillPlaceholder": "e.g. Latte art",
+    "venueSignUpTitle": "Enter your details",
     "venueDetailsTitle": "Venue details",
+    "venueContactTitle": "Contact & description",
     "venueDetailsSubtitle": "This is how workers will see you in listings.",
     "venueLogo": "Venue logo",
     "addPhoto": "Add photo",
+    "changePhoto": "Change photo",
     "venueName": "Venue name",
     "venueType": "Venue type",
     "address": "Address",
@@ -72,8 +90,17 @@
     "description": "Short description",
     "alreadyHaveAccount": "Already have an account?",
     "noAccount": "Don't have an account?",
+    "registerNow": "Register now!",
     "createAccount": "Create account",
     "confirmEmail": "Check your email to confirm your account, then sign in."
+  },
+  "imagePicker": {
+    "chooseFromDevice": "Choose from device",
+    "chooseDifferent": "Choose a different photo",
+    "usePhoto": "Use this photo",
+    "permissionDenied": "We need access to your photos to continue.",
+    "squareSizeHint": "For best results, use a square image close to 400×400px — other proportions may get cropped or padded.",
+    "coverSizeHint": "For best results, use a wide image close to 1080×600px (9:5) — other proportions may get cropped or padded."
   },
   "home": {
     "greeting": "Hi",
@@ -94,7 +121,12 @@
     "candidates": "{count} candidates",
     "applicationsReceived": "Applications received",
     "empty": "Nothing here yet",
-    "searchPlaceholder": "Search position or venue"
+    "noSearchResults": "No venues match “{query}”",
+    "noSearchResultsHint": "Try a different name or clear the search.",
+    "searchPlaceholder": "Search venue",
+    "availableWorkers": "Available workers",
+    "noWorkersAvailable": "No workers available right now",
+    "availableTag": "AVAILABLE"
   },
   "listings": {
     "title": "Listings",
@@ -121,7 +153,7 @@
     "pay": "Pay",
     "schedule": "Schedule",
     "apply": "Apply",
-    "applied": "Application sent",
+    "applied": "Your application has been sent!",
     "saveListing": "Save",
     "savedListing": "Saved",
     "notFound": "Listing not found",
@@ -131,34 +163,49 @@
     "location": "Location",
     "callVenue": "Call venue",
     "edit": "Edit",
-    "noPhone": "Venue has no contact phone on file",
+    "noPhone": "Venue has no contact phone on file.",
     "deleteTitle": "Delete listing?",
     "deleteMessage": "This action cannot be undone.",
     "deleteConfirm": "Delete",
-    "deleteSuccess": "Listing deleted"
+    "deleteSuccess": "Listing deleted successfully.",
+    "applicantsTitle": "Applicants",
+    "noApplicants": "No one has applied yet"
+  },
+  "workerDetail": {
+    "notFound": "Worker not found",
+    "phone": "Phone",
+    "call": "Call worker",
+    "noPhone": "Worker has no contact phone on file."
   },
   "saved": {
     "title": "Saved",
+    "subtitle": "Listings you saved for later",
+    "count": "{count} listings",
     "empty": "No saved listings",
-    "emptyDesc": "Tap the bookmark on any shift to save it for later."
+    "emptyDesc": "Tap the bookmark on any shift to save it for later.",
+    "savedMinutesAgo": "Saved {count}m ago",
+    "savedHoursAgo": "Saved {count}h ago",
+    "savedYesterday": "Saved yesterday",
+    "savedDaysAgo": "Saved {count}d ago"
   },
   "profile": {
     "title": "Profile",
     "venueProfileTitle": "Venue profile",
+    "coverPhoto": "Cover photo",
     "editProfile": "Edit profile",
     "myApplications": "My applications",
     "myListings": "My listings",
     "settings": "Settings",
     "language": "Language",
     "theme": "Appearance",
-    "themeSystem": "System",
-    "themeLight": "Light",
-    "themeDark": "Dark",
     "logOut": "Log out",
     "logOutConfirm": "Are you sure you want to log out?",
     "memberSince": "Member since",
     "worker": "Worker",
-    "venue": "Venue"
+    "venue": "Venue",
+    "about": "About me",
+    "availableForWork": "Available for work",
+    "experienceLabel": "experience"
   },
   "pay": {
     "hour": "/hr",
@@ -199,7 +246,8 @@
     "title": "New listing",
     "editTitle": "Edit listing",
     "saveChanges": "Save changes",
-    "updateSuccess": "Listing updated",
+    "updateSuccess": "Listing updated successfully!",
+    "dateTimeRequired": "Please select a date and time for the shift.",
     "positionQuestion": "Which position do you need?",
     "titleLabel": "Listing title",
     "titleHint": "Short and clear — this is what workers see first.",
@@ -219,6 +267,6 @@
     "selectTime": "Select time",
     "from": "From",
     "to": "To",
-    "publishSuccess": "Listing published"
+    "publishSuccess": "Listing published successfully!"
   }
 }

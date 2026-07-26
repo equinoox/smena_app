@@ -1,13 +1,13 @@
 # Supabase setup
 
-Run these migrations in order in the Supabase SQL editor (Dashboard → SQL Editor),
+Run `migrations/0001_init.sql` in the Supabase SQL editor (Dashboard → SQL Editor),
 or via the Supabase CLI (`supabase db push`).
 
-1. `migrations/0001_init.sql` — enums, tables, triggers (incl. auto-profile on signup).
-2. `migrations/0002_rls.sql` — Row Level Security policies (role/ownership scoped).
-3. `migrations/0003_storage.sql` — `avatars` + `venue-logos` storage buckets & policies.
-4. `migrations/0004_worker_profile_fields.sql` — `profiles.worker_roles` + `profiles.experience_level`.
-5. `migrations/0005_listing_views.sql` — `listing_views` table (a worker opening a listing logs a view; powers venue home stats).
+`0001_init.sql` is the consolidated first-version schema: enums, tables, triggers
+(incl. auto-profile on signup), RLS policies, and storage buckets — squashed from
+what were originally ten incremental migrations, before any real users existed.
+From here on, every schema change is a new migration on top of this one
+(`0002_...`, `0003_...`, etc.) — don't edit `0001_init.sql` again once there's real data.
 
 ## Notes
 

@@ -1,6 +1,7 @@
-// Avatar — remote image with initials fallback. Circular, token-styled.
-import { Image, Text, View } from "react-native";
-import { cn } from "@shared/lib/cn";
+// Avatar — remote image with a generic profile-icon fallback. Rounded square, token-styled.
+import { User } from "phosphor-react-native";
+import { Image, View } from "react-native";
+import { useThemeColors } from "@shared/hooks/useThemeColors";
 
 type AvatarProps = {
   uri?: string | null;
@@ -8,17 +9,10 @@ type AvatarProps = {
   size?: number;
 };
 
-function initials(name?: string | null): string {
-  if (!name) return "?";
-  return name
-    .trim()
-    .split(/\s+/)
-    .slice(0, 2)
-    .map((part) => part[0]?.toUpperCase() ?? "")
-    .join("");
-}
-
-export function Avatar({ uri, name, size = 44 }: AvatarProps) {
+// `name` is accepted for callers that still pass it (a11y label, future use) but no
+// longer drives the fallback — a missing photo always shows the same profile icon.
+export function Avatar({ uri, size = 44 }: AvatarProps) {
+  const colors = useThemeColors();
   // Design uses rounded squares (not circles) for avatars/logos.
   const dimension = { width: size, height: size, borderRadius: Math.round(size * 0.3) };
 
@@ -34,16 +28,8 @@ export function Avatar({ uri, name, size = 44 }: AvatarProps) {
   }
 
   return (
-    <View
-      style={dimension}
-      className={cn("items-center justify-center bg-bg-icon-tint")}
-    >
-      <Text
-        className="font-sans-bold text-brand"
-        style={{ fontSize: size * 0.4 }}
-      >
-        {initials(name)}
-      </Text>
+    <View style={dimension} className="items-center justify-center bg-bg-icon-tint">
+      <User size={size * 0.55} weight="fill" color={colors.brand} />
     </View>
   );
 }

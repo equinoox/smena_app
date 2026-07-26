@@ -8,6 +8,7 @@ import {
   useMemo,
   useState,
 } from "react";
+import { markOnboardingComplete } from "@shared/hooks/useOnboardingStatus";
 import { supabase } from "@shared/lib/supabase";
 
 type AuthContextValue = {
@@ -42,6 +43,9 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       user: session?.user ?? null,
       initializing,
       signOut: async () => {
+        // Whoever is signing out obviously already had a session on this device —
+        // onboarding must never resurface for them again (see RootNavigator's guard).
+        await markOnboardingComplete();
         await supabase.auth.signOut();
       },
     }),

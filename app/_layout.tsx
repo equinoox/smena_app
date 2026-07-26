@@ -10,6 +10,7 @@ import {
   useFonts,
 } from "@expo-google-fonts/plus-jakarta-sans";
 import { QueryClientProvider } from "@tanstack/react-query";
+import { useEffect, useState } from "react";
 import { StatusBar } from "expo-status-bar";
 import { Stack } from "expo-router";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
@@ -35,15 +36,22 @@ import { queryClient } from "@shared/lib/queryClient";
 function RootNavigator() {
   const { session, initializing } = useAuth();
   const { completed } = useOnboardingStatus();
+  const isSignedIn = !!session;
+
+  // Belt-and-suspenders against ever re-showing onboarding after a sign-out: once this
+  // app instance has observed a session, never let the onboarding guard re-open again
+  // for the rest of this run, regardless of what the persisted `completed` flag says.
+  const [everSignedIn, setEverSignedIn] = useState(false);
+  useEffect(() => {
+    if (isSignedIn) setEverSignedIn(true);
+  }, [isSignedIn]);
 
   // Hold render until we know both flags — avoids briefly mounting the wrong guard.
   if (initializing || completed === null) return null;
 
-  const isSignedIn = !!session;
-
   return (
     <Stack screenOptions={{ headerShown: false }}>
-      <Stack.Protected guard={!completed && !isSignedIn}>
+      <Stack.Protected guard={!completed && !isSignedIn && !everSignedIn}>
         <Stack.Screen name="onboarding" />
       </Stack.Protected>
 
@@ -53,9 +61,14 @@ function RootNavigator() {
 
       <Stack.Protected guard={isSignedIn}>
         <Stack.Screen name="(tabs)" />
+        <Stack.Screen name="listings" />
         <Stack.Screen name="listing/[id]" />
+        <Stack.Screen name="listing-applicants/[id]" />
+        <Stack.Screen name="worker/[id]" />
         <Stack.Screen name="profile-edit" />
+        <Stack.Screen name="settings" />
         <Stack.Screen name="listing-create" options={{ presentation: "modal" }} />
+        <Stack.Screen name="venue-profile-edit" options={{ presentation: "modal" }} />
       </Stack.Protected>
     </Stack>
   );
