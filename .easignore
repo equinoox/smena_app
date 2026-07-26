@@ -1,0 +1,45 @@
+# Keep this list aligned with .gitignore. The final !.env rule intentionally
+# sends the local Expo public configuration to EAS Build without committing it.
+
+# dependencies
+node_modules/
+
+# Expo
+.expo/
+dist/
+web-build/
+expo-env.d.ts
+
+# Native
+.kotlin/
+*.orig.*
+*.jks
+*.p8
+*.p12
+*.key
+*.mobileprovision
+/ios
+/android
+
+# Metro
+.metro-health-check*
+
+# debug
+npm-debug.*
+yarn-debug.*
+yarn-error.*
+
+# macOS
+.DS_Store
+*.pem
+
+# local env files
+.env
+.env*.local
+
+# typescript
+*.tsbuildinfo
+
+# EXPO_PUBLIC_* values are compiled into the client bundle and are public.
+# Include the local file so preview builds work even before EAS envs are set.
+!.env

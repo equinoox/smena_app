@@ -9,22 +9,23 @@ import type { Database } from "@shared/types/database.types";
 const supabaseUrl = process.env.EXPO_PUBLIC_SUPABASE_URL;
 const supabaseAnonKey = process.env.EXPO_PUBLIC_SUPABASE_ANON_KEY;
 
-if (!supabaseUrl || !supabaseAnonKey) {
-  // Fail loud and early: copy .env.example -> .env and fill in the project keys.
-  throw new Error(
-    "Missing EXPO_PUBLIC_SUPABASE_URL / EXPO_PUBLIC_SUPABASE_ANON_KEY. " +
-      "Copy .env.example to .env and set your Supabase project values.",
-  );
-}
+export const isSupabaseConfigured = Boolean(supabaseUrl && supabaseAnonKey);
 
-export const supabase = createClient<Database>(supabaseUrl, supabaseAnonKey, {
-  auth: {
-    storage: AsyncStorage,
-    autoRefreshToken: true,
-    persistSession: true,
-    detectSessionInUrl: false,
+// Keep module evaluation safe in release builds. RootLayout renders a useful
+// configuration error when EAS variables are absent instead of Android closing
+// the app because of an uncaught import-time exception.
+export const supabase = createClient<Database>(
+  supabaseUrl ?? "https://configuration-missing.invalid",
+  supabaseAnonKey ?? "configuration-missing",
+  {
+    auth: {
+      storage: AsyncStorage,
+      autoRefreshToken: true,
+      persistSession: true,
+      detectSessionInUrl: false,
+    },
   },
-});
+);
 
 // Keep the session token fresh only while the app is in the foreground.
 AppState.addEventListener("change", (state) => {

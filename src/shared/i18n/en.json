@@ -99,6 +99,7 @@
     "chooseDifferent": "Choose a different photo",
     "usePhoto": "Use this photo",
     "permissionDenied": "We need access to your photos to continue.",
+    "unavailable": "Photos are not available in this app version. Install a new build and try again.",
     "squareSizeHint": "For best results, use a square image close to 400×400px — other proportions may get cropped or padded.",
     "coverSizeHint": "For best results, use a wide image close to 1080×600px (9:5) — other proportions may get cropped or padded."
   },

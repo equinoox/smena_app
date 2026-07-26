@@ -13,6 +13,7 @@ import { QueryClientProvider } from "@tanstack/react-query";
 import { useEffect, useState } from "react";
 import { StatusBar } from "expo-status-bar";
 import { Stack } from "expo-router";
+import { Text, View } from "react-native";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
 import { SafeAreaProvider } from "react-native-safe-area-context";
 import { ErrorBoundary } from "@shared/components/ErrorBoundary";
@@ -22,6 +23,21 @@ import { I18nProvider } from "@shared/i18n/I18nProvider";
 import { AuthProvider, useAuth } from "@shared/providers/AuthProvider";
 import { ThemeProvider } from "@shared/providers/ThemeProvider";
 import { queryClient } from "@shared/lib/queryClient";
+import { isSupabaseConfigured } from "@shared/lib/supabase";
+
+function MissingConfigurationScreen() {
+  return (
+    <View className="flex-1 items-center justify-center bg-bg-screen px-8">
+      <Text className="text-center font-sans-bold text-xl text-text-primary">
+        Nedostaje konfiguracija aplikacije
+      </Text>
+      <Text className="mt-3 text-center font-sans text-sm text-text-tertiary">
+        EAS build nema EXPO_PUBLIC_SUPABASE_URL i EXPO_PUBLIC_SUPABASE_ANON_KEY.
+        Proveri .env ili EAS environment variables, pa napravi novi build.
+      </Text>
+    </View>
+  );
+}
 
 // Gates onboarding / auth / tabs based on onboarding flag + session. Stack.Protected
 // (unlike the old manual router.replace effect) also purges history entries for a
@@ -85,6 +101,10 @@ export default function RootLayout() {
 
   // Hold render until fonts are ready to avoid a flash of the system font.
   if (!fontsLoaded) return null;
+
+  if (!isSupabaseConfigured) {
+    return <MissingConfigurationScreen />;
+  }
 
   return (
     <GestureHandlerRootView style={{ flex: 1 }}>

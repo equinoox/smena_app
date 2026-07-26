@@ -99,6 +99,7 @@
     "chooseDifferent": "Izaberi drugu fotografiju",
     "usePhoto": "Koristi ovu fotografiju",
     "permissionDenied": "Potreban je pristup galeriji da bismo nastavili.",
+    "unavailable": "Galerija nije dostupna u ovoj verziji aplikacije. Instaliraj novi build i pokušaj ponovo.",
     "squareSizeHint": "Za najbolji izgled koristi kvadratnu sliku približno 400×400px — druge proporcije mogu biti isečene ili dopunjene pozadinom.",
     "coverSizeHint": "Za najbolji izgled koristi široku sliku približno 1080×600px (9:5) — druge proporcije mogu biti isečene ili dopunjene pozadinom."
   },

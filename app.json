@@ -31,7 +31,8 @@
         "expo-image-picker",
         {
           "photosPermission": "Allow Smena to access your photos so you can add a profile or venue picture.",
-          "cameraPermission": false
+          "cameraPermission": false,
+          "microphonePermission": false
         }
       ]
     ],

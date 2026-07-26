@@ -1,6 +1,5 @@
 // ImagePickerModal — pick-from-device flow: a note on recommended image dimensions, a
 // "choose from device" button, and a live preview once an image is picked.
-import * as ExpoImagePicker from "expo-image-picker";
 import { Image as ImageIcon, UploadSimple, WarningCircle } from "phosphor-react-native";
 import { useState } from "react";
 import { Image, Text, View } from "react-native";
@@ -38,20 +37,29 @@ export function ImagePickerModal({
   };
 
   const pickImage = async () => {
-    const permission = await ExpoImagePicker.requestMediaLibraryPermissionsAsync();
-    if (!permission.granted) {
-      toast.error(t("imagePicker.permissionDenied"));
-      return;
-    }
+    try {
+      // Load the native package only when it is actually used. This keeps an old
+      // Expo Go/development-client binary from breaking every route at startup.
+      // A freshly built SDK 57 binary contains ExponentImagePicker.
+      // Metro's dynamic import wraps CommonJS modules in `default` on Android,
+      // while a deferred require returns the actual named-export object.
+      const ExpoImagePicker =
+        require("expo-image-picker") as typeof import("expo-image-picker");
 
-    const result = await ExpoImagePicker.launchImageLibraryAsync({
-      mediaTypes: ["images"],
-      allowsEditing: true,
-      aspect,
-      quality: 0.8,
-    });
-    if (!result.canceled && result.assets[0]) {
-      setPickedUri(result.assets[0].uri);
+      // SDK 57 uses the system photo picker, so opening the image library does
+      // not require a separate media-library permission request.
+      const result = await ExpoImagePicker.launchImageLibraryAsync({
+        mediaTypes: ["images"],
+        allowsEditing: true,
+        aspect,
+        quality: 0.8,
+      });
+      if (!result.canceled && result.assets[0]) {
+        setPickedUri(result.assets[0].uri);
+      }
+    } catch (error) {
+      console.error("[Image picker error]", error);
+      toast.error(t("imagePicker.unavailable"));
     }
   };
 
