@@ -27,7 +27,7 @@ import { useAuth } from "@shared/hooks/useAuth";
 import { useMyVenue } from "@shared/hooks/useMyVenue";
 import { useThemeColors } from "@shared/hooks/useThemeColors";
 import { useTranslation, type TranslationKey } from "@shared/i18n/I18nProvider";
-import { employmentChipVariant, formatTimeRange } from "@shared/lib/format";
+import { employmentChipVariant, formatLocation, formatTimeRange } from "@shared/lib/format";
 import { roleIcon } from "@shared/lib/roleIcon";
 import type { ListingWithVenue } from "@shared/types/domain.types";
 import { useVenueListingsByOwner } from "@features/listings/hooks/useListings";
@@ -98,7 +98,7 @@ export function VenueProfileScreen() {
 
   if (isLoading || !venue) return <Loader />;
 
-  const location = [venue.address, venue.city].filter(Boolean).join(" · ");
+  const location = formatLocation(venue.address, venue.city);
 
   return (
     <SafeAreaView edges={["top"]} className="flex-1 bg-bg-screen">

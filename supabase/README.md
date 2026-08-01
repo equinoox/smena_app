@@ -9,6 +9,26 @@ what were originally ten incremental migrations, before any real users existed.
 From here on, every schema change is a new migration on top of this one
 (`0002_...`, `0003_...`, etc.) — don't edit `0001_init.sql` again once there's real data.
 
+## Test data
+
+`reset.sql` wipes every table (via `delete from auth.users`, which cascades through
+every FK). `seed.sql` then creates 4 test accounts — 1 worker + 3 venues at different
+real Belgrade locations, each venue with one open listing — for exercising
+location-dependent features (distance/near-me).
+
+Run from the terminal (needs `psql` installed and `SUPABASE_DB_URL` set in `.env` —
+see `.env.example`):
+```
+npm run db:reset       # wipe everything
+npm run db:seed        # seed the 4 test accounts + listings
+npm run db:test-reset  # both, in order
+```
+Or paste `reset.sql`/`seed.sql` into the Supabase dashboard SQL editor directly.
+
+**Keep both files in sync with the schema** — whenever a migration adds/renames/drops
+a column those scripts touch, update `reset.sql`/`seed.sql` (and this note) in the
+same change.
+
 ## Notes
 
 - **Auth**: `handle_new_user()` reads `role`, `full_name`, `phone` from the signup

@@ -32,6 +32,9 @@ export interface Database {
           avatar_url: string | null;
           bio: string | null;
           city: string | null;
+          address: string | null;
+          lat: number | null;
+          lng: number | null;
           worker_roles: WorkerRole[];
           experience_level: ExperienceLevel | null;
           skills: string[];
@@ -47,6 +50,9 @@ export interface Database {
           avatar_url?: string | null;
           bio?: string | null;
           city?: string | null;
+          address?: string | null;
+          lat?: number | null;
+          lng?: number | null;
           worker_roles?: WorkerRole[];
           experience_level?: ExperienceLevel | null;
           skills?: string[];

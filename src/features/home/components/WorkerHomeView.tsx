@@ -1,10 +1,11 @@
 // Worker home — greeting/search/role-filter header + "recommended near you" list.
-// "Recommended" has no real ranking logic yet: it's every open listing, newest/urgent
-// first (same ordering fetchListings always uses) — only search (by venue name) and
-// the role chips are real filters.
+// "Recommended" (the default view, no search/role filter active) is the 3 nearest open
+// listings to the worker's own home location, nearest first. Searching or filtering by
+// role switches to plain matching results (unranked, uncapped) — that's browse mode,
+// not "recommended".
 import { useRouter } from "expo-router";
 import { Bell, MagnifyingGlass, X } from "phosphor-react-native";
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { ActivityIndicator, Pressable, ScrollView, Text, View } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { Chip } from "@shared/components/Chip";
@@ -14,11 +15,15 @@ import { WorkerIdentityBar } from "@shared/components/WorkerIdentityBar";
 import { useSavedIds, useToggleSaved } from "@shared/hooks/useSaved";
 import { useThemeColors } from "@shared/hooks/useThemeColors";
 import { useToast } from "@shared/hooks/useToast";
+import { useUpdateWorkerLocation } from "@shared/hooks/useUpdateLocation";
 import { useTranslation, type TranslationKey } from "@shared/i18n/I18nProvider";
+import { haversineDistanceKm } from "@shared/lib/geo";
 import { roleIcon, WORKER_ROLES } from "@shared/lib/roleIcon";
 import type { Profile, WorkerRole } from "@shared/types/database.types";
 import type { ListingWithVenue } from "@shared/types/domain.types";
 import { useListings } from "@features/listings/hooks/useListings";
+
+const NEARBY_COUNT = 3;
 
 export function WorkerHomeView({ profile }: { profile: Profile | null }) {
   const router = useRouter();
@@ -44,6 +49,7 @@ export function WorkerHomeView({ profile }: { profile: Profile | null }) {
   });
   const savedIds = useSavedIds();
   const toggleSaved = useToggleSaved();
+  const updateLocation = useUpdateWorkerLocation();
 
   // Feedback starts on the keystroke, not when the debounce fires — otherwise the field
   // looks idle for 300ms. `isPlaceholderData` covers the fetch that follows (see useListings:
@@ -60,6 +66,29 @@ export function WorkerHomeView({ profile }: { profile: Profile | null }) {
   const onToggleSave = (listing: ListingWithVenue) =>
     toggleSaved.mutate({ listingId: listing.id, saved: savedIds.has(listing.id) });
 
+  // "Recommended" only applies to the unfiltered default view — once the worker
+  // searches or picks a role chip, that's browse mode: show every match, unranked.
+  const isDefaultView = !search && !roleFilter;
+  const workerLat = profile?.lat;
+  const workerLng = profile?.lng;
+
+  const displayedListings = useMemo(() => {
+    const all = listings.data ?? [];
+    if (!isDefaultView || workerLat == null || workerLng == null) return all;
+
+    return all
+      .filter((listing) => listing.venue?.lat != null && listing.venue?.lng != null)
+      .map((listing) => ({
+        ...listing,
+        distanceKm: haversineDistanceKm(
+          { lat: workerLat, lng: workerLng },
+          { lat: listing.venue!.lat!, lng: listing.venue!.lng! },
+        ),
+      }))
+      .sort((a, b) => a.distanceKm - b.distanceKm)
+      .slice(0, NEARBY_COUNT);
+  }, [listings.data, isDefaultView, workerLat, workerLng]);
+
   const header = (
     <View className="pb-4">
       {/* Slightly different background than the screen — visually groups identity/search/filters.
@@ -72,6 +101,7 @@ export function WorkerHomeView({ profile }: { profile: Profile | null }) {
       >
         <WorkerIdentityBar
           profile={profile}
+          onChangeLocation={(value) => updateLocation.mutateAsync(value)}
           right={
             <Pressable
               onPress={() => toast.info(t("common.comingSoon"))}
@@ -154,7 +184,7 @@ export function WorkerHomeView({ profile }: { profile: Profile | null }) {
   return (
     <View className="flex-1 bg-bg-screen">
       <ListingList
-        listings={listings.data ?? []}
+        listings={displayedListings}
         isLoading={listings.isLoading}
         savedIds={savedIds}
         onToggleSave={onToggleSave}

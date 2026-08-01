@@ -61,6 +61,8 @@
     "phone": "Phone number",
     "phoneOptional": "Phone (optional)",
     "city": "City",
+    "homeAddress": "Home address",
+    "chooseOnMap": "Choose on map",
     "profilePicture": "Profile picture",
     "workerSignUpTitle": "Create your profile",
     "workerDetailsTitle": "Work details",
@@ -93,6 +95,19 @@
     "registerNow": "Register now!",
     "createAccount": "Create account",
     "confirmEmail": "Check your email to confirm your account, then sign in."
+  },
+  "location": {
+    "searchPlaceholder": "Search for an address",
+    "confirmLocation": "Confirm location",
+    "useCurrentLocation": "Use current location",
+    "locating": "Finding address…",
+    "permissionDenied": "Location access denied. Enable it in your device settings.",
+    "noResults": "No results found",
+    "notConfigured": "Maps are not available right now.",
+    "changeTitle": "Change location?",
+    "changeMessage": "Are you sure you want to replace your current location with the new one you picked?",
+    "setLocation": "Set your location",
+    "distanceAway": "About {distance} away from you"
   },
   "imagePicker": {
     "chooseFromDevice": "Choose from device",

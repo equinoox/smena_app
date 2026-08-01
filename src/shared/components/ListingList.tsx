@@ -26,7 +26,7 @@ function NoListingsIcon() {
 }
 
 type ListingListProps = {
-  listings: (ListingWithVenue & { savedAt?: string })[];
+  listings: (ListingWithVenue & { savedAt?: string; distanceKm?: number })[];
   isLoading: boolean;
   savedIds?: Set<string>;
   onToggleSave?: (listing: ListingWithVenue) => void;
@@ -80,6 +80,7 @@ export function ListingList({
           listing={item}
           saved={savedIds?.has(item.id)}
           savedAt={item.savedAt}
+          distanceKm={item.distanceKm}
           onToggleSave={
             onToggleSave ? () => onToggleSave(item) : undefined
           }

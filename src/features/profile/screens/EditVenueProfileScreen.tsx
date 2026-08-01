@@ -2,7 +2,7 @@
 // from the owner's existing venue record. Opened from the venue-profile tab's edit button.
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useRouter } from "expo-router";
-import { CaretLeft, MapPin, Storefront } from "phosphor-react-native";
+import { CaretLeft, Storefront } from "phosphor-react-native";
 import { useEffect } from "react";
 import { Controller, useForm } from "react-hook-form";
 import { Pressable, Text, View } from "react-native";
@@ -11,6 +11,7 @@ import { Chip } from "@shared/components/Chip";
 import { ControlledInput } from "@shared/components/ControlledInput";
 import { ImagePickerField } from "@shared/components/ImagePickerField";
 import { Loader } from "@shared/components/Loader";
+import { LocationPickerField } from "@shared/components/LocationPickerField";
 import { PhoneInput } from "@shared/components/PhoneInput";
 import { Screen } from "@shared/components/Screen";
 import { useMyVenue } from "@shared/hooks/useMyVenue";
@@ -38,7 +39,7 @@ export function EditVenueProfileScreen() {
     defaultValues: {
       venueName: "",
       venueType: "cafe",
-      address: "",
+      location: undefined,
       pib: "",
       phone: "",
       description: "",
@@ -53,7 +54,16 @@ export function EditVenueProfileScreen() {
     reset({
       venueName: venue.name,
       venueType: venue.venue_type,
-      address: venue.address ?? "",
+      // Venues created before location-picking existed may have an address but no
+      // coordinates yet — fall back to 0,0 rather than leaving the field unset.
+      location: venue.address
+        ? {
+            address: venue.address,
+            city: venue.city,
+            lat: venue.lat ?? 0,
+            lng: venue.lng ?? 0,
+          }
+        : undefined,
       pib: venue.pib ?? "",
       phone: fromSerbianPhone(venue.phone),
       description: venue.description ?? "",
@@ -65,7 +75,7 @@ export function EditVenueProfileScreen() {
       {
         name: values.venueName,
         venueType: values.venueType,
-        address: values.address,
+        location: values.location,
         pib: values.pib,
         phone: toSerbianPhone(values.phone),
         description: values.description,
@@ -160,12 +170,18 @@ export function EditVenueProfileScreen() {
           />
         </View>
 
-        <ControlledInput
+        <Controller
           control={control}
-          name="address"
-          label={t("auth.address")}
-          autoCapitalize="words"
-          leftIcon={<MapPin size={18} color={colors.textMuted} />}
+          name="location"
+          render={({ field, fieldState }) => (
+            <LocationPickerField
+              value={field.value}
+              onChange={field.onChange}
+              label={t("auth.address")}
+              placeholder={t("auth.chooseOnMap")}
+              error={fieldState.error?.message}
+            />
+          )}
         />
 
         <ControlledInput

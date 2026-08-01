@@ -34,6 +34,18 @@
           "cameraPermission": false,
           "microphonePermission": false
         }
+      ],
+      [
+        "@rnmapbox/maps",
+        {
+          "RNMapboxMapsVersion": "11.20.1"
+        }
+      ],
+      [
+        "expo-location",
+        {
+          "locationWhenInUsePermission": "Allow Smena to access your location so you can quickly find your address on the map."
+        }
       ]
     ],
     "experiments": {

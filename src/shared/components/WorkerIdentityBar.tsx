@@ -1,20 +1,24 @@
-// WorkerIdentityBar — avatar + full name (+ city) row shown atop worker-facing tabs
+// WorkerIdentityBar — avatar + full name (+ address) row shown atop worker-facing tabs
 // (Home, Saved) for a consistent identity header. Optional trailing slot for
-// screen-specific actions (e.g. Home's notification bell).
-import { MapPin } from "phosphor-react-native";
+// screen-specific actions (e.g. Home's notification bell). The address is tappable —
+// see EditableLocationRow for the pick-then-confirm flow.
 import { Text, View } from "react-native";
 import { Avatar } from "@shared/components/Avatar";
-import { useThemeColors } from "@shared/hooks/useThemeColors";
+import { EditableLocationRow } from "@shared/components/EditableLocationRow";
+import type { LocationValue } from "@shared/types/location.types";
 import type { Profile } from "@shared/types/database.types";
 
 type WorkerIdentityBarProps = {
   profile: Profile | null;
+  onChangeLocation: (value: LocationValue) => Promise<unknown>;
   right?: React.ReactNode;
 };
 
-export function WorkerIdentityBar({ profile, right }: WorkerIdentityBarProps) {
-  const colors = useThemeColors();
-
+export function WorkerIdentityBar({
+  profile,
+  onChangeLocation,
+  right,
+}: WorkerIdentityBarProps) {
   return (
     <View className="flex-row items-center justify-between">
       <View className="flex-1 flex-row items-center gap-3">
@@ -26,13 +30,22 @@ export function WorkerIdentityBar({ profile, right }: WorkerIdentityBarProps) {
           >
             {profile?.full_name ?? ""}
           </Text>
-          {profile?.city ? (
-            <View className="mt-0.5 flex-row items-center gap-1">
-              <MapPin size={13} weight="fill" color={colors.brand} />
-              <Text className="font-sans-semibold text-xs text-brand" numberOfLines={1}>
-                {profile.city}
-              </Text>
-            </View>
+          {profile ? (
+            <EditableLocationRow
+              className="mt-0.5"
+              address={profile.address}
+              currentValue={
+                profile.address && profile.lat != null && profile.lng != null
+                  ? {
+                      address: profile.address,
+                      city: profile.city,
+                      lat: profile.lat,
+                      lng: profile.lng,
+                    }
+                  : undefined
+              }
+              onChangeLocation={onChangeLocation}
+            />
           ) : null}
         </View>
       </View>

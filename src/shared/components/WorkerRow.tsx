@@ -1,20 +1,24 @@
 // WorkerRow — compact identity row for a worker (avatar, name, city + roles), tappable
-// to open their detail screen. Optional trailing accessory (badge, status, etc).
+// to open their detail screen. Optional trailing accessory (badge, status, etc) and an
+// optional distance-from-venue chip (venue's "Available workers" list, nearest first).
 import { useRouter } from "expo-router";
-import { MapPin } from "phosphor-react-native";
+import { MapPin, NavigationArrow } from "phosphor-react-native";
 import { Text, View } from "react-native";
 import { Avatar } from "@shared/components/Avatar";
 import { Card } from "@shared/components/Card";
+import { Chip } from "@shared/components/Chip";
 import { useThemeColors } from "@shared/hooks/useThemeColors";
 import { useTranslation, type TranslationKey } from "@shared/i18n/I18nProvider";
+import { formatDistanceKm, formatLocation } from "@shared/lib/format";
 import type { Profile } from "@shared/types/database.types";
 
 type WorkerRowProps = {
   worker: Profile;
   trailing?: React.ReactNode;
+  distanceKm?: number;
 };
 
-export function WorkerRow({ worker, trailing }: WorkerRowProps) {
+export function WorkerRow({ worker, trailing, distanceKm }: WorkerRowProps) {
   const router = useRouter();
   const colors = useThemeColors();
   const { t } = useTranslation();
@@ -22,7 +26,9 @@ export function WorkerRow({ worker, trailing }: WorkerRowProps) {
   const roleLabels = worker.worker_roles
     .map((role) => t(`roles.${role}` as TranslationKey))
     .join(" · ");
-  const metaLine = [worker.city, roleLabels].filter(Boolean).join(" · ");
+  const metaLine = [formatLocation(worker.address, worker.city), roleLabels]
+    .filter(Boolean)
+    .join(" · ");
 
   return (
     <Card
@@ -49,6 +55,18 @@ export function WorkerRow({ worker, trailing }: WorkerRowProps) {
               >
                 {metaLine}
               </Text>
+            </View>
+          ) : null}
+          {distanceKm != null ? (
+            <View className="mt-1.5">
+              <Chip
+                label={formatDistanceKm(distanceKm)}
+                variant="success"
+                size="sm"
+                leftIcon={
+                  <NavigationArrow size={11} weight="fill" color={colors.success} />
+                }
+              />
             </View>
           ) : null}
         </View>

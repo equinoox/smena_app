@@ -9,7 +9,6 @@ import {
   CaretLeft,
   EnvelopeSimple,
   Lock,
-  MapPin,
   User,
 } from "phosphor-react-native";
 import { useState } from "react";
@@ -19,6 +18,7 @@ import { Button } from "@shared/components/Button";
 import { Chip } from "@shared/components/Chip";
 import { ControlledInput } from "@shared/components/ControlledInput";
 import { ImagePickerField } from "@shared/components/ImagePickerField";
+import { LocationPickerField } from "@shared/components/LocationPickerField";
 import { PhoneInput } from "@shared/components/PhoneInput";
 import { Screen } from "@shared/components/Screen";
 import { TagInput } from "@shared/components/TagInput";
@@ -56,7 +56,7 @@ export function WorkerSignUpScreen() {
       confirmPassword: "",
       fullName: "",
       phone: "",
-      city: "",
+      location: undefined,
       experienceLevel: undefined,
       avatarUri: undefined,
       bio: "",
@@ -80,7 +80,7 @@ export function WorkerSignUpScreen() {
         password: values.password,
         fullName: values.fullName,
         phone: toSerbianPhone(values.phone),
-        city: values.city,
+        location: values.location,
         experienceLevel: values.experienceLevel,
         avatarUri: values.avatarUri,
         bio: values.bio,
@@ -196,12 +196,18 @@ export function WorkerSignUpScreen() {
           </Text>
 
           <View className="mt-6 gap-4">
-            <ControlledInput
+            <Controller
               control={control}
-              name="city"
-              label={t("auth.city")}
-              autoCapitalize="words"
-              leftIcon={<MapPin size={18} color={colors.textMuted} />}
+              name="location"
+              render={({ field, fieldState }) => (
+                <LocationPickerField
+                  value={field.value}
+                  onChange={field.onChange}
+                  label={t("auth.homeAddress")}
+                  placeholder={t("auth.chooseOnMap")}
+                  error={fieldState.error?.message}
+                />
+              )}
             />
 
             <PhoneInput control={control} name="phone" label={t("auth.phone")} />

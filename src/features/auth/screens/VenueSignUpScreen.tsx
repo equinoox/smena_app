@@ -9,7 +9,6 @@ import {
   CaretLeft,
   EnvelopeSimple,
   Lock,
-  MapPin,
   Storefront,
   User,
 } from "phosphor-react-native";
@@ -20,6 +19,7 @@ import { Button } from "@shared/components/Button";
 import { Chip } from "@shared/components/Chip";
 import { ControlledInput } from "@shared/components/ControlledInput";
 import { ImagePickerField } from "@shared/components/ImagePickerField";
+import { LocationPickerField } from "@shared/components/LocationPickerField";
 import { PhoneInput } from "@shared/components/PhoneInput";
 import { Screen } from "@shared/components/Screen";
 import { useOnboardingStatus } from "@shared/hooks/useOnboardingStatus";
@@ -56,7 +56,7 @@ export function VenueSignUpScreen() {
       ownerPhone: "",
       venueName: "",
       venueType: "cafe",
-      address: "",
+      location: undefined,
       pib: "",
       phone: "",
       description: "",
@@ -82,7 +82,7 @@ export function VenueSignUpScreen() {
         ownerPhone: values.ownerPhone ? toSerbianPhone(values.ownerPhone) : undefined,
         venueName: values.venueName,
         venueType: values.venueType,
-        address: values.address,
+        location: values.location,
         pib: values.pib,
         phone: toSerbianPhone(values.phone),
         description: values.description,
@@ -265,12 +265,18 @@ export function VenueSignUpScreen() {
           </Text>
 
           <View className="mt-6 gap-4">
-            <ControlledInput
+            <Controller
               control={control}
-              name="address"
-              label={t("auth.address")}
-              autoCapitalize="words"
-              leftIcon={<MapPin size={18} color={colors.textMuted} />}
+              name="location"
+              render={({ field, fieldState }) => (
+                <LocationPickerField
+                  value={field.value}
+                  onChange={field.onChange}
+                  label={t("auth.address")}
+                  placeholder={t("auth.chooseOnMap")}
+                  error={fieldState.error?.message}
+                />
+              )}
             />
 
             <ControlledInput

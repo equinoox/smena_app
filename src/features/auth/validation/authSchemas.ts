@@ -1,6 +1,7 @@
 // Zod schemas for auth forms. Factories take the translator so messages are localized.
 import { z } from "zod";
 import { EXPERIENCE_LEVELS, VENUE_TYPES, WORKER_ROLES } from "@shared/lib/roleIcon";
+import { locationSchema } from "@shared/validation/locationSchema";
 import type { TranslationKey } from "@shared/i18n/I18nProvider";
 
 type Translate = (key: TranslationKey) => string;
@@ -20,7 +21,6 @@ function baseSignUp(t: Translate) {
     confirmPassword: z.string(),
     fullName: z.string().min(2, t("validation.nameMin")),
     phone: z.string().optional(),
-    city: z.string().optional(),
   };
 }
 
@@ -33,14 +33,14 @@ export const WORKER_STEP1_FIELDS = [
 ] as const;
 
 // Step 2 (profile basics) fields — used to trigger partial validation before advancing.
-export const WORKER_STEP2_FIELDS = ["city", "phone", "experienceLevel"] as const;
+export const WORKER_STEP2_FIELDS = ["location", "phone", "experienceLevel"] as const;
 
 export function workerSignUpSchema(t: Translate) {
   return z
     .object({
       ...baseSignUp(t),
       phone: z.string().min(1, t("validation.required")),
-      city: z.string().min(1, t("validation.required")),
+      location: locationSchema(t),
       experienceLevel: z.enum(EXPERIENCE_LEVELS, {
         message: t("validation.required"),
       }),
@@ -81,7 +81,7 @@ export function venueSignUpSchema(t: Translate) {
       // Step 2 — venue details.
       venueName: z.string().min(2, t("validation.required")),
       venueType: z.enum(VENUE_TYPES),
-      address: z.string().min(1, t("validation.required")),
+      location: locationSchema(t),
       pib: z.string().min(1, t("validation.required")),
       phone: z.string().min(1, t("validation.required")),
       description: z.string().optional(),

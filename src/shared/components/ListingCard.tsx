@@ -2,7 +2,13 @@
 // "photo" (venue photo banner, default) and "compact" (role icon, tighter — worker
 // listings browse). Both share the same labeling/formatting logic below.
 import { useRouter } from "expo-router";
-import { ArrowRight, Clock, Lightning, MapPin } from "phosphor-react-native";
+import {
+  ArrowRight,
+  Clock,
+  Lightning,
+  MapPin,
+  NavigationArrow,
+} from "phosphor-react-native";
 import { Image as RNImage, Text, View } from "react-native";
 import { Avatar } from "@shared/components/Avatar";
 import { Card } from "@shared/components/Card";
@@ -12,6 +18,8 @@ import { useThemeColors } from "@shared/hooks/useThemeColors";
 import { useTranslation, type TranslationKey } from "@shared/i18n/I18nProvider";
 import {
   employmentChipVariant,
+  formatDistanceKm,
+  formatLocation,
   formatPostedAt,
   formatSavedAt,
   formatTimeRange,
@@ -25,6 +33,9 @@ type ListingCardProps = {
   // When set (Saved screen only), the bottom-left timestamp shows "Saved Xh ago"
   // instead of the listing's own posted-at date.
   savedAt?: string;
+  // Distance from the signed-in worker's home location, in km — set only on the
+  // "Recommended near you" section, which is already sorted/limited by distance.
+  distanceKm?: number;
   onToggleSave?: () => void;
   variant?: "photo" | "compact";
   // Preview usage (e.g. the create-listing form) renders a card for a listing that
@@ -36,6 +47,7 @@ export function ListingCard({
   listing,
   saved,
   savedAt,
+  distanceKm,
   onToggleSave,
   variant = "photo",
   disableNavigation,
@@ -50,8 +62,7 @@ export function ListingCard({
   );
   const time = formatTimeRange(listing.starts_at, listing.ends_at, language);
   const title = listing.title || roleLabel;
-  // `venue.city` is never collected at sign-up/edit — `address` is what's actually set.
-  const venueLocation = listing.venue?.address || listing.venue?.city;
+  const venueLocation = formatLocation(listing.venue?.address, listing.venue?.city);
   const ageLabel = savedAt
     ? formatSavedAt(savedAt, t)
     : formatPostedAt(listing.created_at, t);
@@ -144,6 +155,17 @@ export function ListingCard({
               label={t("listings.urgent")}
               variant="urgent"
               leftIcon={<Lightning size={12} weight="fill" color={colors.onAccent} />}
+            />
+          </View>
+        ) : null}
+        {distanceKm != null ? (
+          <View className="absolute bottom-2 right-2">
+            <Chip
+              label={formatDistanceKm(distanceKm)}
+              variant="success"
+              leftIcon={
+                <NavigationArrow size={12} weight="fill" color={colors.success} />
+              }
             />
           </View>
         ) : null}

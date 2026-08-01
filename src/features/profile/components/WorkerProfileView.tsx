@@ -8,6 +8,7 @@ import { WorkerAboutSections } from "@shared/components/WorkerAboutSections";
 import { useThemeColors } from "@shared/hooks/useThemeColors";
 import { useTranslation, type TranslationKey } from "@shared/i18n/I18nProvider";
 import { cn } from "@shared/lib/cn";
+import { formatLocation } from "@shared/lib/format";
 import type { Profile } from "@shared/types/database.types";
 import { useUpdateWorkerAvailability } from "@features/profile/hooks/useUpdateWorkerAvailability";
 
@@ -21,7 +22,7 @@ export function WorkerProfileView({ profile }: WorkerProfileViewProps) {
   const updateAvailability = useUpdateWorkerAvailability();
 
   const locationLine = [
-    profile.city,
+    formatLocation(profile.address, profile.city),
     profile.experience_level
       ? `${t(`experience.${profile.experience_level}` as TranslationKey)} ${t("profile.experienceLabel")}`
       : null,

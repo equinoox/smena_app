@@ -58,6 +58,11 @@ restaurants, clubs, bakeries) that need shift coverage.
 - Local/UI state → Zustand. Never duplicate in Zustand what Query already owns.
 - All Supabase access goes through typed services; types live in
   `src/shared/types/database.types.ts` (regenerate after schema changes — see `supabase/README.md`).
+- **Test data**: `supabase/reset.sql` (wipe everything) and `supabase/seed.sql` (4 test
+  accounts — 1 worker + 3 venues at different Belgrade locations, each with one listing)
+  must be kept in sync whenever the schema changes — update them in the same change that
+  adds/renames/drops a column they touch. Run via `npm run db:reset` / `db:seed` /
+  `db:test-reset` (needs `psql` + `SUPABASE_DB_URL` in `.env`, see `supabase/README.md`).
 
 ### i18n & theme
 - No user-facing string is hardcoded. Add keys to **both** `en.json` and `sr.json` and use
@@ -102,11 +107,16 @@ restaurants, clubs, bakeries) that need shift coverage.
 - Everything must run on Supabase + Expo free tiers while there are no users.
 - **Phone OTP auth needs a paid SMS provider** — not wired. Auth is email/password; phone is
   profile data only. Ask before wiring phone OTP.
-- Google Maps / `react-native-maps` not added yet. `venues.lat/lng` are stored so it can be
-  added later (PostGIS block is commented in `supabase/migrations/0001_init.sql`). Don't make
-  choices that block it.
+- Maps: `@rnmapbox/maps` + `expo-location` are added (location picker on worker/venue
+  sign-up + venue edit). Mapbox account requires a card on file even on the free tier
+  (50k map loads/mo free) — accepted tradeoff, already wired, don't re-litigate. Radius/
+  near-me search isn't built yet; `profiles.lat/lng` and `venues.lat/lng` are stored so
+  it can be added later (PostGIS block is commented in `supabase/migrations/0001_init.sql`).
 - Flag any feature that would require a paid service **before** building it.
 
 ## Running the app
 - **The user runs and tests the app on their own physical device. Never start a dev server
   (`expo start`) automatically.** Typecheck with `npm run typecheck`.
+- Native modules (e.g. `@rnmapbox/maps`) require a dev-client rebuild after install —
+  never run `expo prebuild`/`eas build` automatically; tell the user the exact command.
+- Reset/reseed test data with `npm run db:test-reset` (see `supabase/README.md`).

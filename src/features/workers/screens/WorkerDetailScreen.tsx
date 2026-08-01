@@ -15,6 +15,7 @@ import { WorkerAboutSections } from "@shared/components/WorkerAboutSections";
 import { useThemeColors } from "@shared/hooks/useThemeColors";
 import { useToast } from "@shared/hooks/useToast";
 import { useTranslation, type TranslationKey } from "@shared/i18n/I18nProvider";
+import { formatLocation } from "@shared/lib/format";
 import { useWorkerProfile } from "@features/workers/hooks/useWorkerProfile";
 
 export function WorkerDetailScreen() {
@@ -36,7 +37,7 @@ export function WorkerDetailScreen() {
   }
 
   const locationLine = [
-    worker.city,
+    formatLocation(worker.address, worker.city),
     worker.experience_level
       ? `${t(`experience.${worker.experience_level}` as TranslationKey)} ${t("profile.experienceLabel")}`
       : null,

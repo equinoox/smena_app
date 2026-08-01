@@ -61,6 +61,8 @@
     "phone": "Broj telefona",
     "phoneOptional": "Telefon (opciono)",
     "city": "Grad",
+    "homeAddress": "Adresa stanovanja",
+    "chooseOnMap": "Odaberi na mapi",
     "profilePicture": "Profilna slika",
     "workerSignUpTitle": "Napravi svoj profil",
     "workerDetailsTitle": "Radni podaci",
@@ -93,6 +95,19 @@
     "registerNow": "Registruj se odmah!",
     "createAccount": "Napravi nalog",
     "confirmEmail": "Proveri email da potvrdiš nalog, pa se prijavi."
+  },
+  "location": {
+    "searchPlaceholder": "Pretraži adresu",
+    "confirmLocation": "Potvrdi lokaciju",
+    "useCurrentLocation": "Koristi trenutnu lokaciju",
+    "locating": "Pronalaženje adrese…",
+    "permissionDenied": "Pristup lokaciji je odbijen. Omogući ga u podešavanjima uređaja.",
+    "noResults": "Nema rezultata",
+    "notConfigured": "Mapa trenutno nije dostupna.",
+    "changeTitle": "Promeniti lokaciju?",
+    "changeMessage": "Da li si siguran da želiš da zameniš trenutnu lokaciju novom koju si izabrao?",
+    "setLocation": "Postavi svoju lokaciju",
+    "distanceAway": "Otprilike {distance} od tebe"
   },
   "imagePicker": {
     "chooseFromDevice": "Izaberi sa telefona",

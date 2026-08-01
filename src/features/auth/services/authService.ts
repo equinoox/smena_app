@@ -9,13 +9,14 @@ import type {
   VenueType,
   WorkerRole,
 } from "@shared/types/database.types";
+import type { LocationValue } from "@shared/types/location.types";
 
 export type WorkerSignUpInput = {
   email: string;
   password: string;
   fullName: string;
   phone: string;
-  city: string;
+  location: LocationValue;
   experienceLevel: ExperienceLevel;
   bio?: string;
   skills: string[];
@@ -30,7 +31,7 @@ export type VenueSignUpInput = {
   ownerPhone?: string; // contact person's own phone, distinct from the venue's public phone
   venueName: string;
   venueType: VenueType;
-  address: string;
+  location: LocationValue;
   pib: string;
   phone: string; // venue's own public contact number, not the owner's
   description?: string;
@@ -67,7 +68,10 @@ export async function signUpWorker(input: WorkerSignUpInput) {
     const { data: profileData, error: profileError } = await supabase
       .from("profiles")
       .update({
-        city: input.city,
+        address: input.location.address,
+        city: input.location.city,
+        lat: input.location.lat,
+        lng: input.location.lng,
         experience_level: input.experienceLevel,
         bio: input.bio || null,
         skills: input.skills,
@@ -117,7 +121,10 @@ export async function signUpVenue(input: VenueSignUpInput) {
         owner_id: data.user.id,
         name: input.venueName,
         venue_type: input.venueType,
-        address: input.address,
+        address: input.location.address,
+        city: input.location.city,
+        lat: input.location.lat,
+        lng: input.location.lng,
         pib: input.pib,
         phone: input.phone,
         description: input.description ?? null,

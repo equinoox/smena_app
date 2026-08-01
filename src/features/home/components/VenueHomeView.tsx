@@ -7,13 +7,16 @@ import { ActivityIndicator, Pressable, ScrollView, Text, View } from "react-nati
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { Avatar } from "@shared/components/Avatar";
 import { Chip } from "@shared/components/Chip";
+import { EditableLocationRow } from "@shared/components/EditableLocationRow";
 import { EmptyState } from "@shared/components/EmptyState";
 import { WorkerRow } from "@shared/components/WorkerRow";
 import { useMyVenue } from "@shared/hooks/useMyVenue";
 import { useThemeColors } from "@shared/hooks/useThemeColors";
 import { useToast } from "@shared/hooks/useToast";
+import { useUpdateVenueLocation } from "@shared/hooks/useUpdateLocation";
 import { useUserRole } from "@shared/hooks/useUserRole";
 import { useTranslation, type TranslationKey } from "@shared/i18n/I18nProvider";
+import { haversineDistanceKm } from "@shared/lib/geo";
 import { useListingCounts } from "@features/listings/hooks/useListingViews";
 import { useVenueListings, useVenueStats } from "@features/listings/hooks/useListings";
 import { useAvailableWorkers } from "@features/home/hooks/useAvailableWorkers";
@@ -66,6 +69,7 @@ export function VenueHomeView() {
   const listings = useVenueListings(venue?.id);
   const stats = useVenueStats(venue?.id);
   const availableWorkers = useAvailableWorkers();
+  const updateLocation = useUpdateVenueLocation(venue?.id);
 
   const recentListings = useMemo(
     () => (listings.data ?? []).slice(0, 2),
@@ -76,6 +80,34 @@ export function VenueHomeView() {
     [recentListings],
   );
   const counts = useListingCounts(recentListingIds);
+
+  // Nearest first when the venue's own location is known; workers without a location
+  // of their own (pre-existing edge case) keep their original order, appended last.
+  const rankedAvailableWorkers = useMemo(() => {
+    const all = availableWorkers.data ?? [];
+    if (venue?.lat == null || venue?.lng == null) {
+      return all.map((worker) => ({ worker, distanceKm: undefined }));
+    }
+
+    const withDistance: { worker: (typeof all)[number]; distanceKm: number }[] = [];
+    const withoutLocation: { worker: (typeof all)[number]; distanceKm: undefined }[] = [];
+
+    for (const worker of all) {
+      if (worker.lat != null && worker.lng != null) {
+        withDistance.push({
+          worker,
+          distanceKm: haversineDistanceKm(
+            { lat: venue.lat, lng: venue.lng },
+            { lat: worker.lat, lng: worker.lng },
+          ),
+        });
+      } else {
+        withoutLocation.push({ worker, distanceKm: undefined });
+      }
+    }
+    withDistance.sort((a, b) => a.distanceKm - b.distanceKm);
+    return [...withDistance, ...withoutLocation];
+  }, [availableWorkers.data, venue?.lat, venue?.lng]);
 
   const comingSoon = () => toast.info(t("common.comingSoon"));
 
@@ -95,7 +127,7 @@ export function VenueHomeView() {
           style={{ paddingTop: insets.top + 16 }}
         >
           <View className="flex-row items-center justify-between pb-4">
-            <View className="flex-row items-center gap-3">
+            <View className="flex-1 flex-row items-center gap-3">
               {venue?.logo_url ? (
                 <Avatar uri={venue.logo_url} size={44} />
               ) : (
@@ -103,13 +135,33 @@ export function VenueHomeView() {
                   <Coffee size={22} weight="fill" color={colors.onBrand} />
                 </View>
               )}
-              <View>
+              <View className="min-w-0 flex-1">
                 <Text className="font-sans text-sm text-text-tertiary">
                   {t(greetingKey())},
                 </Text>
-                <Text className="font-sans-extrabold text-lg text-text-primary">
+                <Text
+                  className="font-sans-extrabold text-lg text-text-primary"
+                  numberOfLines={1}
+                >
                   {profile?.full_name ?? venue?.name ?? t("home.forVenues")}
                 </Text>
+                {venue ? (
+                  <EditableLocationRow
+                    className="mt-0.5"
+                    address={venue.address}
+                    currentValue={
+                      venue.address && venue.lat != null && venue.lng != null
+                        ? {
+                            address: venue.address,
+                            city: venue.city,
+                            lat: venue.lat,
+                            lng: venue.lng,
+                          }
+                        : undefined
+                    }
+                    onChangeLocation={(value) => updateLocation.mutateAsync(value)}
+                  />
+                ) : null}
               </View>
             </View>
             <Pressable
@@ -194,13 +246,14 @@ export function VenueHomeView() {
         </View>
 
         <View className="mt-3 gap-3">
-          {(availableWorkers.data ?? []).length === 0 && !availableWorkers.isLoading ? (
+          {rankedAvailableWorkers.length === 0 && !availableWorkers.isLoading ? (
             <EmptyState title={t("home.noWorkersAvailable")} />
           ) : (
-            (availableWorkers.data ?? []).map((worker) => (
+            rankedAvailableWorkers.map(({ worker, distanceKm }) => (
               <WorkerRow
                 key={worker.id}
                 worker={worker}
+                distanceKm={distanceKm}
                 trailing={<Chip label={t("home.availableTag")} variant="success" />}
               />
             ))

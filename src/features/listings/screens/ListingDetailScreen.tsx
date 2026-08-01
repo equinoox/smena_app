@@ -35,6 +35,7 @@ import { ConfirmationModal } from "@shared/components/ConfirmationModal";
 import { EmptyState } from "@shared/components/EmptyState";
 import { InfoCard } from "@shared/components/InfoCard";
 import { Loader } from "@shared/components/Loader";
+import { LocationViewModal } from "@shared/components/LocationViewModal";
 import { SaveToggle } from "@shared/components/SaveToggle";
 import { SmartCoverImage } from "@shared/components/SmartCoverImage";
 import { useAuth } from "@shared/hooks/useAuth";
@@ -47,6 +48,7 @@ import { useTranslation, type TranslationKey } from "@shared/i18n/I18nProvider";
 import { cn } from "@shared/lib/cn";
 import {
   employmentChipVariant,
+  formatLocation,
   formatPay,
   formatPostedAt,
   formatTimeRange,
@@ -82,7 +84,7 @@ export function ListingDetailScreen() {
   const colors = useThemeColors();
   const toast = useToast();
   const { t, language } = useTranslation();
-  const { role } = useUserRole();
+  const { role, profile } = useUserRole();
   const { venue: myVenue } = useMyVenue();
 
   const { data: listing, isLoading } = useListing(id ?? "");
@@ -98,6 +100,7 @@ export function ListingDetailScreen() {
   const logView = useLogListingView();
   const deleteListing = useDeleteListing(myVenue?.id);
   const [deleteConfirmVisible, setDeleteConfirmVisible] = useState(false);
+  const [locationModalVisible, setLocationModalVisible] = useState(false);
 
   useEffect(() => {
     if (isVenue || !listing || !user) return;
@@ -125,11 +128,7 @@ export function ListingDetailScreen() {
   const hasApplied = !!myApplication.data;
   const isSaved = savedIds.has(listing.id);
   const venuePhone = listing.venue?.phone;
-  // `venue.city` is never collected at sign-up/edit — `address` is what's actually
-  // set, so that's the real location to show here.
-  const venueLocation = [listing.venue?.address, listing.venue?.city]
-    .filter(Boolean)
-    .join(", ");
+  const venueLocation = formatLocation(listing.venue?.address, listing.venue?.city);
 
   const onApply = () =>
     apply.mutate(undefined, {
@@ -290,6 +289,11 @@ export function ListingDetailScreen() {
                 icon={<MapPin size={14} color={colors.brand} />}
                 label={t("listingDetail.location")}
                 value={venueLocation || "—"}
+                onPress={
+                  listing.venue?.lat != null && listing.venue?.lng != null
+                    ? () => setLocationModalVisible(true)
+                    : undefined
+                }
               />
               <InfoCard
                 icon={<Users size={14} color={colors.brand} />}
@@ -397,6 +401,20 @@ export function ListingDetailScreen() {
         onConfirm={onDelete}
         onCancel={() => setDeleteConfirmVisible(false)}
       />
+
+      {listing.venue?.lat != null && listing.venue?.lng != null ? (
+        <LocationViewModal
+          visible={locationModalVisible}
+          onClose={() => setLocationModalVisible(false)}
+          address={venueLocation}
+          target={{ lat: listing.venue.lat, lng: listing.venue.lng }}
+          origin={
+            !isVenue && profile?.lat != null && profile?.lng != null
+              ? { lat: profile.lat, lng: profile.lng }
+              : undefined
+          }
+        />
+      ) : null}
     </SafeAreaView>
   );
 }

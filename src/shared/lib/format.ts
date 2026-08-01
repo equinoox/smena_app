@@ -69,6 +69,21 @@ export function formatPostedAt(createdAtIso: string, t: Translate): string {
   return t("listings.postedDaysAgo", { count: days });
 }
 
+// "Knez Mihailova 5, Beograd" — joins address + city, omitting whichever is missing;
+// null when both are missing.
+export function formatLocation(
+  address: string | null | undefined,
+  city: string | null | undefined,
+): string | null {
+  const parts = [address, city].filter(Boolean);
+  return parts.length ? parts.join(", ") : null;
+}
+
+// "1.2 km" — distance chip label.
+export function formatDistanceKm(km: number): string {
+  return `${km.toFixed(1)} km`;
+}
+
 // "Sačuvano pre 2h" / "Sačuvano juče" / "Sačuvano pre 3 dana" — relative save age.
 export function formatSavedAt(savedAtIso: string, t: Translate): string {
   const minutes = Math.max(

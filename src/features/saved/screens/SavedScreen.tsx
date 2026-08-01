@@ -6,6 +6,7 @@ import { ListingList } from "@shared/components/ListingList";
 import { WorkerIdentityBar } from "@shared/components/WorkerIdentityBar";
 import { useSavedIds, useSavedListings, useToggleSaved } from "@shared/hooks/useSaved";
 import { useThemeColors } from "@shared/hooks/useThemeColors";
+import { useUpdateWorkerLocation } from "@shared/hooks/useUpdateLocation";
 import { useUserRole } from "@shared/hooks/useUserRole";
 import { useTranslation } from "@shared/i18n/I18nProvider";
 import type { ListingWithVenue } from "@shared/types/domain.types";
@@ -18,6 +19,7 @@ export function SavedScreen() {
   const saved = useSavedListings();
   const savedIds = useSavedIds();
   const toggleSaved = useToggleSaved();
+  const updateLocation = useUpdateWorkerLocation();
 
   const onToggleSave = (listing: ListingWithVenue) =>
     toggleSaved.mutate({ listingId: listing.id, saved: savedIds.has(listing.id) });
@@ -31,7 +33,10 @@ export function SavedScreen() {
         className="-mx-4 bg-bg-surface px-4 pb-4"
         style={{ paddingTop: insets.top + 16 }}
       >
-        <WorkerIdentityBar profile={profile} />
+        <WorkerIdentityBar
+          profile={profile}
+          onChangeLocation={(value) => updateLocation.mutateAsync(value)}
+        />
       </View>
 
       <View className="mt-5 flex-row items-center justify-between">

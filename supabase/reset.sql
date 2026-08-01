@@ -1,0 +1,11 @@
+-- Wipes ALL data in the database — every auth user (including your own real test
+-- accounts, not just seeded ones), profile, venue, listing, application, saved
+-- listing, and view log. `delete from auth.users` cascades through every FK in
+-- 0001_init.sql (profiles -> venues -> listings -> applications/saved_listings/
+-- listing_views), so nothing else needs truncating separately.
+--
+-- Dev/test only — there is no undo, and it does NOT clean up Storage files
+-- (avatars/venue-logos buckets) left behind by deleted profiles/venues.
+--
+-- Run via Supabase SQL editor, or `npm run db:reset` (see supabase/README.md).
+delete from auth.users;
