@@ -4,6 +4,7 @@ import { MapPin } from "phosphor-react-native";
 import { Switch, Text, View } from "react-native";
 import { Avatar } from "@shared/components/Avatar";
 import { Card } from "@shared/components/Card";
+import { StarRatingBadge } from "@shared/components/StarRatingBadge";
 import { WorkerAboutSections } from "@shared/components/WorkerAboutSections";
 import { useThemeColors } from "@shared/hooks/useThemeColors";
 import { useTranslation, type TranslationKey } from "@shared/i18n/I18nProvider";
@@ -38,6 +39,13 @@ export function WorkerProfileView({ profile }: WorkerProfileViewProps) {
           <Text className="font-sans-extrabold text-xl text-text-primary">
             {profile.full_name ?? ""}
           </Text>
+          <View className="mt-1">
+            <StarRatingBadge
+              rating={profile.rating_avg}
+              count={profile.rating_count}
+              size="md"
+            />
+          </View>
           {profile.worker_roles.length ? (
             <Text className="mt-1 font-sans-bold text-base text-brand">
               {profile.worker_roles

@@ -29,5 +29,11 @@ export const queryKeys = {
   openListingsCount: () => ["listings", "openCount"] as const,
   listingViews: (listingId: string) => ["views", "listing", listingId] as const,
   availableWorkers: () => ["profiles", "available"] as const,
+  allWorkers: () => ["profiles", "all"] as const,
   workerProfile: (id: string) => ["profiles", "worker", id] as const,
+  venueProfile: (id: string) => ["venues", "profile", id] as const,
+  myWorkerRating: (workerId: string, raterId: string) =>
+    ["ratings", "worker", workerId, "mine", raterId] as const,
+  myVenueRating: (venueId: string, raterId: string) =>
+    ["ratings", "venue", venueId, "mine", raterId] as const,
 };

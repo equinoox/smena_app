@@ -8,6 +8,7 @@ import { Controller, useForm } from "react-hook-form";
 import { Pressable, Text, View } from "react-native";
 import { Button } from "@shared/components/Button";
 import { Chip } from "@shared/components/Chip";
+import { ChipSlider } from "@shared/components/ChipSlider";
 import { ControlledInput } from "@shared/components/ControlledInput";
 import { ImagePickerField } from "@shared/components/ImagePickerField";
 import { Loader } from "@shared/components/Loader";
@@ -155,7 +156,7 @@ export function EditVenueProfileScreen() {
             control={control}
             name="venueType"
             render={({ field }) => (
-              <View className="flex-row flex-wrap gap-2">
+              <ChipSlider>
                 {VENUE_TYPES.map((type) => (
                   <Chip
                     key={type}
@@ -165,7 +166,7 @@ export function EditVenueProfileScreen() {
                     onPress={() => field.onChange(type)}
                   />
                 ))}
-              </View>
+              </ChipSlider>
             )}
           />
         </View>
@@ -199,7 +200,7 @@ export function EditVenueProfileScreen() {
           name="description"
           label={t("auth.description")}
           multiline
-          numberOfLines={3}
+          numberOfLines={4}
         />
       </View>
 

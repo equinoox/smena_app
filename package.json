@@ -1,6 +1,6 @@
 {
   "name": "smena_app",
-  "version": "0.8.0",
+  "version": "0.8.3",
   "main": "expo-router/entry",
   "dependencies": {
     "@expo-google-fonts/plus-jakarta-sans": "^0.4.2",
@@ -46,10 +46,7 @@
     "android": "expo start --android",
     "ios": "expo start --ios",
     "web": "expo start --web",
-    "typecheck": "tsc --noEmit",
-    "db:reset": "node scripts/run-sql.js supabase/reset.sql",
-    "db:seed": "node scripts/run-sql.js supabase/seed.sql",
-    "db:test-reset": "npm run db:reset && npm run db:seed"
+    "typecheck": "tsc --noEmit"
   },
   "private": true
 }

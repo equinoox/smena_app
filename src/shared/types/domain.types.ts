@@ -13,6 +13,8 @@ export type VenueSummary = Pick<
   | "lat"
   | "lng"
   | "phone"
+  | "rating_avg"
+  | "rating_count"
 >;
 
 // A listing joined with its parent venue (as returned by listings queries).

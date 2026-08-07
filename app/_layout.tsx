@@ -78,9 +78,11 @@ function RootNavigator() {
       <Stack.Protected guard={isSignedIn}>
         <Stack.Screen name="(tabs)" />
         <Stack.Screen name="listings" />
+        <Stack.Screen name="workers" />
         <Stack.Screen name="listing/[id]" />
         <Stack.Screen name="listing-applicants/[id]" />
         <Stack.Screen name="worker/[id]" />
+        <Stack.Screen name="venue/[id]" />
         <Stack.Screen name="profile-edit" />
         <Stack.Screen name="settings" />
         <Stack.Screen name="listing-create" options={{ presentation: "modal" }} />

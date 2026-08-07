@@ -14,6 +14,7 @@ import { Avatar } from "@shared/components/Avatar";
 import { Card } from "@shared/components/Card";
 import { Chip } from "@shared/components/Chip";
 import { SaveToggle } from "@shared/components/SaveToggle";
+import { StarRatingBadge } from "@shared/components/StarRatingBadge";
 import { useThemeColors } from "@shared/hooks/useThemeColors";
 import { useTranslation, type TranslationKey } from "@shared/i18n/I18nProvider";
 import {
@@ -60,7 +61,7 @@ export function ListingCard({
   const employmentLabel = t(
     `employment.${listing.employment_type}` as TranslationKey,
   );
-  const time = formatTimeRange(listing.starts_at, listing.ends_at, language);
+  const time = formatTimeRange(listing.start_hour, listing.end_hour, language);
   const title = listing.title || roleLabel;
   const venueLocation = formatLocation(listing.venue?.address, listing.venue?.city);
   const ageLabel = savedAt
@@ -80,12 +81,18 @@ export function ListingCard({
               <RoleIcon size={20} weight="bold" color={colors.brand} />
             </View>
             <View className="min-w-0 flex-1">
-              <Text
-                className="font-sans-semibold text-xs text-text-tertiary"
-                numberOfLines={1}
-              >
-                {listing.venue?.name ?? ""}
-              </Text>
+              <View className="flex-row items-center gap-1.5">
+                <Text
+                  className="shrink font-sans-semibold text-xs text-text-tertiary"
+                  numberOfLines={1}
+                >
+                  {listing.venue?.name ?? ""}
+                </Text>
+                <StarRatingBadge
+                  rating={listing.venue?.rating_avg ?? null}
+                  count={listing.venue?.rating_count ?? 0}
+                />
+              </View>
               <Text
                 className="font-sans-extrabold text-base text-text-primary"
                 numberOfLines={1}
@@ -104,19 +111,17 @@ export function ListingCard({
             label={employmentLabel}
             variant={employmentChipVariant(listing.employment_type)}
           />
+          <View className="flex-row items-center gap-1 rounded-chip bg-bg-surface-alt px-2.5 py-1.5">
+            <Clock size={13} color={colors.textMuted} />
+            <Text className="font-sans-semibold text-xs text-text-secondary">
+              {time ?? t("listingDetail.byAgreement")}
+            </Text>
+          </View>
           {venueLocation ? (
             <View className="flex-row items-center gap-1 rounded-chip bg-bg-surface-alt px-2.5 py-1.5">
               <MapPin size={13} weight="fill" color={colors.textMuted} />
               <Text className="font-sans-semibold text-xs text-text-secondary">
                 {venueLocation}
-              </Text>
-            </View>
-          ) : null}
-          {time ? (
-            <View className="flex-row items-center gap-1 rounded-chip bg-bg-surface-alt px-2.5 py-1.5">
-              <Clock size={13} color={colors.textMuted} />
-              <Text className="font-sans-semibold text-xs text-text-secondary">
-                {time}
               </Text>
             </View>
           ) : null}
@@ -176,11 +181,15 @@ export function ListingCard({
           <View className="min-w-0 flex-1 flex-row items-center gap-2">
             <Avatar uri={listing.venue?.logo_url} name={listing.venue?.name} size={22} />
             <Text
-              className="flex-1 font-sans-semibold text-xs text-text-tertiary"
+              className="shrink font-sans-semibold text-xs text-text-tertiary"
               numberOfLines={1}
             >
               {listing.venue?.name ?? ""}
             </Text>
+            <StarRatingBadge
+              rating={listing.venue?.rating_avg ?? null}
+              count={listing.venue?.rating_count ?? 0}
+            />
           </View>
           {onToggleSave ? (
             <SaveToggle saved={!!saved} onPress={onToggleSave} className="pl-2" />
@@ -199,19 +208,17 @@ export function ListingCard({
             label={employmentLabel}
             variant={employmentChipVariant(listing.employment_type)}
           />
+          <View className="flex-row items-center gap-1 rounded-chip bg-bg-surface-alt px-2.5 py-1.5">
+            <Clock size={13} color={colors.textMuted} />
+            <Text className="font-sans-semibold text-xs text-text-secondary">
+              {time ?? t("listingDetail.byAgreement")}
+            </Text>
+          </View>
           {venueLocation ? (
             <View className="flex-row items-center gap-1 rounded-chip bg-bg-surface-alt px-2.5 py-1.5">
               <MapPin size={13} weight="fill" color={colors.textMuted} />
               <Text className="font-sans-semibold text-xs text-text-secondary">
                 {venueLocation}
-              </Text>
-            </View>
-          ) : null}
-          {time ? (
-            <View className="flex-row items-center gap-1 rounded-chip bg-bg-surface-alt px-2.5 py-1.5">
-              <Clock size={13} color={colors.textMuted} />
-              <Text className="font-sans-semibold text-xs text-text-secondary">
-                {time}
               </Text>
             </View>
           ) : null}

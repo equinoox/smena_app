@@ -23,6 +23,7 @@ import { Chip } from "@shared/components/Chip";
 import { EmptyState } from "@shared/components/EmptyState";
 import { Loader } from "@shared/components/Loader";
 import { SmartCoverImage } from "@shared/components/SmartCoverImage";
+import { StarRatingBadge } from "@shared/components/StarRatingBadge";
 import { useAuth } from "@shared/hooks/useAuth";
 import { useMyVenue } from "@shared/hooks/useMyVenue";
 import { useThemeColors } from "@shared/hooks/useThemeColors";
@@ -41,7 +42,7 @@ function ActiveListingRow({ listing }: { listing: ListingWithVenue }) {
   const employmentLabel = t(
     `employment.${listing.employment_type}` as TranslationKey,
   );
-  const time = formatTimeRange(listing.starts_at, listing.ends_at, language);
+  const time = formatTimeRange(listing.start_hour, listing.end_hour, language);
   const title = listing.title || roleLabel;
   const RoleIcon = roleIcon[listing.role_needed];
 
@@ -65,14 +66,12 @@ function ActiveListingRow({ listing }: { listing: ListingWithVenue }) {
             label={employmentLabel}
             variant={employmentChipVariant(listing.employment_type)}
           />
-          {time ? (
-            <View className="flex-row items-center gap-1 rounded-chip bg-bg-surface-alt px-2 py-1">
-              <Clock size={12} color={colors.textMuted} />
-              <Text className="font-sans-semibold text-xs text-text-secondary">
-                {time}
-              </Text>
-            </View>
-          ) : null}
+          <View className="flex-row items-center gap-1 rounded-chip bg-bg-surface-alt px-2 py-1">
+            <Clock size={12} color={colors.textMuted} />
+            <Text className="font-sans-semibold text-xs text-text-secondary">
+              {time ?? t("listingDetail.byAgreement")}
+            </Text>
+          </View>
         </View>
       </View>
       <CaretRight size={18} color={colors.textMuted} />
@@ -148,7 +147,14 @@ export function VenueProfileScreen() {
           <Text className="mt-3 font-sans-extrabold text-2xl text-text-primary">
             {venue.name}
           </Text>
-          <Text className="mt-0.5 font-sans-semibold text-sm text-text-tertiary">
+          <View className="mt-1">
+            <StarRatingBadge
+              rating={venue.rating_avg}
+              count={venue.rating_count}
+              size="md"
+            />
+          </View>
+          <Text className="mt-1.5 font-sans-semibold text-sm text-text-tertiary">
             {t(`venueTypes.${venue.venue_type}` as TranslationKey)}
           </Text>
 

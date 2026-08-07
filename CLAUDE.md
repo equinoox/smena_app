@@ -61,8 +61,9 @@ restaurants, clubs, bakeries) that need shift coverage.
 - **Test data**: `supabase/reset.sql` (wipe everything) and `supabase/seed.sql` (4 test
   accounts — 1 worker + 3 venues at different Belgrade locations, each with one listing)
   must be kept in sync whenever the schema changes — update them in the same change that
-  adds/renames/drops a column they touch. Run via `npm run db:reset` / `db:seed` /
-  `db:test-reset` (needs `psql` + `SUPABASE_DB_URL` in `.env`, see `supabase/README.md`).
+  adds/renames/drops a column they touch. Run by pasting both into the Supabase
+  dashboard's SQL Editor (`reset.sql` then `seed.sql`) — no local `psql`/npm-script
+  tooling for this, see `supabase/README.md`.
 
 ### i18n & theme
 - No user-facing string is hardcoded. Add keys to **both** `en.json` and `sr.json` and use
@@ -119,4 +120,5 @@ restaurants, clubs, bakeries) that need shift coverage.
   (`expo start`) automatically.** Typecheck with `npm run typecheck`.
 - Native modules (e.g. `@rnmapbox/maps`) require a dev-client rebuild after install —
   never run `expo prebuild`/`eas build` automatically; tell the user the exact command.
-- Reset/reseed test data with `npm run db:test-reset` (see `supabase/README.md`).
+- Reset/reseed test data by pasting `reset.sql`/`seed.sql` into the Supabase dashboard's
+  SQL Editor (see `supabase/README.md`).

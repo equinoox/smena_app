@@ -30,6 +30,12 @@ export function ImagePickerModal({
   const toast = useToast();
   const { t } = useTranslation();
   const [pickedUri, setPickedUri] = useState<string | null>(null);
+  // Launching the system picker/cropper starts a separate Activity on Android, which
+  // pauses the host Activity and tears down our native Modal window. If the Modal stays
+  // "visible" the whole time, RN never re-issues it on return and the modal appears to
+  // vanish entirely. Hiding it for the duration of the pick and reopening it with the
+  // result keeps the native Modal window from being orphaned by that Activity switch.
+  const [isPicking, setIsPicking] = useState(false);
 
   const close = () => {
     setPickedUri(null);
@@ -37,6 +43,7 @@ export function ImagePickerModal({
   };
 
   const pickImage = async () => {
+    setIsPicking(true);
     try {
       // Load the native package only when it is actually used. This keeps an old
       // Expo Go/development-client binary from breaking every route at startup.
@@ -60,6 +67,8 @@ export function ImagePickerModal({
     } catch (error) {
       console.error("[Image picker error]", error);
       toast.error(t("imagePicker.unavailable"));
+    } finally {
+      setIsPicking(false);
     }
   };
 
@@ -70,7 +79,7 @@ export function ImagePickerModal({
   };
 
   return (
-    <Modal visible={visible} onClose={close} title={title}>
+    <Modal visible={visible && !isPicking} onClose={close} title={title}>
       <View className="gap-4">
         <View
           className="w-full items-center justify-center overflow-hidden rounded-input bg-bg-surface-alt"

@@ -29,6 +29,7 @@ module.exports = {
         danger: "rgb(var(--danger) / <alpha-value>)",
         "danger-bg": "rgb(var(--danger-bg) / <alpha-value>)",
         "accent-badge": "rgb(var(--accent-badge) / <alpha-value>)",
+        star: "rgb(var(--star) / <alpha-value>)",
         info: "rgb(var(--info) / <alpha-value>)",
         "on-brand": "rgb(var(--on-brand) / <alpha-value>)",
         "on-accent": "rgb(var(--on-accent) / <alpha-value>)",

@@ -20,6 +20,7 @@ type Palette = {
   warning: string;
   danger: string;
   accentBadge: string;
+  star: string;
   info: string;
   onBrand: string;
   onAccent: string;
@@ -45,6 +46,7 @@ export const themeColors: { light: Palette; dark: Palette } = {
     warning: "#C25E1F",
     danger: "#C82626",
     accentBadge: "#E8991A",
+    star: "#F2A900",
     info: "#1E82C8",
     onBrand: "#FFFFFF",
     onAccent: "#1B1712",
@@ -68,6 +70,7 @@ export const themeColors: { light: Palette; dark: Palette } = {
     warning: "#F0894A",
     danger: "#F05A5A",
     accentBadge: "#FFC24B",
+    star: "#FFCA3A",
     info: "#6EBEFF",
     onBrand: "#FFFFFF",
     onAccent: "#0D0B09",

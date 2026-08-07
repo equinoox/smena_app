@@ -1,11 +1,11 @@
 // CreateListingScreen — venue "post a shift" form: position, title, employment type,
-// date/shift time, optional pay, description, custom requirement tags, urgent toggle.
-// Also doubles as the "edit listing" form: an `id` search param switches it into edit
-// mode, prefilling from the existing listing and updating instead of creating.
+// optional daily working hours, optional pay, description, custom requirement tags,
+// urgent toggle. Also doubles as the "edit listing" form: an `id` search param switches
+// it into edit mode, prefilling from the existing listing and updating instead of
+// creating.
 import { useLocalSearchParams, useRouter } from "expo-router";
 import {
   Briefcase,
-  CalendarBlank,
   Clock,
   Lightning,
   PaperPlaneRight,
@@ -17,6 +17,7 @@ import { Controller, useForm } from "react-hook-form";
 import { Pressable, Switch, Text, View } from "react-native";
 import { Button } from "@shared/components/Button";
 import { Chip } from "@shared/components/Chip";
+import { ChipSlider } from "@shared/components/ChipSlider";
 import { ControlledInput } from "@shared/components/ControlledInput";
 import { Input } from "@shared/components/Input";
 import { Loader } from "@shared/components/Loader";
@@ -37,10 +38,6 @@ import type {
   WorkerRole,
 } from "@shared/types/database.types";
 import type { ListingWithVenue } from "@shared/types/domain.types";
-import {
-  DatePickerModal,
-  formatShortDate,
-} from "@features/listings/components/DatePickerModal";
 import { TimeRangePickerModal } from "@features/listings/components/TimeRangePickerModal";
 import {
   useCreateListing,
@@ -54,11 +51,11 @@ const EMPLOYMENT_TYPES: { value: EmploymentType; icon: typeof Lightning }[] = [
   { value: "full_time", icon: Briefcase },
 ];
 
-// No explicit pay-period selector in the design — infer a sensible default from
-// employment type (a one-off fill-in is priced per shift, a permanent role per month).
+// No explicit pay-period selector in the design — infer it from employment type
+// (matches the labels: Ispomoć/hourly, Dnevnica/daily-shift, Stalno/monthly).
 const DEFAULT_PAY_PERIOD: Record<EmploymentType, PayPeriod> = {
-  fill_in: "shift",
-  part_time: "hour",
+  fill_in: "hour",
+  part_time: "shift",
   full_time: "month",
 };
 
@@ -82,10 +79,8 @@ export function CreateListingScreen() {
   const createListing = useCreateListing(venue?.id);
   const updateListing = useUpdateListing(venue?.id);
 
-  const [date, setDate] = useState<Date | null>(null);
   const [fromHour, setFromHour] = useState<number | null>(null);
   const [toHour, setToHour] = useState<number | null>(null);
-  const [datePickerOpen, setDatePickerOpen] = useState(false);
   const [timePickerOpen, setTimePickerOpen] = useState(false);
   const [requirements, setRequirements] = useState<string[]>([]);
   const [isUrgent, setIsUrgent] = useState(false);
@@ -117,14 +112,8 @@ export function CreateListingScreen() {
     });
     setRequirements(existing.requirements);
     setIsUrgent(existing.is_urgent);
-    if (existing.starts_at) {
-      const start = new Date(existing.starts_at);
-      setDate(start);
-      setFromHour(start.getHours());
-    }
-    if (existing.ends_at) {
-      setToHour(new Date(existing.ends_at).getHours());
-    }
+    setFromHour(existing.start_hour);
+    setToHour(existing.end_hour);
     // Only ever prefill from the fetched row itself, not on every re-render.
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [existingListing.data, isEdit]);
@@ -134,22 +123,6 @@ export function CreateListingScreen() {
 
   const onSubmit = handleSubmit((values) => {
     if (!venue?.id) return;
-    if (!date || fromHour === null || toHour === null) {
-      toast.error(t("createListing.dateTimeRequired"));
-      return;
-    }
-    const startsAt = new Date(
-      date.getFullYear(),
-      date.getMonth(),
-      date.getDate(),
-      fromHour,
-    ).toISOString();
-    const endsAt = new Date(
-      date.getFullYear(),
-      date.getMonth(),
-      date.getDate(),
-      toHour,
-    ).toISOString();
 
     const input = {
       title: values.title,
@@ -158,8 +131,8 @@ export function CreateListingScreen() {
       description: values.description || undefined,
       payAmount: values.payAmount ? Number(values.payAmount) : undefined,
       payPeriod,
-      startsAt,
-      endsAt,
+      startHour: fromHour ?? undefined,
+      endHour: toHour ?? undefined,
       isUrgent,
       requirements,
     };
@@ -199,24 +172,8 @@ export function CreateListingScreen() {
         pay_amount: watch("payAmount") ? Number(watch("payAmount")) : null,
         pay_period: payPeriod,
         currency: "RSD",
-        starts_at:
-          date && fromHour !== null
-            ? new Date(
-                date.getFullYear(),
-                date.getMonth(),
-                date.getDate(),
-                fromHour,
-              ).toISOString()
-            : null,
-        ends_at:
-          date && toHour !== null
-            ? new Date(
-                date.getFullYear(),
-                date.getMonth(),
-                date.getDate(),
-                toHour,
-              ).toISOString()
-            : null,
+        start_hour: fromHour,
+        end_hour: toHour,
         is_urgent: isUrgent,
         status: "open",
         requirements,
@@ -233,6 +190,8 @@ export function CreateListingScreen() {
           lat: venue.lat,
           lng: venue.lng,
           phone: venue.phone,
+          rating_avg: venue.rating_avg,
+          rating_count: venue.rating_count,
         },
       }
     : null;
@@ -263,7 +222,7 @@ export function CreateListingScreen() {
           control={control}
           name="roleNeeded"
           render={({ field }) => (
-            <View className="flex-row flex-wrap gap-2">
+            <ChipSlider>
               {WORKER_ROLES.map((role) => (
                 <Chip
                   key={role}
@@ -273,7 +232,7 @@ export function CreateListingScreen() {
                   onPress={() => field.onChange(role)}
                 />
               ))}
-            </View>
+            </ChipSlider>
           )}
         />
       </View>
@@ -318,7 +277,7 @@ export function CreateListingScreen() {
                     />
                     <Text
                       className={cn(
-                        "font-sans-semibold text-sm",
+                        "text-center font-sans-semibold text-sm",
                         selected ? "text-brand" : "text-text-muted",
                       )}
                     >
@@ -334,30 +293,19 @@ export function CreateListingScreen() {
 
       <View className="mt-5 gap-2">
         <Text className="font-sans-medium text-sm text-text-tertiary">
-          {t("createListing.dateAndShift")}
+          {t("createListing.workingHoursLabel")} · {t("createListing.optional")}
         </Text>
-        <View className="flex-row gap-3">
-          <Pressable
-            onPress={() => setDatePickerOpen(true)}
-            className="h-12 flex-1 flex-row items-center gap-2 rounded-input border border-border-default bg-bg-surface px-3"
-          >
-            <CalendarBlank size={18} color={colors.textMuted} />
-            <Text className="font-sans-semibold text-base text-text-primary">
-              {date ? formatShortDate(date, language) : t("createListing.selectDate")}
-            </Text>
-          </Pressable>
-          <Pressable
-            onPress={() => setTimePickerOpen(true)}
-            className="h-12 flex-1 flex-row items-center gap-2 rounded-input border border-border-default bg-bg-surface px-3"
-          >
-            <Clock size={18} color={colors.textMuted} />
-            <Text className="font-sans-semibold text-base text-text-primary">
-              {fromHour !== null && toHour !== null
-                ? `${formatHour(fromHour, language)} - ${formatHour(toHour, language)}`
-                : t("createListing.selectTime")}
-            </Text>
-          </Pressable>
-        </View>
+        <Pressable
+          onPress={() => setTimePickerOpen(true)}
+          className="h-12 flex-row items-center gap-2 rounded-input border border-border-default bg-bg-surface px-3"
+        >
+          <Clock size={18} color={colors.textMuted} />
+          <Text className="font-sans-semibold text-base text-text-primary">
+            {fromHour !== null && toHour !== null
+              ? `${formatHour(fromHour, language)} - ${formatHour(toHour, language)}`
+              : t("createListing.selectTime")}
+          </Text>
+        </Pressable>
       </View>
 
       <View className="mt-5 gap-1.5">
@@ -389,7 +337,7 @@ export function CreateListingScreen() {
           name="description"
           label={t("createListing.descriptionLabel")}
           multiline
-          numberOfLines={3}
+          numberOfLines={4}
         />
       </View>
 
@@ -450,12 +398,6 @@ export function CreateListingScreen() {
         ) : null}
       </Modal>
 
-      <DatePickerModal
-        visible={datePickerOpen}
-        value={date}
-        onSelect={setDate}
-        onClose={() => setDatePickerOpen(false)}
-      />
       <TimeRangePickerModal
         visible={timePickerOpen}
         fromHour={fromHour}

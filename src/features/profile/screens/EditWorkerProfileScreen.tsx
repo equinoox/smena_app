@@ -6,6 +6,7 @@ import { useState } from "react";
 import { Pressable, Text, View } from "react-native";
 import { Button } from "@shared/components/Button";
 import { Chip } from "@shared/components/Chip";
+import { ChipSlider } from "@shared/components/ChipSlider";
 import { ImagePickerField } from "@shared/components/ImagePickerField";
 import { Loader } from "@shared/components/Loader";
 import { Screen } from "@shared/components/Screen";
@@ -40,9 +41,14 @@ export function EditWorkerProfileScreen() {
   if (isLoading || !initialized) return <Loader />;
 
   const togglePosition = (role: WorkerRole) =>
-    setPositions((prev) =>
-      prev.includes(role) ? prev.filter((r) => r !== role) : [...prev, role],
-    );
+    setPositions((prev) => {
+      if (prev.includes(role)) return prev.filter((r) => r !== role);
+      if (prev.length >= 3) {
+        toast.info(t("validation.selectPositionMax"));
+        return prev;
+      }
+      return [...prev, role];
+    });
 
   const onSave = () => {
     if (positions.length === 0) {
@@ -98,7 +104,7 @@ export function EditWorkerProfileScreen() {
             · {t("auth.positionHint")}
           </Text>
         </View>
-        <View className="flex-row flex-wrap gap-2">
+        <ChipSlider>
           {WORKER_ROLES.map((role) => (
             <Chip
               key={role}
@@ -108,7 +114,7 @@ export function EditWorkerProfileScreen() {
               onPress={() => togglePosition(role)}
             />
           ))}
-        </View>
+        </ChipSlider>
       </View>
 
       <View className="mt-6 gap-2">

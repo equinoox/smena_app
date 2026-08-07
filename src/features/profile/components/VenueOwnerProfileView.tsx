@@ -6,6 +6,7 @@ import { Text, View } from "react-native";
 import { Avatar } from "@shared/components/Avatar";
 import { Card } from "@shared/components/Card";
 import { InfoCard } from "@shared/components/InfoCard";
+import { StarRatingBadge } from "@shared/components/StarRatingBadge";
 import { useAuth } from "@shared/hooks/useAuth";
 import { useMyVenue } from "@shared/hooks/useMyVenue";
 import { useThemeColors } from "@shared/hooks/useThemeColors";
@@ -66,12 +67,18 @@ export function VenueOwnerProfileView({ profile }: VenueOwnerProfileViewProps) {
             <Storefront size={20} weight="bold" color={colors.brand} />
           </View>
           <View className="min-w-0 flex-1">
-            <Text
-              className="font-sans-bold text-[15px] text-text-primary"
-              numberOfLines={1}
-            >
-              {venue.name}
-            </Text>
+            <View className="flex-row items-center gap-2">
+              <Text
+                className="shrink font-sans-bold text-[15px] text-text-primary"
+                numberOfLines={1}
+              >
+                {venue.name}
+              </Text>
+              <StarRatingBadge
+                rating={venue.rating_avg}
+                count={venue.rating_count}
+              />
+            </View>
             <Text className="font-sans-semibold text-xs text-text-tertiary">
               {t(`venueTypes.${venue.venue_type}` as TranslationKey)}
             </Text>

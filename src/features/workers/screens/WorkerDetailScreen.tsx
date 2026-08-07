@@ -1,6 +1,7 @@
 // Worker detail — venue-facing read-only view of a worker's profile: identity, bio,
-// skills, experience, and contact actions (call/message), mirroring the listing detail
-// screen's venue-contact pattern.
+// skills, experience, contact actions (call/message), and a rating summary/CTA,
+// mirroring the listing detail screen's venue-contact pattern.
+import { useState } from "react";
 import { useLocalSearchParams, useRouter } from "expo-router";
 import { CaretLeft, ChatCircle, MapPin, Phone } from "phosphor-react-native";
 import { Linking, Pressable, ScrollView, Text, View } from "react-native";
@@ -11,11 +12,16 @@ import { Chip } from "@shared/components/Chip";
 import { EmptyState } from "@shared/components/EmptyState";
 import { InfoCard } from "@shared/components/InfoCard";
 import { Loader } from "@shared/components/Loader";
+import { RatingSummary } from "@shared/components/RatingSummary";
+import { StarRatingBadge } from "@shared/components/StarRatingBadge";
 import { WorkerAboutSections } from "@shared/components/WorkerAboutSections";
 import { useThemeColors } from "@shared/hooks/useThemeColors";
 import { useToast } from "@shared/hooks/useToast";
+import { useUserRole } from "@shared/hooks/useUserRole";
 import { useTranslation, type TranslationKey } from "@shared/i18n/I18nProvider";
 import { formatLocation } from "@shared/lib/format";
+import { RateWorkerModal } from "@features/workers/components/RateWorkerModal";
+import { useMyWorkerRating } from "@features/workers/hooks/useMyWorkerRating";
 import { useWorkerProfile } from "@features/workers/hooks/useWorkerProfile";
 
 export function WorkerDetailScreen() {
@@ -24,8 +30,11 @@ export function WorkerDetailScreen() {
   const colors = useThemeColors();
   const toast = useToast();
   const { t } = useTranslation();
+  const { role } = useUserRole();
+  const [rateModalVisible, setRateModalVisible] = useState(false);
 
   const { data: worker, isLoading } = useWorkerProfile(id ?? "");
+  const { data: myRating } = useMyWorkerRating(id ?? "");
 
   if (isLoading) return <Loader />;
   if (!worker) {
@@ -81,6 +90,13 @@ export function WorkerDetailScreen() {
           <Text className="mt-4 font-sans-extrabold text-xl text-text-primary">
             {worker.full_name ?? ""}
           </Text>
+          <View className="mt-1">
+            <StarRatingBadge
+              rating={worker.rating_avg}
+              count={worker.rating_count}
+              size="md"
+            />
+          </View>
           {worker.worker_roles.length ? (
             <Text className="mt-1 font-sans-bold text-base text-brand">
               {worker.worker_roles
@@ -111,8 +127,30 @@ export function WorkerDetailScreen() {
           />
         </View>
 
+        <View className="mt-6">
+          <RatingSummary
+            ratingAvg={worker.rating_avg}
+            ratingCount={worker.rating_count}
+            title={t("rating.overall")}
+            noRatingsLabel={t("rating.noRatingsYet")}
+            countLabel={t("rating.count", { count: worker.rating_count })}
+            onRatePress={
+              role === "venue" ? () => setRateModalVisible(true) : undefined
+            }
+            rateButtonLabel={
+              myRating ? t("rating.editRating") : t("rating.rateWorker")
+            }
+          />
+        </View>
+
         <WorkerAboutSections profile={worker} />
       </ScrollView>
+
+      <RateWorkerModal
+        visible={rateModalVisible}
+        onClose={() => setRateModalVisible(false)}
+        workerId={worker.id}
+      />
 
       <View className="flex-row items-center gap-3 border-t border-border-default bg-bg-surface px-4 py-3">
         <Pressable

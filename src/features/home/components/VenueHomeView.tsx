@@ -239,10 +239,15 @@ export function VenueHomeView() {
           )}
         </View>
 
-        <View className="mt-6">
+        <View className="mt-6 flex-row items-center justify-between">
           <Text className="font-sans-bold text-xl text-text-primary">
             {t("home.availableWorkers")}
           </Text>
+          <Pressable onPress={() => router.push("/workers")} hitSlop={8}>
+            <Text className="font-sans-bold text-sm text-brand">
+              {t("common.seeAll")}
+            </Text>
+          </Pressable>
         </View>
 
         <View className="mt-3 gap-3">

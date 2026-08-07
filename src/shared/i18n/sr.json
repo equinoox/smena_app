@@ -15,6 +15,7 @@
     "close": "Zatvori",
     "clear": "Obriši",
     "confirm": "Potvrdi",
+    "reset": "Resetuj",
     "error": "Greška",
     "somethingWrong": "Nešto je pošlo naopako",
     "tryAgain": "Pokušajte ponovo.",
@@ -27,6 +28,7 @@
     "passwordsDontMatch": "Lozinke se ne poklapaju",
     "nameMin": "Unesite ime i prezime",
     "selectPosition": "Molimo izaberite bar jednu poziciju.",
+    "selectPositionMax": "Možeš izabrati najviše 3 pozicije.",
     "selectExperience": "Molimo izaberite nivo iskustva."
   },
   "nav": {
@@ -68,7 +70,7 @@
     "workerDetailsTitle": "Radni podaci",
     "workerDetailsSubtitle": "Lokali te pronalaze na osnovu ovih podataka.",
     "position": "Pozicija",
-    "positionHint": "izaberi jednu ili više",
+    "positionHint": "izaberi do 3",
     "experience": "Iskustvo",
     "workerExperienceTitle": "Tvoje iskustvo",
     "workerExperienceSubtitle": "Pomozi lokalima da te bolje upoznaju.",
@@ -149,7 +151,11 @@
     "browse": "Pregledaj smene",
     "filterAll": "Sve",
     "filters": "Filteri",
-    "nearMe": "Blizu mene",
+    "filtersTitle": "Filtriraj oglase",
+    "minPay": "Minimalna nadoknada",
+    "minPayBadge": "Od {amount} RSD",
+    "distance": "Udaljenost",
+    "applyFilters": "Primeni filtere",
     "activeCount": "{count} aktivnih",
     "applyNow": "Prijavi se",
     "applied": "Prijavljeno",
@@ -175,6 +181,7 @@
     "notFound": "Oglas nije pronađen",
     "applicants": "{count} prijava",
     "views": "{count} pregleda",
+    "byAgreement": "Po dogovoru",
     "workingHours": "Radno vreme",
     "location": "Lokacija",
     "callVenue": "Pozovi lokal",
@@ -192,6 +199,15 @@
     "phone": "Telefon",
     "call": "Pozovi radnika",
     "noPhone": "Radnik nema uneti kontakt telefon."
+  },
+  "venueDetail": {
+    "notFound": "Lokal nije pronađen"
+  },
+  "workers": {
+    "title": "Radnici",
+    "empty": "Nema pronađenih radnika",
+    "filtersTitle": "Filtriraj radnike",
+    "experience": "Iskustvo"
   },
   "saved": {
     "title": "Sačuvano",
@@ -230,12 +246,13 @@
   },
   "employment": {
     "fill_in": "Ispomoć",
-    "part_time": "Honorarno",
+    "part_time": "Dnevnica",
     "full_time": "Stalno"
   },
   "roles": {
     "waiter": "Konobar",
     "bartender": "Šanker",
+    "cocktail_master": "Koktel majstor",
     "barista": "Barista",
     "cook": "Kuvar",
     "host": "Hostesa",
@@ -249,8 +266,11 @@
   "venueTypes": {
     "cafe": "Kafić",
     "bar": "Bar",
-    "restaurant": "Restoran",
+    "pub": "Pub",
     "club": "Klub",
+    "kafana": "Kafana",
+    "restaurant": "Restoran",
+    "fast_food": "Brza hrana",
     "bakery": "Pekara"
   },
   "errors": {
@@ -258,17 +278,38 @@
     "auth": "Prijava nije uspela. Proverite podatke.",
     "generic": "Nešto je pošlo naopako. Pokušajte ponovo."
   },
+  "rating": {
+    "overall": "Ocena",
+    "noRatingsYet": "Još nema ocena",
+    "count": "{count} ocena",
+    "rateWorker": "Oceni radnika",
+    "rateVenue": "Oceni lokal",
+    "editRating": "Izmeni svoju ocenu",
+    "rateWorkerTitle": "Oceni ovog radnika",
+    "rateVenueTitle": "Oceni ovaj lokal",
+    "submit": "Potvrdi ocenu",
+    "submitSuccess": "Ocena je uspešno poslata!",
+    "worker": {
+      "productivity": "Produktivnost",
+      "reliability": "Pouzdanost",
+      "quality": "Kvalitet"
+    },
+    "venue": {
+      "conditions": "Uslovi rada",
+      "atmosphere": "Radna atmosfera",
+      "benefits": "Beneficije"
+    }
+  },
   "createListing": {
     "title": "Novi oglas",
     "editTitle": "Izmeni oglas",
     "saveChanges": "Sačuvaj izmene",
     "updateSuccess": "Oglas je uspešno izmenjen!",
-    "dateTimeRequired": "Molimo izaberite datum i vreme smene.",
     "positionQuestion": "Koja pozicija ti treba?",
     "titleLabel": "Naslov oglasa",
     "titleHint": "Kratko i jasno — ovo radnici prvo vide.",
     "employmentLabel": "Tip angažmana",
-    "dateAndShift": "Datum i smena",
+    "workingHoursLabel": "Radno vreme",
     "compensation": "Nadoknada",
     "optional": "opciono",
     "descriptionLabel": "Opis posla",
@@ -279,7 +320,6 @@
     "markUrgentHint": "Oglas ide na vrh feeda radnika u blizini.",
     "preview": "Pregled",
     "publish": "Objavi oglas",
-    "selectDate": "Izaberi datum",
     "selectTime": "Izaberi vreme",
     "from": "Od",
     "to": "Do",

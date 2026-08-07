@@ -79,14 +79,14 @@ insert into venues (
 
 insert into listings (
   id, venue_id, title, role_needed, employment_type, description,
-  pay_amount, pay_period, currency, starts_at, ends_at, is_urgent, requirements
+  pay_amount, pay_period, currency, start_hour, end_hour, is_urgent, requirements
 ) values (
   '00000000-0000-0000-0000-000000000201',
   '00000000-0000-0000-0000-000000000101',
   'Konobar za vikend', 'waiter', 'part_time',
   'Potreban konobar za rad vikendom u kafiću u centru.',
-  600, 'hour', 'RSD',
-  now() + interval '2 days', now() + interval '2 days' + interval '8 hours',
+  600, 'shift', 'RSD',
+  16, 24,
   true, '{Iskustvo sa šankom}'
 );
 
@@ -120,14 +120,14 @@ insert into venues (
 
 insert into listings (
   id, venue_id, title, role_needed, employment_type, description,
-  pay_amount, pay_period, currency, starts_at, ends_at, is_urgent, requirements
+  pay_amount, pay_period, currency, start_hour, end_hour, is_urgent, requirements
 ) values (
   '00000000-0000-0000-0000-000000000202',
   '00000000-0000-0000-0000-000000000102',
   'Šanker za smenu', 'bartender', 'fill_in',
   'Potreban šanker za jednu smenu, hitno.',
-  500, 'shift', 'RSD',
-  now() + interval '1 day', now() + interval '1 day' + interval '6 hours',
+  500, 'hour', 'RSD',
+  18, 24,
   false, '{Rad pod pritiskom}'
 );
 
@@ -159,15 +159,28 @@ insert into venues (
   '100000003', '+381601111114'
 );
 
+-- Deliberately no start_hour/end_hour — demonstrates the "Po dogovoru" (by agreement)
+-- fallback in the app for permanent roles with no fixed daily hours.
 insert into listings (
   id, venue_id, title, role_needed, employment_type, description,
-  pay_amount, pay_period, currency, starts_at, ends_at, is_urgent, requirements
+  pay_amount, pay_period, currency, is_urgent, requirements
 ) values (
   '00000000-0000-0000-0000-000000000203',
   '00000000-0000-0000-0000-000000000103',
   'Kuvar za stalno', 'cook', 'full_time',
   'Tražimo kuvara za stalni radni odnos.',
   90000, 'month', 'RSD',
-  now() + interval '3 days', now() + interval '3 days' + interval '10 hours',
   false, '{Iskustvo u kuhinji}'
 );
+
+-- Ratings — the 3 venue owners rate the test worker, and the test worker rates the
+-- 3 venues, so the star badges have something real to show right after seeding.
+insert into worker_ratings (worker_id, rater_id, productivity, reliability, quality) values
+  ('00000000-0000-0000-0000-000000000001', '00000000-0000-0000-0000-000000000002', 5, 4, 5),
+  ('00000000-0000-0000-0000-000000000001', '00000000-0000-0000-0000-000000000003', 4, 4, 4),
+  ('00000000-0000-0000-0000-000000000001', '00000000-0000-0000-0000-000000000004', 5, 5, 4);
+
+insert into venue_ratings (venue_id, rater_id, conditions, atmosphere, benefits) values
+  ('00000000-0000-0000-0000-000000000101', '00000000-0000-0000-0000-000000000001', 4, 5, 3),
+  ('00000000-0000-0000-0000-000000000102', '00000000-0000-0000-0000-000000000001', 3, 4, 3),
+  ('00000000-0000-0000-0000-000000000103', '00000000-0000-0000-0000-000000000001', 5, 5, 5);

@@ -10,7 +10,7 @@ import type {
 import type { ListingWithVenue } from "@shared/types/domain.types";
 
 const VENUE_SELECT =
-  "id, name, venue_type, city, address, logo_url, cover_photo_url, lat, lng, phone";
+  "id, name, venue_type, city, address, logo_url, cover_photo_url, lat, lng, phone, rating_avg, rating_count";
 
 export async function fetchListings(
   filters: ListingFilters,
@@ -98,8 +98,8 @@ export type CreateListingInput = {
   description?: string;
   payAmount?: number;
   payPeriod: PayPeriod;
-  startsAt?: string;
-  endsAt?: string;
+  startHour?: number;
+  endHour?: number;
   isUrgent: boolean;
   requirements: string[];
 };
@@ -115,8 +115,8 @@ export async function createListing(input: CreateListingInput) {
       description: input.description ?? null,
       pay_amount: input.payAmount ?? null,
       pay_period: input.payPeriod,
-      starts_at: input.startsAt ?? null,
-      ends_at: input.endsAt ?? null,
+      start_hour: input.startHour ?? null,
+      end_hour: input.endHour ?? null,
       is_urgent: input.isUrgent,
       requirements: input.requirements,
     })
@@ -139,8 +139,8 @@ export async function updateListing(id: string, input: UpdateListingInput) {
       description: input.description ?? null,
       pay_amount: input.payAmount ?? null,
       pay_period: input.payPeriod,
-      starts_at: input.startsAt ?? null,
-      ends_at: input.endsAt ?? null,
+      start_hour: input.startHour ?? null,
+      end_hour: input.endHour ?? null,
       is_urgent: input.isUrgent,
       requirements: input.requirements,
     })

@@ -16,14 +16,9 @@ every FK). `seed.sql` then creates 4 test accounts — 1 worker + 3 venues at di
 real Belgrade locations, each venue with one open listing — for exercising
 location-dependent features (distance/near-me).
 
-Run from the terminal (needs `psql` installed and `SUPABASE_DB_URL` set in `.env` —
-see `.env.example`):
-```
-npm run db:reset       # wipe everything
-npm run db:seed        # seed the 4 test accounts + listings
-npm run db:test-reset  # both, in order
-```
-Or paste `reset.sql`/`seed.sql` into the Supabase dashboard SQL editor directly.
+Run both by pasting their contents into the Supabase dashboard's SQL Editor and
+clicking Run — `reset.sql` first, then `seed.sql`. (There's no local `psql`/npm-script
+tooling for this — dashboard only.)
 
 **Keep both files in sync with the schema** — whenever a migration adds/renames/drops
 a column those scripts touch, update `reset.sql`/`seed.sql` (and this note) in the

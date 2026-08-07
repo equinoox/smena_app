@@ -15,22 +15,18 @@ export function formatPay(listing: Listing, t: Translate): string | null {
   return `${amount} ${listing.currency}${period}`;
 }
 
-// "16:00–24:00" (sr, 24h) or "4:00 PM–12:00 AM" (en, 12h) from timestamps;
-// null when no start time is set.
+// "16h–24h" (sr) or "4 PM–12 AM" (en) from plain hour-of-day numbers (0-24); null when
+// no start hour is set. Listings describe a daily working-hours window, not a specific
+// calendar date, so this just reuses formatHour — no Date/locale parsing needed.
 export function formatTimeRange(
-  startIso: string | null,
-  endIso: string | null,
+  startHour: number | null,
+  endHour: number | null,
   language: Language,
 ): string | null {
-  if (!startIso) return null;
-  const locale = language === "en" ? "en-US" : "sr-RS";
-  const fmt = (iso: string) =>
-    new Date(iso).toLocaleTimeString(locale, {
-      hour: "2-digit",
-      minute: "2-digit",
-      hour12: language === "en",
-    });
-  return endIso ? `${fmt(startIso)}–${fmt(endIso)}` : fmt(startIso);
+  if (startHour == null) return null;
+  return endHour != null
+    ? `${formatHour(startHour, language)}–${formatHour(endHour, language)}`
+    : formatHour(startHour, language);
 }
 
 // A single hour (0-24, 24 meaning midnight/end of day) as shown in the shift-time

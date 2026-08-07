@@ -16,6 +16,7 @@ import { Controller, useForm } from "react-hook-form";
 import { Pressable, Text, View } from "react-native";
 import { Button } from "@shared/components/Button";
 import { Chip } from "@shared/components/Chip";
+import { ChipSlider } from "@shared/components/ChipSlider";
 import { ControlledInput } from "@shared/components/ControlledInput";
 import { ImagePickerField } from "@shared/components/ImagePickerField";
 import { LocationPickerField } from "@shared/components/LocationPickerField";
@@ -211,49 +212,6 @@ export function WorkerSignUpScreen() {
             />
 
             <PhoneInput control={control} name="phone" label={t("auth.phone")} />
-
-            <View className="gap-2">
-              <Text className="font-sans-medium text-sm text-text-tertiary">
-                {t("auth.experience")}
-              </Text>
-              <Controller
-                control={control}
-                name="experienceLevel"
-                render={({ field, fieldState }) => (
-                  <>
-                    <View className="flex-row rounded-input border border-border-default bg-bg-surface p-1">
-                      {EXPERIENCE_LEVELS.map((level) => {
-                        const selected = field.value === level;
-                        return (
-                          <Pressable
-                            key={level}
-                            onPress={() => field.onChange(level)}
-                            className={cn(
-                              "flex-1 items-center justify-center rounded-chip py-2.5",
-                              selected && "bg-bg-surface-alt",
-                            )}
-                          >
-                            <Text
-                              className={cn(
-                                "font-sans-semibold text-sm",
-                                selected ? "text-text-primary" : "text-text-muted",
-                              )}
-                            >
-                              {t(`experience.${level}` as TranslationKey)}
-                            </Text>
-                          </Pressable>
-                        );
-                      })}
-                    </View>
-                    {fieldState.error ? (
-                      <Text className="font-sans text-xs text-warning">
-                        {fieldState.error.message}
-                      </Text>
-                    ) : null}
-                  </>
-                )}
-              />
-            </View>
           </View>
 
           <View className="mt-8">
@@ -281,7 +239,7 @@ export function WorkerSignUpScreen() {
               label={t("auth.bio")}
               placeholder={t("auth.bioPlaceholder")}
               multiline
-              numberOfLines={3}
+              numberOfLines={4}
             />
 
             <View className="gap-2">
@@ -323,22 +281,72 @@ export function WorkerSignUpScreen() {
                 name="workerRoles"
                 render={({ field, fieldState }) => (
                   <>
-                    <View className="flex-row flex-wrap gap-2">
-                      {WORKER_ROLES.map((role) => (
-                        <Chip
-                          key={role}
-                          label={t(`roles.${role}` as TranslationKey)}
-                          variant={field.value.includes(role) ? "active" : "neutral"}
-                          size="lg"
-                          onPress={() =>
-                            field.onChange(
-                              field.value.includes(role)
-                                ? field.value.filter((r) => r !== role)
-                                : [...field.value, role],
-                            )
-                          }
-                        />
-                      ))}
+                    <ChipSlider>
+                      {WORKER_ROLES.map((role) => {
+                        const selected = field.value.includes(role);
+                        return (
+                          <Chip
+                            key={role}
+                            label={t(`roles.${role}` as TranslationKey)}
+                            variant={selected ? "active" : "neutral"}
+                            size="lg"
+                            onPress={() => {
+                              if (selected) {
+                                field.onChange(field.value.filter((r) => r !== role));
+                                return;
+                              }
+                              if (field.value.length >= 3) {
+                                toast.info(t("validation.selectPositionMax"));
+                                return;
+                              }
+                              field.onChange([...field.value, role]);
+                            }}
+                          />
+                        );
+                      })}
+                    </ChipSlider>
+                    {fieldState.error ? (
+                      <Text className="font-sans text-xs text-warning">
+                        {fieldState.error.message}
+                      </Text>
+                    ) : null}
+                  </>
+                )}
+              />
+            </View>
+
+            <View className="gap-2">
+              <Text className="font-sans-medium text-sm text-text-tertiary">
+                {t("auth.experience")}
+              </Text>
+              <Controller
+                control={control}
+                name="experienceLevel"
+                render={({ field, fieldState }) => (
+                  <>
+                    <View className="flex-row rounded-input border border-border-default bg-bg-surface p-1">
+                      {EXPERIENCE_LEVELS.map((level) => {
+                        const selected = field.value === level;
+                        return (
+                          <Pressable
+                            key={level}
+                            onPress={() => field.onChange(level)}
+                            className={cn(
+                              "flex-1 items-center justify-center rounded-chip py-2.5",
+                              selected && "bg-bg-surface-alt",
+                            )}
+                          >
+                            <Text
+                              className={cn(
+                                "font-sans-semibold text-sm",
+                                selected ? "text-text-primary" : "text-text-muted",
+                              )}
+                            >
+                              {t(`experience.${level}` as TranslationKey)}
+                            </Text>
+                          </Pressable>
+                        );
+                      })}
                     </View>
                     {fieldState.error ? (
                       <Text className="font-sans text-xs text-warning">

@@ -37,7 +37,7 @@ export const Input = forwardRef<TextInput, InputProps>(function Input(
       <View
         className={cn(
           "flex-row gap-2 rounded-input border bg-bg-surface px-3",
-          rest.multiline ? "h-24 items-start py-3" : "h-12 items-center",
+          rest.multiline ? "h-32 items-start py-3" : "h-12 items-center",
           focused ? "border-brand" : "border-border-default",
           error && "border-warning",
         )}

@@ -2,10 +2,19 @@
 // Regenerate later with `supabase gen types typescript` once the project exists.
 
 export type UserRole = "worker" | "venue";
-export type VenueType = "cafe" | "bar" | "restaurant" | "club" | "bakery";
+export type VenueType =
+  | "cafe"
+  | "bar"
+  | "pub"
+  | "club"
+  | "kafana"
+  | "restaurant"
+  | "fast_food"
+  | "bakery";
 export type WorkerRole =
   | "waiter"
   | "bartender"
+  | "cocktail_master"
   | "barista"
   | "cook"
   | "host"
@@ -39,6 +48,8 @@ export interface Database {
           experience_level: ExperienceLevel | null;
           skills: string[];
           is_available: boolean;
+          rating_avg: number | null;
+          rating_count: number;
           created_at: string;
           updated_at: string;
         };
@@ -57,6 +68,8 @@ export interface Database {
           experience_level?: ExperienceLevel | null;
           skills?: string[];
           is_available?: boolean;
+          rating_avg?: number | null;
+          rating_count?: number;
           created_at?: string;
           updated_at?: string;
         };
@@ -78,6 +91,8 @@ export interface Database {
           lng: number | null;
           logo_url: string | null;
           cover_photo_url: string | null;
+          rating_avg: number | null;
+          rating_count: number;
           created_at: string;
           updated_at: string;
         };
@@ -95,6 +110,8 @@ export interface Database {
           lng?: number | null;
           logo_url?: string | null;
           cover_photo_url?: string | null;
+          rating_avg?: number | null;
+          rating_count?: number;
           created_at?: string;
           updated_at?: string;
         };
@@ -112,8 +129,8 @@ export interface Database {
           pay_amount: number | null;
           pay_period: PayPeriod;
           currency: string;
-          starts_at: string | null;
-          ends_at: string | null;
+          start_hour: number | null;
+          end_hour: number | null;
           is_urgent: boolean;
           status: ListingStatus;
           requirements: string[];
@@ -130,8 +147,8 @@ export interface Database {
           pay_amount?: number | null;
           pay_period?: PayPeriod;
           currency?: string;
-          starts_at?: string | null;
-          ends_at?: string | null;
+          start_hour?: number | null;
+          end_hour?: number | null;
           is_urgent?: boolean;
           status?: ListingStatus;
           requirements?: string[];
@@ -195,6 +212,54 @@ export interface Database {
         Update: Partial<Database["public"]["Tables"]["listing_views"]["Insert"]>;
         Relationships: [];
       };
+      worker_ratings: {
+        Row: {
+          id: string;
+          worker_id: string;
+          rater_id: string;
+          productivity: number;
+          reliability: number;
+          quality: number;
+          created_at: string;
+          updated_at: string;
+        };
+        Insert: {
+          id?: string;
+          worker_id: string;
+          rater_id: string;
+          productivity: number;
+          reliability: number;
+          quality: number;
+          created_at?: string;
+          updated_at?: string;
+        };
+        Update: Partial<Database["public"]["Tables"]["worker_ratings"]["Insert"]>;
+        Relationships: [];
+      };
+      venue_ratings: {
+        Row: {
+          id: string;
+          venue_id: string;
+          rater_id: string;
+          conditions: number;
+          atmosphere: number;
+          benefits: number;
+          created_at: string;
+          updated_at: string;
+        };
+        Insert: {
+          id?: string;
+          venue_id: string;
+          rater_id: string;
+          conditions: number;
+          atmosphere: number;
+          benefits: number;
+          created_at?: string;
+          updated_at?: string;
+        };
+        Update: Partial<Database["public"]["Tables"]["venue_ratings"]["Insert"]>;
+        Relationships: [];
+      };
     };
     Views: Record<string, never>;
     Functions: Record<string, never>;
@@ -219,3 +284,6 @@ export type Application = Database["public"]["Tables"]["applications"]["Row"];
 export type SavedListing =
   Database["public"]["Tables"]["saved_listings"]["Row"];
 export type ListingView = Database["public"]["Tables"]["listing_views"]["Row"];
+export type WorkerRating =
+  Database["public"]["Tables"]["worker_ratings"]["Row"];
+export type VenueRating = Database["public"]["Tables"]["venue_ratings"]["Row"];

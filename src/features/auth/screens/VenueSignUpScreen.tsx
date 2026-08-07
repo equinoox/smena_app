@@ -17,6 +17,7 @@ import { Controller, useForm } from "react-hook-form";
 import { Pressable, Text, View } from "react-native";
 import { Button } from "@shared/components/Button";
 import { Chip } from "@shared/components/Chip";
+import { ChipSlider } from "@shared/components/ChipSlider";
 import { ControlledInput } from "@shared/components/ControlledInput";
 import { ImagePickerField } from "@shared/components/ImagePickerField";
 import { LocationPickerField } from "@shared/components/LocationPickerField";
@@ -233,7 +234,7 @@ export function VenueSignUpScreen() {
                 control={control}
                 name="venueType"
                 render={({ field }) => (
-                  <View className="flex-row flex-wrap gap-2">
+                  <ChipSlider>
                     {VENUE_TYPES.map((type) => (
                       <Chip
                         key={type}
@@ -243,7 +244,7 @@ export function VenueSignUpScreen() {
                         onPress={() => field.onChange(type)}
                       />
                     ))}
-                  </View>
+                  </ChipSlider>
                 )}
               />
             </View>
@@ -294,7 +295,7 @@ export function VenueSignUpScreen() {
               name="description"
               label={t("auth.description")}
               multiline
-              numberOfLines={3}
+              numberOfLines={4}
             />
           </View>
 

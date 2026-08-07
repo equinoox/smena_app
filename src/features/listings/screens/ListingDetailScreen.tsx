@@ -122,7 +122,7 @@ export function ListingDetailScreen() {
   const employmentLabel = t(
     `employment.${listing.employment_type}` as TranslationKey,
   );
-  const time = formatTimeRange(listing.starts_at, listing.ends_at, language);
+  const time = formatTimeRange(listing.start_hour, listing.end_hour, language);
   const pay = formatPay(listing, t);
   const title = listing.title || roleLabel;
   const hasApplied = !!myApplication.data;
@@ -200,7 +200,18 @@ export function ListingDetailScreen() {
         </View>
 
         <View className="px-4">
-          <View className="-mt-8 flex-row items-center gap-3">
+          <Pressable
+            onPress={
+              !isVenue
+                ? () =>
+                    router.push({
+                      pathname: "/venue/[id]",
+                      params: { id: listing.venue_id },
+                    })
+                : undefined
+            }
+            className="-mt-8 flex-row items-center gap-3"
+          >
             {listing.venue?.logo_url ? (
               <Image
                 source={{ uri: listing.venue.logo_url }}
@@ -223,7 +234,7 @@ export function ListingDetailScreen() {
                 ) : null}
               </View>
             </View>
-          </View>
+          </Pressable>
 
           <Text className="mt-3 font-sans-extrabold text-2xl text-text-primary">
             {title}
@@ -276,12 +287,12 @@ export function ListingDetailScreen() {
               <InfoCard
                 icon={<Clock size={14} color={colors.brand} />}
                 label={t("listingDetail.workingHours")}
-                value={time ?? "—"}
+                value={time ?? t("listingDetail.byAgreement")}
               />
               <InfoCard
                 icon={<Wallet size={14} color={colors.brand} />}
                 label={t("listingDetail.pay")}
-                value={pay ?? "—"}
+                value={pay ?? t("listingDetail.byAgreement")}
               />
             </View>
             <View className="flex-row gap-3">

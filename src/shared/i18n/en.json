@@ -15,6 +15,7 @@
     "close": "Close",
     "clear": "Clear",
     "confirm": "Confirm",
+    "reset": "Reset",
     "error": "Error",
     "somethingWrong": "Something went wrong",
     "tryAgain": "Please try again.",
@@ -27,6 +28,7 @@
     "passwordsDontMatch": "Passwords do not match",
     "nameMin": "Enter your full name",
     "selectPosition": "Please select at least one position.",
+    "selectPositionMax": "You can select up to 3 positions.",
     "selectExperience": "Please select your experience level."
   },
   "nav": {
@@ -68,7 +70,7 @@
     "workerDetailsTitle": "Work details",
     "workerDetailsSubtitle": "Venues find you based on this info.",
     "position": "Position",
-    "positionHint": "choose one or more",
+    "positionHint": "choose up to 3",
     "experience": "Experience",
     "workerExperienceTitle": "Your experience",
     "workerExperienceSubtitle": "Help venues get to know you better.",
@@ -149,7 +151,11 @@
     "browse": "Browse shifts",
     "filterAll": "All",
     "filters": "Filters",
-    "nearMe": "Near me",
+    "filtersTitle": "Filter listings",
+    "minPay": "Minimum pay",
+    "minPayBadge": "From {amount} RSD",
+    "distance": "Distance",
+    "applyFilters": "Apply filters",
     "activeCount": "{count} active",
     "applyNow": "Apply now",
     "applied": "Applied",
@@ -175,6 +181,7 @@
     "notFound": "Listing not found",
     "applicants": "{count} applicants",
     "views": "{count} views",
+    "byAgreement": "By agreement",
     "workingHours": "Working hours",
     "location": "Location",
     "callVenue": "Call venue",
@@ -192,6 +199,15 @@
     "phone": "Phone",
     "call": "Call worker",
     "noPhone": "Worker has no contact phone on file."
+  },
+  "venueDetail": {
+    "notFound": "Venue not found"
+  },
+  "workers": {
+    "title": "Workers",
+    "empty": "No workers found",
+    "filtersTitle": "Filter workers",
+    "experience": "Experience"
   },
   "saved": {
     "title": "Saved",
@@ -230,12 +246,13 @@
   },
   "employment": {
     "fill_in": "Fill-in",
-    "part_time": "Part-time",
+    "part_time": "Day-rate",
     "full_time": "Full-time"
   },
   "roles": {
     "waiter": "Waiter",
     "bartender": "Bartender",
+    "cocktail_master": "Cocktail master",
     "barista": "Barista",
     "cook": "Cook",
     "host": "Host",
@@ -249,8 +266,11 @@
   "venueTypes": {
     "cafe": "Café",
     "bar": "Bar",
-    "restaurant": "Restaurant",
+    "pub": "Pub",
     "club": "Club",
+    "kafana": "Kafana",
+    "restaurant": "Restaurant",
+    "fast_food": "Fast food",
     "bakery": "Bakery"
   },
   "errors": {
@@ -258,17 +278,38 @@
     "auth": "Could not sign you in. Check your details.",
     "generic": "Something went wrong. Please try again."
   },
+  "rating": {
+    "overall": "Rating",
+    "noRatingsYet": "No ratings yet",
+    "count": "{count} ratings",
+    "rateWorker": "Rate worker",
+    "rateVenue": "Rate venue",
+    "editRating": "Edit your rating",
+    "rateWorkerTitle": "Rate this worker",
+    "rateVenueTitle": "Rate this venue",
+    "submit": "Submit rating",
+    "submitSuccess": "Rating submitted!",
+    "worker": {
+      "productivity": "Productivity",
+      "reliability": "Reliability",
+      "quality": "Quality"
+    },
+    "venue": {
+      "conditions": "Working conditions",
+      "atmosphere": "Atmosphere",
+      "benefits": "Benefits"
+    }
+  },
   "createListing": {
     "title": "New listing",
     "editTitle": "Edit listing",
     "saveChanges": "Save changes",
     "updateSuccess": "Listing updated successfully!",
-    "dateTimeRequired": "Please select a date and time for the shift.",
     "positionQuestion": "Which position do you need?",
     "titleLabel": "Listing title",
     "titleHint": "Short and clear — this is what workers see first.",
     "employmentLabel": "Employment type",
-    "dateAndShift": "Date and shift",
+    "workingHoursLabel": "Working hours",
     "compensation": "Compensation",
     "optional": "optional",
     "descriptionLabel": "Job description",
@@ -279,7 +320,6 @@
     "markUrgentHint": "Listing goes to the top of nearby workers' feed.",
     "preview": "Preview",
     "publish": "Publish listing",
-    "selectDate": "Select date",
     "selectTime": "Select time",
     "from": "From",
     "to": "To",

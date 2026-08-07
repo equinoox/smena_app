@@ -7,6 +7,7 @@ import { Text, View } from "react-native";
 import { Avatar } from "@shared/components/Avatar";
 import { Card } from "@shared/components/Card";
 import { Chip } from "@shared/components/Chip";
+import { StarRatingBadge } from "@shared/components/StarRatingBadge";
 import { useThemeColors } from "@shared/hooks/useThemeColors";
 import { useTranslation, type TranslationKey } from "@shared/i18n/I18nProvider";
 import { formatDistanceKm, formatLocation } from "@shared/lib/format";
@@ -40,12 +41,18 @@ export function WorkerRow({ worker, trailing, distanceKm }: WorkerRowProps) {
       <View className="flex-row items-center gap-3">
         <Avatar uri={worker.avatar_url} name={worker.full_name} size={44} />
         <View className="min-w-0 flex-1">
-          <Text
-            className="font-sans-bold text-[15px] text-text-primary"
-            numberOfLines={1}
-          >
-            {worker.full_name ?? ""}
-          </Text>
+          <View className="flex-row items-center gap-2">
+            <Text
+              className="shrink font-sans-bold text-[15px] text-text-primary"
+              numberOfLines={1}
+            >
+              {worker.full_name ?? ""}
+            </Text>
+            <StarRatingBadge
+              rating={worker.rating_avg}
+              count={worker.rating_count}
+            />
+          </View>
           {metaLine ? (
             <View className="mt-1 flex-row items-center gap-1">
               <MapPin size={13} color={colors.textMuted} />

@@ -33,7 +33,8 @@ export const WORKER_STEP1_FIELDS = [
 ] as const;
 
 // Step 2 (profile basics) fields — used to trigger partial validation before advancing.
-export const WORKER_STEP2_FIELDS = ["location", "phone", "experienceLevel"] as const;
+// experienceLevel moved to step 3, alongside position — validated at final submit only.
+export const WORKER_STEP2_FIELDS = ["location", "phone"] as const;
 
 export function workerSignUpSchema(t: Translate) {
   return z
@@ -50,7 +51,8 @@ export function workerSignUpSchema(t: Translate) {
       skills: z.array(z.string()),
       workerRoles: z
         .array(z.enum(WORKER_ROLES))
-        .min(1, t("validation.selectPosition")),
+        .min(1, t("validation.selectPosition"))
+        .max(3, t("validation.selectPositionMax")),
     })
     .refine((v) => v.password === v.confirmPassword, {
       message: t("validation.passwordsDontMatch"),
