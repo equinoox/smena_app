@@ -83,10 +83,12 @@ function RootNavigator() {
         <Stack.Screen name="listing-applicants/[id]" />
         <Stack.Screen name="worker/[id]" />
         <Stack.Screen name="venue/[id]" />
+        <Stack.Screen name="venue-profile/[id]" />
         <Stack.Screen name="profile-edit" />
         <Stack.Screen name="settings" />
         <Stack.Screen name="listing-create" options={{ presentation: "modal" }} />
         <Stack.Screen name="venue-profile-edit" options={{ presentation: "modal" }} />
+        <Stack.Screen name="venue-create" options={{ presentation: "modal" }} />
       </Stack.Protected>
     </Stack>
   );

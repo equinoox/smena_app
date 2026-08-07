@@ -121,7 +121,8 @@ export interface Database {
       listings: {
         Row: {
           id: string;
-          venue_id: string;
+          venue_id: string | null;
+          owner_id: string;
           title: string;
           role_needed: WorkerRole;
           employment_type: EmploymentType;
@@ -134,12 +135,19 @@ export interface Database {
           is_urgent: boolean;
           status: ListingStatus;
           requirements: string[];
+          // One-off location for venue-less listings only — venue-backed listings use
+          // the joined venue's own address/city/lat/lng instead.
+          address: string | null;
+          city: string | null;
+          lat: number | null;
+          lng: number | null;
           created_at: string;
           updated_at: string;
         };
         Insert: {
           id?: string;
-          venue_id: string;
+          venue_id?: string | null;
+          owner_id: string;
           title: string;
           role_needed: WorkerRole;
           employment_type: EmploymentType;
@@ -152,6 +160,10 @@ export interface Database {
           is_urgent?: boolean;
           status?: ListingStatus;
           requirements?: string[];
+          address?: string | null;
+          city?: string | null;
+          lat?: number | null;
+          lng?: number | null;
           created_at?: string;
           updated_at?: string;
         };

@@ -70,6 +70,7 @@ export const VENUE_STEP1_FIELDS = [
 ] as const;
 
 // Step 2 (venue identity) fields — used to trigger partial validation before advancing.
+// Only checked when hasVenue is true — a venue-less sign-up skips straight to submit.
 export const VENUE_STEP2_FIELDS = ["venueName", "venueType"] as const;
 
 export function venueSignUpSchema(t: Translate) {
@@ -80,19 +81,45 @@ export function venueSignUpSchema(t: Translate) {
       confirmPassword: z.string(),
       fullName: z.string().min(2, t("validation.nameMin")),
       ownerPhone: z.string().optional(),
-      // Step 2 — venue details.
-      venueName: z.string().min(2, t("validation.required")),
-      venueType: z.enum(VENUE_TYPES),
-      location: locationSchema(t),
-      pib: z.string().min(1, t("validation.required")),
-      phone: z.string().min(1, t("validation.required")),
+      // Whether this owner runs a physical venue at all — false means they only ever
+      // post venue-less temporary-job listings (see CreateListingScreen's "Bez lokala").
+      hasVenue: z.boolean(),
+      // Step 2 — venue details, required only when hasVenue is true.
+      venueName: z.string().optional(),
+      venueType: z.enum(VENUE_TYPES).optional(),
+      location: locationSchema(t).optional(),
+      pib: z.string().optional(),
+      phone: z.string().optional(),
       description: z.string().optional(),
       logoUri: z.string().optional(),
       coverPhotoUri: z.string().optional(),
     })
-    .refine((v) => v.password === v.confirmPassword, {
-      message: t("validation.passwordsDontMatch"),
-      path: ["confirmPassword"],
+    .superRefine((v, ctx) => {
+      if (v.password !== v.confirmPassword) {
+        ctx.addIssue({
+          code: "custom",
+          message: t("validation.passwordsDontMatch"),
+          path: ["confirmPassword"],
+        });
+      }
+      if (v.hasVenue) {
+        if (!v.venueName || v.venueName.length < 2) {
+          ctx.addIssue({ code: "custom", message: t("validation.required"), path: ["venueName"] });
+        }
+        if (!v.location) {
+          ctx.addIssue({ code: "custom", message: t("validation.required"), path: ["location"] });
+        }
+        if (!v.pib) {
+          ctx.addIssue({ code: "custom", message: t("validation.required"), path: ["pib"] });
+        }
+        if (!v.phone) {
+          ctx.addIssue({ code: "custom", message: t("validation.required"), path: ["phone"] });
+        }
+      } else if (!v.ownerPhone) {
+        // No venue phone to fall back on for worker contact — the owner's own phone
+        // becomes required instead.
+        ctx.addIssue({ code: "custom", message: t("validation.required"), path: ["ownerPhone"] });
+      }
     });
 }
 export type VenueSignUpValues = z.infer<ReturnType<typeof venueSignUpSchema>>;

@@ -1,5 +1,7 @@
 // Listings data access — browse (with venue join), single listing, a venue's own listings,
-// and creating/updating/deleting a listing (the venue's "post a shift" form).
+// and creating/updating/deleting a listing (the venue's "post a shift" form). A listing may
+// have no venue at all (a one-off temporary-job ad) — `venue` in the results is then null
+// and `owner` (the posting profile) is the display/contact fallback.
 import { supabase } from "@shared/lib/supabase";
 import type { ListingFilters } from "@shared/lib/queryKeys";
 import type {
@@ -8,19 +10,24 @@ import type {
   WorkerRole,
 } from "@shared/types/database.types";
 import type { ListingWithVenue } from "@shared/types/domain.types";
+import type { LocationValue } from "@shared/types/location.types";
 
 const VENUE_SELECT =
   "id, name, venue_type, city, address, logo_url, cover_photo_url, lat, lng, phone, rating_avg, rating_count";
+const OWNER_SELECT = "id, full_name, avatar_url, phone";
 
 export async function fetchListings(
   filters: ListingFilters,
 ): Promise<ListingWithVenue[]> {
-  // !inner so a filter on the embedded venue (e.g. name search) actually excludes
-  // non-matching listings instead of just shaping the embed (every listing has a
-  // venue via the FK, so this never drops rows that would otherwise be included).
+  // venue is a left join by default so venue-less listings still come back (with
+  // venue: null). !inner is only added when searching by venue name — that filter
+  // can't match a venue-less listing anyway, so requiring the join there is correct
+  // (see the PostgREST note: filtering an embedded resource's column only actually
+  // excludes non-matching top-level rows when the embed is `!inner`).
+  const venueEmbed = filters.search?.trim() ? `venues!inner` : `venues`;
   let query = supabase
     .from("listings")
-    .select(`*, venue:venues!inner(${VENUE_SELECT})`)
+    .select(`*, venue:${venueEmbed}(${VENUE_SELECT}), owner:profiles(${OWNER_SELECT})`)
     .eq("status", "open")
     .order("is_urgent", { ascending: false })
     .order("created_at", { ascending: false });
@@ -30,6 +37,9 @@ export async function fetchListings(
   }
   if (filters.roleNeeded) {
     query = query.eq("role_needed", filters.roleNeeded);
+  }
+  if (filters.noVenueOnly) {
+    query = query.is("venue_id", null);
   }
   if (filters.search?.trim()) {
     query = query.ilike("venue.name", `%${filters.search.trim()}%`);
@@ -55,7 +65,7 @@ export async function fetchListingById(
 ): Promise<ListingWithVenue | null> {
   const { data, error } = await supabase
     .from("listings")
-    .select(`*, venue:venues(${VENUE_SELECT}, description)`)
+    .select(`*, venue:venues(${VENUE_SELECT}, description), owner:profiles(${OWNER_SELECT})`)
     .eq("id", id)
     .maybeSingle();
   if (error) throw error;
@@ -67,31 +77,32 @@ export async function fetchVenueListings(
 ): Promise<ListingWithVenue[]> {
   const { data, error } = await supabase
     .from("listings")
-    .select(`*, venue:venues(${VENUE_SELECT})`)
+    .select(`*, venue:venues(${VENUE_SELECT}), owner:profiles(${OWNER_SELECT})`)
     .eq("venue_id", venueId)
     .order("created_at", { ascending: false });
   if (error) throw error;
   return (data ?? []) as unknown as ListingWithVenue[];
 }
 
-// Same as fetchVenueListings, but keyed by the venue's owner id instead of the venue's
-// own id — lets the venue-profile screen fetch its venue and that venue's listings in
-// parallel (both keyed off the signed-in user) instead of waiting for the venue fetch
-// to resolve first before it even knows which venue_id to filter on.
+// All of an owner's listings across every venue they run, plus any venue-less
+// (temporary-job) listings they've posted — used by the "see all" / dashboard views
+// that aren't scoped to one specific venue.
 export async function fetchVenueListingsByOwner(
   ownerId: string,
 ): Promise<ListingWithVenue[]> {
   const { data, error } = await supabase
     .from("listings")
-    .select(`*, venue:venues!inner(${VENUE_SELECT})`)
-    .eq("venue.owner_id", ownerId)
+    .select(`*, venue:venues(${VENUE_SELECT}), owner:profiles(${OWNER_SELECT})`)
+    .eq("owner_id", ownerId)
     .order("created_at", { ascending: false });
   if (error) throw error;
   return (data ?? []) as unknown as ListingWithVenue[];
 }
 
 export type CreateListingInput = {
-  venueId: string;
+  ownerId: string;
+  // Omitted for a venue-less (temporary-job) listing.
+  venueId?: string;
   title: string;
   roleNeeded: WorkerRole;
   employmentType: EmploymentType;
@@ -102,13 +113,16 @@ export type CreateListingInput = {
   endHour?: number;
   isUrgent: boolean;
   requirements: string[];
+  // The one-off job location — only used (and only meaningful) when venueId is omitted.
+  location?: LocationValue;
 };
 
 export async function createListing(input: CreateListingInput) {
   const { data, error } = await supabase
     .from("listings")
     .insert({
-      venue_id: input.venueId,
+      owner_id: input.ownerId,
+      venue_id: input.venueId ?? null,
       title: input.title,
       role_needed: input.roleNeeded,
       employment_type: input.employmentType,
@@ -119,6 +133,10 @@ export async function createListing(input: CreateListingInput) {
       end_hour: input.endHour ?? null,
       is_urgent: input.isUrgent,
       requirements: input.requirements,
+      address: input.location?.address ?? null,
+      city: input.location?.city ?? null,
+      lat: input.location?.lat ?? null,
+      lng: input.location?.lng ?? null,
     })
     .select()
     .single();
@@ -126,8 +144,9 @@ export async function createListing(input: CreateListingInput) {
   return data;
 }
 
-// Same shape as create, minus venueId — a listing never changes owning venue.
-export type UpdateListingInput = Omit<CreateListingInput, "venueId">;
+// Same shape as create, minus venueId/ownerId — a listing never changes owning venue
+// or owner. `location` is still editable (relevant only for a venue-less listing).
+export type UpdateListingInput = Omit<CreateListingInput, "venueId" | "ownerId">;
 
 export async function updateListing(id: string, input: UpdateListingInput) {
   const { data, error } = await supabase
@@ -143,6 +162,14 @@ export async function updateListing(id: string, input: UpdateListingInput) {
       end_hour: input.endHour ?? null,
       is_urgent: input.isUrgent,
       requirements: input.requirements,
+      ...(input.location
+        ? {
+            address: input.location.address,
+            city: input.location.city,
+            lat: input.location.lat,
+            lng: input.location.lng,
+          }
+        : {}),
     })
     .eq("id", id)
     .select()

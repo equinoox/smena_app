@@ -1,21 +1,23 @@
-// Venue listings — the venue's own shift postings (all statuses).
+// Venue listings — all of the owner's own shift postings (all statuses), across every
+// venue they run plus any venue-less temporary-job listings — the one place those are
+// still reachable/manageable, since they don't belong to any single venue's own profile.
 // Reached only via "See all" pushes (no tab bar item), so it carries its own back arrow.
 import { useRouter } from "expo-router";
 import { CaretLeft } from "phosphor-react-native";
 import { Pressable, Text, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { ListingList } from "@shared/components/ListingList";
-import { useMyVenue } from "@shared/hooks/useMyVenue";
+import { useAuth } from "@shared/hooks/useAuth";
 import { useThemeColors } from "@shared/hooks/useThemeColors";
 import { useTranslation } from "@shared/i18n/I18nProvider";
-import { useVenueListings } from "@features/listings/hooks/useListings";
+import { useVenueListingsByOwner } from "@features/listings/hooks/useListings";
 
 export function VenueListingsView() {
   const router = useRouter();
   const colors = useThemeColors();
   const { t } = useTranslation();
-  const { venue } = useMyVenue();
-  const listings = useVenueListings(venue?.id);
+  const { user } = useAuth();
+  const listings = useVenueListingsByOwner(user?.id);
 
   const header = (
     <View className="pb-4 pt-2">

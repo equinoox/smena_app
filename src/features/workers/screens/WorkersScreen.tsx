@@ -11,7 +11,7 @@ import { Chip } from "@shared/components/Chip";
 import { EmptyState } from "@shared/components/EmptyState";
 import { Loader } from "@shared/components/Loader";
 import { WorkerRow } from "@shared/components/WorkerRow";
-import { useMyVenue } from "@shared/hooks/useMyVenue";
+import { useActiveVenue } from "@shared/hooks/useActiveVenue";
 import { useThemeColors } from "@shared/hooks/useThemeColors";
 import { useTranslation, type TranslationKey } from "@shared/i18n/I18nProvider";
 import { haversineDistanceKm } from "@shared/lib/geo";
@@ -26,7 +26,7 @@ export function WorkersScreen() {
   const router = useRouter();
   const { t } = useTranslation();
   const colors = useThemeColors();
-  const { venue } = useMyVenue();
+  const { venue } = useActiveVenue();
   const workers = useAllWorkers();
   const [filters, setFilters] = useState<WorkersFilterValues>(DEFAULT_WORKERS_FILTERS);
   const [filterModalVisible, setFilterModalVisible] = useState(false);

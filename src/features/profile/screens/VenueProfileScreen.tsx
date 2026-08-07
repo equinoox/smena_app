@@ -1,14 +1,19 @@
-// Venue profile — the venue owner's own business profile: cover banner, logo, details,
-// and their active listings. The edit button opens the pre-filled edit-venue form.
+// Venue profile — one lokal's own business profile: cover banner, logo, details, and its
+// active listings. Takes an explicit venueId (rather than assuming "the" venue) so it works
+// both as the venue-profile tab (owner's sole venue) and as a pushed screen opened from the
+// "Moji lokali" list (one of several). The edit button opens the pre-filled edit-venue form;
+// the "+" button next to it starts the add-venue wizard.
 import { useMemo } from "react";
 import { useRouter } from "expo-router";
 import {
+  CaretLeft,
   CaretRight,
   Clock,
   Coffee,
   MapPin,
   PencilSimple,
   Phone,
+  Plus,
 } from "phosphor-react-native";
 import {
   ActivityIndicator,
@@ -24,14 +29,13 @@ import { EmptyState } from "@shared/components/EmptyState";
 import { Loader } from "@shared/components/Loader";
 import { SmartCoverImage } from "@shared/components/SmartCoverImage";
 import { StarRatingBadge } from "@shared/components/StarRatingBadge";
-import { useAuth } from "@shared/hooks/useAuth";
-import { useMyVenue } from "@shared/hooks/useMyVenue";
 import { useThemeColors } from "@shared/hooks/useThemeColors";
 import { useTranslation, type TranslationKey } from "@shared/i18n/I18nProvider";
 import { employmentChipVariant, formatLocation, formatTimeRange } from "@shared/lib/format";
 import { roleIcon } from "@shared/lib/roleIcon";
 import type { ListingWithVenue } from "@shared/types/domain.types";
-import { useVenueListingsByOwner } from "@features/listings/hooks/useListings";
+import { useVenueProfile } from "@features/venues/hooks/useVenueProfile";
+import { useVenueListings } from "@features/listings/hooks/useListings";
 
 function ActiveListingRow({ listing }: { listing: ListingWithVenue }) {
   const router = useRouter();
@@ -79,16 +83,22 @@ function ActiveListingRow({ listing }: { listing: ListingWithVenue }) {
   );
 }
 
-export function VenueProfileScreen() {
+type VenueProfileScreenProps = {
+  venueId: string;
+  // Set when pushed from the "Moji lokali" list (as opposed to being the venue-profile
+  // tab's own root screen, which needs no way back).
+  onBack?: () => void;
+};
+
+export function VenueProfileScreen({ venueId, onBack }: VenueProfileScreenProps) {
   const router = useRouter();
   const colors = useThemeColors();
   const { t } = useTranslation();
-  // Fetch the venue and its listings in parallel (both keyed off the signed-in user)
-  // instead of waiting for the venue fetch to resolve before even starting the
-  // listings fetch — cuts a full sequential round-trip off the loading time.
-  const { user } = useAuth();
-  const { venue, isLoading } = useMyVenue();
-  const listings = useVenueListingsByOwner(user?.id);
+  // Fetch the venue and its listings in parallel (both keyed off venueId) instead of
+  // waiting for the venue fetch to resolve before even starting the listings fetch —
+  // cuts a full sequential round-trip off the loading time.
+  const { data: venue, isLoading } = useVenueProfile(venueId);
+  const listings = useVenueListings(venueId);
 
   const activeListings = useMemo(
     () => (listings.data ?? []).filter((listing) => listing.status === "open"),
@@ -121,13 +131,31 @@ export function VenueProfileScreen() {
               {t("profile.coverPhoto").toUpperCase()}
             </Text>
           )}
-          <Pressable
-            onPress={() => router.push("/venue-profile-edit")}
-            hitSlop={10}
-            className="absolute right-3 top-3 h-10 w-10 items-center justify-center rounded-input border border-border-default bg-bg-surface"
-          >
-            <PencilSimple size={18} color={colors.textPrimary} />
-          </Pressable>
+          {onBack ? (
+            <Pressable
+              onPress={onBack}
+              hitSlop={10}
+              className="absolute left-3 top-3 h-10 w-10 items-center justify-center rounded-input bg-bg-canvas/70"
+            >
+              <CaretLeft size={20} color={colors.textPrimary} />
+            </Pressable>
+          ) : null}
+          <View className="absolute right-3 top-3 flex-row gap-2">
+            <Pressable
+              onPress={() => router.push("/venue-create")}
+              hitSlop={10}
+              className="h-10 w-10 items-center justify-center rounded-input border border-border-default bg-bg-surface"
+            >
+              <Plus size={18} color={colors.textPrimary} />
+            </Pressable>
+            <Pressable
+              onPress={() => router.push(`/venue-profile-edit?id=${venue.id}`)}
+              hitSlop={10}
+              className="h-10 w-10 items-center justify-center rounded-input border border-border-default bg-bg-surface"
+            >
+              <PencilSimple size={18} color={colors.textPrimary} />
+            </Pressable>
+          </View>
         </View>
 
         <View className="px-4">

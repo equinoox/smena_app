@@ -1,13 +1,16 @@
-// Venue sign-up — 3-step RHF + Zod wizard. Step 1 is the contact person's own
-// credentials; step 2 is the venue's identity (photos, name, type); step 3 is contact
-// + description. Creates the auth user (role=venue) and the venue record (incl. logo
-// upload) once step 3 submits.
+// Venue sign-up — RHF + Zod wizard. Step 1 is the contact person's own credentials;
+// step 2 asks whether they run a physical venue at all — "yes" shows the venue's
+// identity fields (photos, name, type) and continues to step 3 (contact + description);
+// "no" skips straight to submit (they'll only ever post venue-less temporary-job
+// listings, see CreateListingScreen's "Bez lokala"). Creates the auth user (role=venue)
+// and, unless venue-less, the venue record (incl. logo upload) once submitted.
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useRouter } from "expo-router";
 import {
   ArrowRight,
   CaretLeft,
   EnvelopeSimple,
+  Lightning,
   Lock,
   Storefront,
   User,
@@ -27,6 +30,7 @@ import { useOnboardingStatus } from "@shared/hooks/useOnboardingStatus";
 import { useThemeColors } from "@shared/hooks/useThemeColors";
 import { useToast } from "@shared/hooks/useToast";
 import { useTranslation, type TranslationKey } from "@shared/i18n/I18nProvider";
+import { cn } from "@shared/lib/cn";
 import { toSerbianPhone } from "@shared/lib/phone";
 import { VENUE_TYPES } from "@shared/lib/roleIcon";
 import { ProgressDots } from "@features/auth/components/ProgressDots";
@@ -47,7 +51,7 @@ export function VenueSignUpScreen() {
   const signUp = useSignUpVenue();
   const [step, setStep] = useState<1 | 2 | 3>(1);
 
-  const { control, handleSubmit, trigger } = useForm<VenueSignUpValues>({
+  const { control, handleSubmit, trigger, watch, setValue } = useForm<VenueSignUpValues>({
     resolver: zodResolver(venueSignUpSchema(t)),
     defaultValues: {
       email: "",
@@ -55,6 +59,7 @@ export function VenueSignUpScreen() {
       confirmPassword: "",
       fullName: "",
       ownerPhone: "",
+      hasVenue: true,
       venueName: "",
       venueType: "cafe",
       location: undefined,
@@ -65,6 +70,8 @@ export function VenueSignUpScreen() {
       coverPhotoUri: undefined,
     },
   });
+
+  const hasVenue = watch("hasVenue");
 
   const goToStep2 = async () => {
     if (await trigger(VENUE_STEP1_FIELDS)) setStep(2);
@@ -81,11 +88,12 @@ export function VenueSignUpScreen() {
         password: values.password,
         fullName: values.fullName,
         ownerPhone: values.ownerPhone ? toSerbianPhone(values.ownerPhone) : undefined,
+        hasVenue: values.hasVenue,
         venueName: values.venueName,
         venueType: values.venueType,
         location: values.location,
         pib: values.pib,
-        phone: toSerbianPhone(values.phone),
+        phone: values.phone ? toSerbianPhone(values.phone) : undefined,
         description: values.description,
         logoUri: values.logoUri,
         coverPhotoUri: values.coverPhotoUri,
@@ -103,6 +111,9 @@ export function VenueSignUpScreen() {
     ),
   );
 
+  // Step 2's own "Continue" acts as the final submit when there's no venue (no step 3).
+  const onStep2Continue = hasVenue ? goToStep3 : onSubmit;
+
   return (
     <Screen scroll>
       <Pressable
@@ -114,7 +125,7 @@ export function VenueSignUpScreen() {
       </Pressable>
 
       <View className="mt-5">
-        <ProgressDots total={3} activeIndex={step - 1} />
+        <ProgressDots total={hasVenue ? 3 : 2} activeIndex={step - 1} />
       </View>
 
       {step === 1 ? (
@@ -188,72 +199,126 @@ export function VenueSignUpScreen() {
             {t("auth.venueDetailsSubtitle")}
           </Text>
 
-          <View className="mt-6 gap-4">
-            <Controller
-              control={control}
-              name="coverPhotoUri"
-              render={({ field }) => (
-                <ImagePickerField
-                  value={field.value}
-                  onChange={field.onChange}
-                  label={t("profile.coverPhoto")}
-                  recommendedSize={t("imagePicker.coverSizeHint")}
-                  aspect={[9, 5]}
-                  wide
-                />
-              )}
-            />
-
-            <Controller
-              control={control}
-              name="logoUri"
-              render={({ field }) => (
-                <ImagePickerField
-                  value={field.value}
-                  onChange={field.onChange}
-                  label={t("auth.venueLogo")}
-                  recommendedSize={t("imagePicker.squareSizeHint")}
-                  aspect={[1, 1]}
-                />
-              )}
-            />
-
-            <ControlledInput
-              control={control}
-              name="venueName"
-              label={t("auth.venueName")}
-              autoCapitalize="words"
-              leftIcon={<Storefront size={18} color={colors.textMuted} />}
-            />
-
-            <View className="gap-2">
-              <Text className="font-sans-medium text-sm text-text-tertiary">
-                {t("auth.venueType")}
-              </Text>
-              <Controller
-                control={control}
-                name="venueType"
-                render={({ field }) => (
-                  <ChipSlider>
-                    {VENUE_TYPES.map((type) => (
-                      <Chip
-                        key={type}
-                        label={t(`venueTypes.${type}` as TranslationKey)}
-                        variant={field.value === type ? "active" : "neutral"}
-                        size="lg"
-                        onPress={() => field.onChange(type)}
-                      />
-                    ))}
-                  </ChipSlider>
-                )}
-              />
+          <View className="mt-6 gap-2">
+            <Text className="font-sans-medium text-sm text-text-tertiary">
+              {t("auth.hasVenueQuestion")}
+            </Text>
+            <View className="flex-row gap-2">
+              {(
+                [
+                  { value: true, icon: Storefront, label: t("auth.hasVenueYes") },
+                  { value: false, icon: Lightning, label: t("auth.hasVenueNo") },
+                ] as const
+              ).map(({ value, icon: Icon, label }) => {
+                const selected = hasVenue === value;
+                return (
+                  <Pressable
+                    key={String(value)}
+                    onPress={() => setValue("hasVenue", value)}
+                    className={cn(
+                      "flex-1 items-center gap-2 rounded-input border p-3",
+                      selected
+                        ? "border-brand bg-bg-icon-tint"
+                        : "border-border-default bg-bg-surface",
+                    )}
+                  >
+                    <Icon
+                      size={20}
+                      weight="bold"
+                      color={selected ? colors.brand : colors.textMuted}
+                    />
+                    <Text
+                      className={cn(
+                        "text-center font-sans-semibold text-sm",
+                        selected ? "text-brand" : "text-text-muted",
+                      )}
+                    >
+                      {label}
+                    </Text>
+                  </Pressable>
+                );
+              })}
             </View>
           </View>
+
+          {hasVenue ? (
+            <View className="mt-6 gap-4">
+              <Controller
+                control={control}
+                name="coverPhotoUri"
+                render={({ field }) => (
+                  <ImagePickerField
+                    value={field.value}
+                    onChange={field.onChange}
+                    label={t("profile.coverPhoto")}
+                    recommendedSize={t("imagePicker.coverSizeHint")}
+                    aspect={[9, 5]}
+                    wide
+                  />
+                )}
+              />
+
+              <Controller
+                control={control}
+                name="logoUri"
+                render={({ field }) => (
+                  <ImagePickerField
+                    value={field.value}
+                    onChange={field.onChange}
+                    label={t("auth.venueLogo")}
+                    recommendedSize={t("imagePicker.squareSizeHint")}
+                    aspect={[1, 1]}
+                  />
+                )}
+              />
+
+              <ControlledInput
+                control={control}
+                name="venueName"
+                label={t("auth.venueName")}
+                autoCapitalize="words"
+                leftIcon={<Storefront size={18} color={colors.textMuted} />}
+              />
+
+              <View className="gap-2">
+                <Text className="font-sans-medium text-sm text-text-tertiary">
+                  {t("auth.venueType")}
+                </Text>
+                <Controller
+                  control={control}
+                  name="venueType"
+                  render={({ field }) => (
+                    <ChipSlider>
+                      {VENUE_TYPES.map((type) => (
+                        <Chip
+                          key={type}
+                          label={t(`venueTypes.${type}` as TranslationKey)}
+                          variant={field.value === type ? "active" : "neutral"}
+                          size="lg"
+                          onPress={() => field.onChange(type)}
+                        />
+                      ))}
+                    </ChipSlider>
+                  )}
+                />
+              </View>
+            </View>
+          ) : (
+            <View className="mt-6 gap-1.5">
+              <Text className="font-sans text-sm leading-5 text-text-secondary">
+                {t("auth.hasVenueNoHint")}
+              </Text>
+              <View className="mt-3">
+                <PhoneInput control={control} name="ownerPhone" label={t("auth.phone")} />
+              </View>
+            </View>
+          )}
 
           <View className="mt-8">
             <Button
               label={t("common.continue")}
-              onPress={goToStep3}
+              onPress={onStep2Continue}
+              loading={!hasVenue && signUp.isPending}
               size="lg"
               rightIcon={<ArrowRight size={18} color={colors.onBrand} weight="bold" />}
             />

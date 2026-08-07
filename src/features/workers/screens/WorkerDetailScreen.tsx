@@ -119,7 +119,7 @@ export function WorkerDetailScreen() {
           ) : null}
         </View>
 
-        <View className="mt-6">
+        <View className="mt-6 flex-row">
           <InfoCard
             icon={<Phone size={14} color={colors.brand} />}
             label={t("workerDetail.phone")}

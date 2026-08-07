@@ -1,7 +1,8 @@
 // Edit venue profile — same fields as venue sign-up's business-details step, pre-filled
-// from the owner's existing venue record. Opened from the venue-profile tab's edit button.
+// from the venue record identified by the `id` route param. Opened from a venue profile's
+// edit button.
 import { zodResolver } from "@hookform/resolvers/zod";
-import { useRouter } from "expo-router";
+import { useLocalSearchParams, useRouter } from "expo-router";
 import { CaretLeft, Storefront } from "phosphor-react-native";
 import { useEffect } from "react";
 import { Controller, useForm } from "react-hook-form";
@@ -15,12 +16,12 @@ import { Loader } from "@shared/components/Loader";
 import { LocationPickerField } from "@shared/components/LocationPickerField";
 import { PhoneInput } from "@shared/components/PhoneInput";
 import { Screen } from "@shared/components/Screen";
-import { useMyVenue } from "@shared/hooks/useMyVenue";
 import { useThemeColors } from "@shared/hooks/useThemeColors";
 import { useToast } from "@shared/hooks/useToast";
 import { useTranslation, type TranslationKey } from "@shared/i18n/I18nProvider";
 import { fromSerbianPhone, toSerbianPhone } from "@shared/lib/phone";
 import { VENUE_TYPES } from "@shared/lib/roleIcon";
+import { useVenueProfile } from "@features/venues/hooks/useVenueProfile";
 import { useUpdateVenue } from "@features/profile/hooks/useUpdateVenue";
 import {
   venueEditSchema,
@@ -32,8 +33,9 @@ export function EditVenueProfileScreen() {
   const colors = useThemeColors();
   const toast = useToast();
   const { t } = useTranslation();
-  const { venue, isLoading } = useMyVenue();
-  const update = useUpdateVenue(venue?.id);
+  const { id } = useLocalSearchParams<{ id: string }>();
+  const { data: venue, isLoading } = useVenueProfile(id);
+  const update = useUpdateVenue(id);
 
   const { control, handleSubmit, reset } = useForm<VenueEditValues>({
     resolver: zodResolver(venueEditSchema(t)),

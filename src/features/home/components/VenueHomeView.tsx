@@ -10,7 +10,7 @@ import { Chip } from "@shared/components/Chip";
 import { EditableLocationRow } from "@shared/components/EditableLocationRow";
 import { EmptyState } from "@shared/components/EmptyState";
 import { WorkerRow } from "@shared/components/WorkerRow";
-import { useMyVenue } from "@shared/hooks/useMyVenue";
+import { useActiveVenue } from "@shared/hooks/useActiveVenue";
 import { useThemeColors } from "@shared/hooks/useThemeColors";
 import { useToast } from "@shared/hooks/useToast";
 import { useUpdateVenueLocation } from "@shared/hooks/useUpdateLocation";
@@ -64,7 +64,7 @@ export function VenueHomeView() {
   const toast = useToast();
   const colors = useThemeColors();
   const insets = useSafeAreaInsets();
-  const { venue } = useMyVenue();
+  const { venue } = useActiveVenue();
   const { profile } = useUserRole();
   const listings = useVenueListings(venue?.id);
   const stats = useVenueStats(venue?.id);

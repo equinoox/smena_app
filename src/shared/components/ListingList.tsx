@@ -31,6 +31,7 @@ type ListingListProps = {
   savedIds?: Set<string>;
   onToggleSave?: (listing: ListingWithVenue) => void;
   header?: React.ReactElement;
+  footer?: React.ReactElement;
   emptyTitle: string;
   emptyDescription?: string;
   emptyIcon?: React.ReactNode;
@@ -43,6 +44,7 @@ export function ListingList({
   savedIds,
   onToggleSave,
   header,
+  footer,
   emptyTitle,
   emptyDescription,
   emptyIcon,
@@ -57,6 +59,7 @@ export function ListingList({
       data={isLoading ? [] : listings}
       keyExtractor={(item) => item.id}
       ListHeaderComponent={header}
+      ListFooterComponent={isLoading ? undefined : footer}
       contentContainerClassName="px-4 pb-8"
       showsVerticalScrollIndicator={false}
       keyboardShouldPersistTaps="handled"

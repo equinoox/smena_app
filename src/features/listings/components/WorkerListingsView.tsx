@@ -2,7 +2,7 @@
 // employment-type chips, a real filter modal (position/employment/pay/proximity), compact
 // cards. Reached only via "See all" pushes (no tab bar item), so it carries its own back arrow.
 import { useMemo, useState } from "react";
-import { useRouter } from "expo-router";
+import { useLocalSearchParams, useRouter } from "expo-router";
 import { CaretLeft, Sliders } from "phosphor-react-native";
 import { Pressable, ScrollView, Text, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
@@ -30,11 +30,16 @@ export function WorkerListingsView() {
   const { t } = useTranslation();
   const colors = useThemeColors();
   const { profile } = useUserRole();
+  // Set only when pushed from the home "Privremeni poslovi" shelf's "See all" — pins
+  // this view to venue-less listings instead of the normal full browse.
+  const { noVenueOnly: noVenueOnlyParam } = useLocalSearchParams<{ noVenueOnly?: string }>();
+  const noVenueOnly = noVenueOnlyParam === "1";
   const [filters, setFilters] = useState<ListingsFilterValues>(DEFAULT_LISTINGS_FILTERS);
   const [filterModalVisible, setFilterModalVisible] = useState(false);
   const listings = useListings({
     employmentType: filters.employmentType,
     roleNeeded: filters.roleNeeded,
+    noVenueOnly,
   });
   const activeCount = useOpenListingsCount();
   const savedIds = useSavedIds();
@@ -45,6 +50,12 @@ export function WorkerListingsView() {
 
   const filterLabel = (f: QuickFilter) =>
     f === "all" ? t("listings.filterAll") : t(`employment.${f}` as TranslationKey);
+
+  // A venue-less listing can never be full_time (see the DB check constraint) — no
+  // point offering a quick filter that would always come back empty here.
+  const quickFilters = noVenueOnly
+    ? QUICK_FILTERS.filter((f) => f !== "full_time")
+    : QUICK_FILTERS;
 
   // Position/employment already filtered server-side (useListings above); pay and
   // proximity have no query param (no PostGIS) so they're applied here instead.
@@ -58,11 +69,10 @@ export function WorkerListingsView() {
       const origin = { lat: profile.lat, lng: profile.lng };
       const maxDistanceKm = filters.maxDistanceKm;
       result = result.filter((l) => {
-        if (l.venue?.lat == null || l.venue?.lng == null) return false;
-        return (
-          haversineDistanceKm(origin, { lat: l.venue.lat, lng: l.venue.lng }) <=
-          maxDistanceKm
-        );
+        const lat = l.venue?.lat ?? l.lat;
+        const lng = l.venue?.lng ?? l.lng;
+        if (lat == null || lng == null) return false;
+        return haversineDistanceKm(origin, { lat, lng }) <= maxDistanceKm;
       });
     }
     return result;
@@ -107,7 +117,7 @@ export function WorkerListingsView() {
 
       <View className="mt-4 flex-row items-end justify-between">
         <Text className="font-sans-extrabold text-2xl text-text-primary">
-          {t("listings.title")}
+          {noVenueOnly ? t("listings.temporaryJobsTitle") : t("listings.title")}
         </Text>
         {activeCount.data != null ? (
           <Text className="font-sans-medium text-sm text-text-tertiary">
@@ -141,7 +151,7 @@ export function WorkerListingsView() {
             onPress={() => setFilterModalVisible(true)}
           />
         ))}
-        {QUICK_FILTERS.map((f) => (
+        {quickFilters.map((f) => (
           <Chip
             key={f}
             label={filterLabel(f)}

@@ -1,8 +1,8 @@
--- Seeds 4 test accounts for exercising location-dependent features: 1 worker
--- (home address in Novi Beograd) + 3 venues (Centar, Zemun, Vračar), each with one
--- open listing, spread across Belgrade so distance/near-me logic has something real
--- to sort. Run reset.sql first — this assumes an empty database (fixed test ids/
--- emails will conflict with a unique-constraint error if seeded twice in a row).
+-- Seeds 3 real accounts and their data: Marko (StarBucks - Novi Beograd, 1 listing),
+-- Darko (two venues — McDonald's Zvezdara with 1 listing, McDonald's Novi Beograd with
+-- none — exercising multi-venue), and Nikola (no venue at all, one venue-less
+-- temporary-job listing). Run reset.sql first — this assumes an empty database (fixed
+-- test ids/emails will conflict with a unique-constraint error if seeded twice in a row).
 --
 -- Update this file (and reset.sql) whenever the schema changes — see CLAUDE.md's
 -- "Test data" note and supabase/README.md.
@@ -14,13 +14,15 @@
 -- signUp() call, auto-creating the matching `profiles` row. pgcrypto is needed for
 -- password hashing (crypt/gen_salt); Supabase projects have it available by default.
 --
--- Note: these accounts are for populating data to BROWSE, not to sign in as — there's
--- no matching auth.identities row, so the app's email/password sign-in won't
--- authenticate them (that table's shape varies across GoTrue versions, too fragile to
--- seed reliably here). Browse/test from your own real account instead.
+-- Password for all 3 accounts: 12345678. Each auth.users row is paired with an
+-- auth.identities row (email provider) — without it, GoTrue's password grant fails
+-- with a 500 rather than a clean "invalid credentials" (inserting straight into
+-- auth.users alone isn't enough to actually log in as one of these). This is the
+-- current (2023+) auth.identities shape; if your project is on a very different GoTrue
+-- version and this errors, create the account by hand through the app instead.
 create extension if not exists pgcrypto;
 
--- Worker: Test Radnik — home address in Novi Beograd ---------------------------
+-- Venue 1: StarBucks - Novi Beograd (Marko Marković) -------------------------------
 insert into auth.users (
   instance_id, id, aud, role, email, encrypted_password,
   email_confirmed_at, created_at, updated_at,
@@ -29,158 +31,173 @@ insert into auth.users (
   '00000000-0000-0000-0000-000000000000',
   '00000000-0000-0000-0000-000000000001',
   'authenticated', 'authenticated',
-  'test.worker1@smena.test',
-  crypt('Test1234!', gen_salt('bf')),
+  'marko@gmail.com',
+  crypt('12345678', gen_salt('bf')),
   now(), now(), now(),
   '{"provider":"email","providers":["email"]}',
-  '{"role":"worker","full_name":"Test Radnik","phone":"+381601111111"}',
+  '{"role":"venue","full_name":"Marko Marković","phone":"+381600277244"}',
   '', ''
 );
 
-update profiles set
-  worker_roles = '{waiter,bartender}',
-  experience_level = '1_3_years',
-  skills = '{Rad sa gostima,Brzina}',
-  is_available = true,
-  bio = 'Test profil radnika za proveru lokacije.',
-  address = 'Bulevar Zorana Đinđića 10, Novi Beograd',
-  city = 'Beograd',
-  lat = 44.8125,
-  lng = 20.3906
-where id = '00000000-0000-0000-0000-000000000001';
-
--- Venue 1: Test Kafić Centar (Knez Mihailova) -----------------------------------
-insert into auth.users (
-  instance_id, id, aud, role, email, encrypted_password,
-  email_confirmed_at, created_at, updated_at,
-  raw_app_meta_data, raw_user_meta_data, confirmation_token, recovery_token
+insert into auth.identities (
+  id, user_id, provider_id, identity_data, provider, last_sign_in_at, created_at, updated_at
 ) values (
-  '00000000-0000-0000-0000-000000000000',
-  '00000000-0000-0000-0000-000000000002',
-  'authenticated', 'authenticated',
-  'test.venue1@smena.test',
-  crypt('Test1234!', gen_salt('bf')),
-  now(), now(), now(),
-  '{"provider":"email","providers":["email"]}',
-  '{"role":"venue","full_name":"Test Vlasnik Centar","phone":"+381601111112"}',
-  '', ''
+  gen_random_uuid(), '00000000-0000-0000-0000-000000000001',
+  '00000000-0000-0000-0000-000000000001',
+  '{"sub":"00000000-0000-0000-0000-000000000001","email":"marko@gmail.com","email_verified":true}',
+  'email', now(), now(), now()
 );
 
 insert into venues (
-  id, owner_id, name, venue_type, description, address, city, lat, lng, pib, phone
+  id, owner_id, name, venue_type, description, address, city, lat, lng, pib, phone,
+  logo_url, cover_photo_url
 ) values (
   '00000000-0000-0000-0000-000000000101',
-  '00000000-0000-0000-0000-000000000002',
-  'Test Kafić Centar', 'cafe',
-  'Test kafić u centru grada.',
-  'Knez Mihailova 5', 'Beograd', 44.8172, 20.4573,
-  '100000001', '+381601111112'
+  '00000000-0000-0000-0000-000000000001',
+  'StarBucks - Novi Beograd', 'cafe',
+  'StarBucks - Novi Beograd ☕
+Nudi prijatnu ambijent, kafu i ljubazno osoblje!
+Idealno mesto za opuštenu kaficu i druženje sa prijateljima.',
+  'Ušće', 'Beograd', 44.815346, 20.435282,
+  '1234', '+381600277244',
+  'https://csdnkxfjfjiyymjweivr.supabase.co/storage/v1/object/public/venue-logos/0230e399-5c53-490c-b4c4-918042bf7504/logo-1786132644655.jpeg',
+  'https://csdnkxfjfjiyymjweivr.supabase.co/storage/v1/object/public/venue-logos/0230e399-5c53-490c-b4c4-918042bf7504/cover-1786132618443.jpeg'
 );
 
 insert into listings (
-  id, venue_id, title, role_needed, employment_type, description,
+  id, venue_id, owner_id, title, role_needed, employment_type, description,
   pay_amount, pay_period, currency, start_hour, end_hour, is_urgent, requirements
 ) values (
   '00000000-0000-0000-0000-000000000201',
   '00000000-0000-0000-0000-000000000101',
-  'Konobar za vikend', 'waiter', 'part_time',
-  'Potreban konobar za rad vikendom u kafiću u centru.',
-  600, 'shift', 'RSD',
-  16, 24,
-  true, '{Iskustvo sa šankom}'
+  '00000000-0000-0000-0000-000000000001',
+  'Starbucks - START Program', 'bartender', 'full_time',
+  'Započni svoju karijeru u Starbucks-u!
+Novi program obuke radnika za zvanje profesionalnog kafe majstora!
+Idealni uslovi ☕
+Povećanje plate tokom vremena 💶
+Dobra ekipa 💪🏼
+Pridruži se! 💯',
+  3000, 'month', 'RSD',
+  9, 17,
+  false, '{Engleski jezik,Pravljenje kafe}'
 );
 
--- Venue 2: Test Bar Zemun (Kej oslobođenja) --------------------------------------
+-- Venue 2: McDonald's Zvezdara (Darko Darković) --------------------------------------
 insert into auth.users (
   instance_id, id, aud, role, email, encrypted_password,
   email_confirmed_at, created_at, updated_at,
   raw_app_meta_data, raw_user_meta_data, confirmation_token, recovery_token
 ) values (
   '00000000-0000-0000-0000-000000000000',
-  '00000000-0000-0000-0000-000000000003',
+  '00000000-0000-0000-0000-000000000002',
   'authenticated', 'authenticated',
-  'test.venue2@smena.test',
-  crypt('Test1234!', gen_salt('bf')),
+  'darko@gmail.com',
+  crypt('12345678', gen_salt('bf')),
   now(), now(), now(),
   '{"provider":"email","providers":["email"]}',
-  '{"role":"venue","full_name":"Test Vlasnik Zemun","phone":"+381601111113"}',
+  '{"role":"venue","full_name":"Darko Darković","phone":"+381600277244"}',
   '', ''
 );
 
+insert into auth.identities (
+  id, user_id, provider_id, identity_data, provider, last_sign_in_at, created_at, updated_at
+) values (
+  gen_random_uuid(), '00000000-0000-0000-0000-000000000002',
+  '00000000-0000-0000-0000-000000000002',
+  '{"sub":"00000000-0000-0000-0000-000000000002","email":"darko@gmail.com","email_verified":true}',
+  'email', now(), now(), now()
+);
+
 insert into venues (
-  id, owner_id, name, venue_type, description, address, city, lat, lng, pib, phone
+  id, owner_id, name, venue_type, description, address, city, lat, lng, pib, phone,
+  logo_url, cover_photo_url
 ) values (
   '00000000-0000-0000-0000-000000000102',
-  '00000000-0000-0000-0000-000000000003',
-  'Test Bar Zemun', 'bar',
-  'Test bar na keju u Zemunu.',
-  'Kej oslobođenja 15, Zemun', 'Beograd', 44.8438, 20.4009,
-  '100000002', '+381601111113'
+  '00000000-0000-0000-0000-000000000002',
+  'McDonald''s Zvezdara', 'fast_food',
+  'McDonald''s Zvezdara 🍔
+McDonald''s je poznat po brzoj usluzi, prepoznatljivim burgerima, pomfritu i raznovrsnoj ponudi.
+Restoran nude opušten ambijent, pogodan za brz obrok i druženje sa prijateljima!',
+  'Braće Ribnikar 54', 'Beograd', 44.805206, 20.485633,
+  '1234', '+381600277244',
+  'https://csdnkxfjfjiyymjweivr.supabase.co/storage/v1/object/public/venue-logos/29f3f4a6-169b-463a-a3e2-ed19f940f6d0/logo-1786133248588.png',
+  'https://csdnkxfjfjiyymjweivr.supabase.co/storage/v1/object/public/venue-logos/29f3f4a6-169b-463a-a3e2-ed19f940f6d0/cover-1786133248589.jpeg'
 );
 
 insert into listings (
-  id, venue_id, title, role_needed, employment_type, description,
+  id, venue_id, owner_id, title, role_needed, employment_type, description,
   pay_amount, pay_period, currency, start_hour, end_hour, is_urgent, requirements
 ) values (
   '00000000-0000-0000-0000-000000000202',
   '00000000-0000-0000-0000-000000000102',
-  'Šanker za smenu', 'bartender', 'fill_in',
-  'Potreban šanker za jednu smenu, hitno.',
-  500, 'hour', 'RSD',
-  18, 24,
-  false, '{Rad pod pritiskom}'
+  '00000000-0000-0000-0000-000000000002',
+  'McDonald''s Kuvar', 'cook', 'full_time',
+  'Tražimo  komunikativne, odgovorne i motivisane osobe koje žele da postanu deo našeg tima.
+Nudimo fleksibilno radno vreme, prijatno radno okruženje i mogućnost napredovanja.
+Hitno potreban radnik!',
+  60000, 'month', 'RSD',
+  10, 14,
+  true, '{Kuvar}'
 );
 
--- Venue 3: Test Restoran Vračar (Njegoševa) --------------------------------------
+-- Venue 2b: a second lokal for the same owner (Darko) — multi-venue, no listing yet --
+insert into venues (
+  id, owner_id, name, venue_type, description, address, city, lat, lng, pib, phone,
+  logo_url, cover_photo_url
+) values (
+  '00000000-0000-0000-0000-000000000103',
+  '00000000-0000-0000-0000-000000000002',
+  'McDonald''s Novi Beograd', 'fast_food',
+  'McDonald''s Novi Beograd 🍔
+Naš novi restoran na Novom Beogradu nudi prepoznatljivu hranu i još bolju zabavu i uživanje u jelu!
+Zahvaljujući dobroj organizaciji i jednostavnom načinu elektronskog naručivanja, gosti mogu brzo i lako uživati u svom obroku. 💯',
+  'Jurija Gagarina 14', 'Beograd', 44.80483, 20.408657,
+  '1235', '+381600277244',
+  'https://csdnkxfjfjiyymjweivr.supabase.co/storage/v1/object/public/venue-logos/29f3f4a6-169b-463a-a3e2-ed19f940f6d0/logo-1786137094907.png',
+  'https://csdnkxfjfjiyymjweivr.supabase.co/storage/v1/object/public/venue-logos/29f3f4a6-169b-463a-a3e2-ed19f940f6d0/cover-1786137094909.png'
+);
+
+-- Nikola Nikolić — no venue at all, only posts venue-less temporary-job listings ------
 insert into auth.users (
   instance_id, id, aud, role, email, encrypted_password,
   email_confirmed_at, created_at, updated_at,
   raw_app_meta_data, raw_user_meta_data, confirmation_token, recovery_token
 ) values (
   '00000000-0000-0000-0000-000000000000',
-  '00000000-0000-0000-0000-000000000004',
+  '00000000-0000-0000-0000-000000000003',
   'authenticated', 'authenticated',
-  'test.venue3@smena.test',
-  crypt('Test1234!', gen_salt('bf')),
+  'nikola@gmail.com',
+  crypt('12345678', gen_salt('bf')),
   now(), now(), now(),
   '{"provider":"email","providers":["email"]}',
-  '{"role":"venue","full_name":"Test Vlasnik Vračar","phone":"+381601111114"}',
+  '{"role":"venue","full_name":"Nikola Nikolić","phone":"+381600277244"}',
   '', ''
 );
 
-insert into venues (
-  id, owner_id, name, venue_type, description, address, city, lat, lng, pib, phone
+insert into auth.identities (
+  id, user_id, provider_id, identity_data, provider, last_sign_in_at, created_at, updated_at
 ) values (
-  '00000000-0000-0000-0000-000000000103',
-  '00000000-0000-0000-0000-000000000004',
-  'Test Restoran Vračar', 'restaurant',
-  'Test restoran na Vračaru.',
-  'Njegoševa 45, Vračar', 'Beograd', 44.7972, 20.4718,
-  '100000003', '+381601111114'
+  gen_random_uuid(), '00000000-0000-0000-0000-000000000003',
+  '00000000-0000-0000-0000-000000000003',
+  '{"sub":"00000000-0000-0000-0000-000000000003","email":"nikola@gmail.com","email_verified":true}',
+  'email', now(), now(), now()
 );
 
--- Deliberately no start_hour/end_hour — demonstrates the "Po dogovoru" (by agreement)
--- fallback in the app for permanent roles with no fixed daily hours.
+-- A temporary-job listing not tied to any venue — only fill_in/part_time employment
+-- types are allowed without a venue (see the DB check constraint).
 insert into listings (
-  id, venue_id, title, role_needed, employment_type, description,
-  pay_amount, pay_period, currency, is_urgent, requirements
+  id, owner_id, title, role_needed, employment_type, description,
+  pay_amount, pay_period, currency, start_hour, end_hour, is_urgent, requirements,
+  address, city, lat, lng
 ) values (
   '00000000-0000-0000-0000-000000000203',
-  '00000000-0000-0000-0000-000000000103',
-  'Kuvar za stalno', 'cook', 'full_time',
-  'Tražimo kuvara za stalni radni odnos.',
-  90000, 'month', 'RSD',
-  false, '{Iskustvo u kuhinji}'
+  '00000000-0000-0000-0000-000000000003',
+  'Festival Belgrade Waterfront', 'cocktail_master', 'part_time',
+  'Potreban koktel majstor za festival koji se održava na Beogradu na vodi.
+Posao je za štandom, neophodno je pravljenje 10 različitih vrsta koktela, naplaćuje se putem kupona.',
+  4500, 'shift', 'RSD',
+  10, 20,
+  true, '{Brz rad}',
+  'Savski trg 11', 'Beograd', 44.80799, 20.457209
 );
-
--- Ratings — the 3 venue owners rate the test worker, and the test worker rates the
--- 3 venues, so the star badges have something real to show right after seeding.
-insert into worker_ratings (worker_id, rater_id, productivity, reliability, quality) values
-  ('00000000-0000-0000-0000-000000000001', '00000000-0000-0000-0000-000000000002', 5, 4, 5),
-  ('00000000-0000-0000-0000-000000000001', '00000000-0000-0000-0000-000000000003', 4, 4, 4),
-  ('00000000-0000-0000-0000-000000000001', '00000000-0000-0000-0000-000000000004', 5, 5, 4);
-
-insert into venue_ratings (venue_id, rater_id, conditions, atmosphere, benefits) values
-  ('00000000-0000-0000-0000-000000000101', '00000000-0000-0000-0000-000000000001', 4, 5, 3),
-  ('00000000-0000-0000-0000-000000000102', '00000000-0000-0000-0000-000000000001', 3, 4, 3),
-  ('00000000-0000-0000-0000-000000000103', '00000000-0000-0000-0000-000000000001', 5, 5, 5);

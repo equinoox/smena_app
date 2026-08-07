@@ -41,11 +41,14 @@ export function useSignUpVenue() {
   return useMutation({
     mutationFn: (input: VenueSignUpInput) => signUpVenue(input),
     onSuccess: (data) => {
-      // Same idea as useSignUpWorker — seed the venue (and its empty listings list)
-      // so "Profil lokala" renders instantly instead of waiting on a first fetch.
-      if (data.venue) {
-        client.setQueryData(queryKeys.myVenue(data.venue.owner_id), data.venue);
-        client.setQueryData(queryKeys.venueListingsByOwner(data.venue.owner_id), []);
+      // Same idea as useSignUpWorker — seed the venue list (and empty listings list) so
+      // "Profil lokala" renders instantly instead of waiting on a first fetch. An owner
+      // who skipped venue creation still gets an (empty) venues list seeded, rather than
+      // leaving it to load from a query that would just return the same empty result.
+      const ownerId = data.venue?.owner_id ?? data.user?.id;
+      if (ownerId) {
+        client.setQueryData(queryKeys.myVenues(ownerId), data.venue ? [data.venue] : []);
+        client.setQueryData(queryKeys.venueListingsByOwner(ownerId), []);
       }
     },
   });

@@ -1,14 +1,14 @@
 // VenueOwnerProfileView — the venue owner's own personal account info: identity, contact
 // details, member-since, and a link into their venue's business profile.
 import { useRouter } from "expo-router";
-import { CaretRight, EnvelopeSimple, Phone, Storefront } from "phosphor-react-native";
+import { CaretRight, EnvelopeSimple, Phone, Plus, Storefront } from "phosphor-react-native";
 import { Text, View } from "react-native";
 import { Avatar } from "@shared/components/Avatar";
 import { Card } from "@shared/components/Card";
 import { InfoCard } from "@shared/components/InfoCard";
 import { StarRatingBadge } from "@shared/components/StarRatingBadge";
 import { useAuth } from "@shared/hooks/useAuth";
-import { useMyVenue } from "@shared/hooks/useMyVenue";
+import { useActiveVenue } from "@shared/hooks/useActiveVenue";
 import { useThemeColors } from "@shared/hooks/useThemeColors";
 import { useTranslation, type TranslationKey } from "@shared/i18n/I18nProvider";
 import type { Profile } from "@shared/types/database.types";
@@ -21,7 +21,7 @@ export function VenueOwnerProfileView({ profile }: VenueOwnerProfileViewProps) {
   const router = useRouter();
   const colors = useThemeColors();
   const { user } = useAuth();
-  const { venue } = useMyVenue();
+  const { venue } = useActiveVenue();
   const { t } = useTranslation();
 
   const memberSinceYear = new Date(profile.created_at).getFullYear();
@@ -85,7 +85,25 @@ export function VenueOwnerProfileView({ profile }: VenueOwnerProfileViewProps) {
           </View>
           <CaretRight size={18} color={colors.textMuted} />
         </Card>
-      ) : null}
+      ) : (
+        <Card
+          onPress={() => router.push("/venue-create")}
+          className="flex-row items-center gap-3"
+        >
+          <View className="h-11 w-11 items-center justify-center rounded-input bg-bg-icon-tint">
+            <Plus size={20} weight="bold" color={colors.brand} />
+          </View>
+          <View className="min-w-0 flex-1">
+            <Text className="font-sans-bold text-[15px] text-text-primary">
+              {t("myVenues.addVenue")}
+            </Text>
+            <Text className="font-sans-semibold text-xs text-text-tertiary">
+              {t("myVenues.emptyHint")}
+            </Text>
+          </View>
+          <CaretRight size={18} color={colors.textMuted} />
+        </Card>
+      )}
     </View>
   );
 }

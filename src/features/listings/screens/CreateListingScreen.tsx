@@ -1,5 +1,6 @@
-// CreateListingScreen — venue "post a shift" form: position, title, employment type,
-// optional daily working hours, optional pay, description, custom requirement tags,
+// CreateListingScreen — venue "post a shift" form: which lokal it belongs to (if the owner
+// runs more than one, or none at all for a temporary-job ad), position, title, employment
+// type, optional daily working hours, optional pay, description, custom requirement tags,
 // urgent toggle. Also doubles as the "edit listing" form: an `id` search param switches
 // it into edit mode, prefilling from the existing listing and updating instead of
 // creating.
@@ -21,13 +22,16 @@ import { ChipSlider } from "@shared/components/ChipSlider";
 import { ControlledInput } from "@shared/components/ControlledInput";
 import { Input } from "@shared/components/Input";
 import { Loader } from "@shared/components/Loader";
+import { LocationPickerField } from "@shared/components/LocationPickerField";
 import { Modal } from "@shared/components/Modal";
 import { Screen } from "@shared/components/Screen";
 import { ListingCard } from "@shared/components/ListingCard";
 import { TagInput } from "@shared/components/TagInput";
-import { useMyVenue } from "@shared/hooks/useMyVenue";
+import { useActiveVenue } from "@shared/hooks/useActiveVenue";
+import { useAuth } from "@shared/hooks/useAuth";
 import { useThemeColors } from "@shared/hooks/useThemeColors";
 import { useToast } from "@shared/hooks/useToast";
+import { useUserRole } from "@shared/hooks/useUserRole";
 import { useTranslation, type TranslationKey } from "@shared/i18n/I18nProvider";
 import { cn } from "@shared/lib/cn";
 import { formatHour } from "@shared/lib/format";
@@ -38,6 +42,7 @@ import type {
   WorkerRole,
 } from "@shared/types/database.types";
 import type { ListingWithVenue } from "@shared/types/domain.types";
+import type { LocationValue } from "@shared/types/location.types";
 import { TimeRangePickerModal } from "@features/listings/components/TimeRangePickerModal";
 import {
   useCreateListing,
@@ -72,12 +77,18 @@ export function CreateListingScreen() {
   const colors = useThemeColors();
   const toast = useToast();
   const { t, language } = useTranslation();
-  const { venue } = useMyVenue();
+  const { user } = useAuth();
+  const { profile } = useUserRole();
+  const { venue: activeVenue, venues } = useActiveVenue();
   const { id: editId } = useLocalSearchParams<{ id?: string }>();
   const isEdit = !!editId;
   const existingListing = useListing(editId ?? "");
-  const createListing = useCreateListing(venue?.id);
-  const updateListing = useUpdateListing(venue?.id);
+
+  // null = "Bez lokala" (a temporary-job listing not tied to any venue).
+  const [selectedVenueId, setSelectedVenueId] = useState<string | null>(null);
+  const [noVenueLocation, setNoVenueLocation] = useState<LocationValue | undefined>();
+  const createListing = useCreateListing(selectedVenueId ?? undefined);
+  const updateListing = useUpdateListing(selectedVenueId ?? undefined);
 
   const [fromHour, setFromHour] = useState<number | null>(null);
   const [toHour, setToHour] = useState<number | null>(null);
@@ -86,7 +97,7 @@ export function CreateListingScreen() {
   const [isUrgent, setIsUrgent] = useState(false);
   const [previewOpen, setPreviewOpen] = useState(false);
 
-  const { control, handleSubmit, watch, reset } = useForm<FormValues>({
+  const { control, handleSubmit, watch, reset, setValue } = useForm<FormValues>({
     defaultValues: {
       roleNeeded: "waiter",
       title: "",
@@ -95,6 +106,15 @@ export function CreateListingScreen() {
       description: "",
     },
   });
+
+  // Default the venue picker to the active venue, once it's loaded — a ref guard so a
+  // later refetch doesn't clobber a venue the owner already picked by hand.
+  const venueDefaultedRef = useRef(false);
+  useEffect(() => {
+    if (isEdit || venueDefaultedRef.current || !activeVenue) return;
+    venueDefaultedRef.current = true;
+    setSelectedVenueId(activeVenue.id);
+  }, [isEdit, activeVenue]);
 
   // Prefill once the existing listing loads (edit mode only) — a ref guard keeps a
   // later refetch (e.g. right after saving) from clobbering in-progress edits.
@@ -114,15 +134,40 @@ export function CreateListingScreen() {
     setIsUrgent(existing.is_urgent);
     setFromHour(existing.start_hour);
     setToHour(existing.end_hour);
+    setSelectedVenueId(existing.venue_id);
+    if (!existing.venue_id) {
+      setNoVenueLocation({
+        address: existing.address ?? "",
+        city: existing.city,
+        lat: existing.lat ?? 0,
+        lng: existing.lng ?? 0,
+      });
+    }
     // Only ever prefill from the fetched row itself, not on every re-render.
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [existingListing.data, isEdit]);
 
   const employmentType = watch("employmentType");
   const payPeriod = DEFAULT_PAY_PERIOD[employmentType];
+  const hasVenue = selectedVenueId !== null;
+  const selectedVenue = venues.find((v) => v.id === selectedVenueId) ?? null;
+  const availableEmploymentTypes = hasVenue
+    ? EMPLOYMENT_TYPES
+    : EMPLOYMENT_TYPES.filter((e) => e.value !== "full_time");
+
+  // A permanent role implies a real place of work — matches the DB check constraint.
+  useEffect(() => {
+    if (!hasVenue && employmentType === "full_time") {
+      setValue("employmentType", "fill_in");
+    }
+  }, [hasVenue, employmentType, setValue]);
 
   const onSubmit = handleSubmit((values) => {
-    if (!venue?.id) return;
+    if (!user) return;
+    if (!hasVenue && !noVenueLocation) {
+      toast.error(t("createListing.noVenueLocationRequired"));
+      return;
+    }
 
     const input = {
       title: values.title,
@@ -135,6 +180,7 @@ export function CreateListingScreen() {
       endHour: toHour ?? undefined,
       isUrgent,
       requirements,
+      location: hasVenue ? undefined : noVenueLocation,
     };
 
     if (isEdit && editId) {
@@ -151,7 +197,7 @@ export function CreateListingScreen() {
     }
 
     createListing.mutate(
-      { ...input, venueId: venue.id },
+      { ...input, ownerId: user.id, venueId: selectedVenueId ?? undefined },
       {
         onSuccess: () => {
           toast.success(t("createListing.publishSuccess"));
@@ -161,10 +207,11 @@ export function CreateListingScreen() {
     );
   });
 
-  const previewListing: ListingWithVenue | null = venue
+  const previewListing: ListingWithVenue | null = user
     ? {
         id: "preview",
-        venue_id: venue.id,
+        owner_id: user.id,
+        venue_id: selectedVenue?.id ?? null,
         title: watch("title"),
         role_needed: watch("roleNeeded"),
         employment_type: employmentType,
@@ -177,22 +224,36 @@ export function CreateListingScreen() {
         is_urgent: isUrgent,
         status: "open",
         requirements,
+        address: selectedVenue ? null : noVenueLocation?.address ?? null,
+        city: selectedVenue ? null : noVenueLocation?.city ?? null,
+        lat: selectedVenue ? null : noVenueLocation?.lat ?? null,
+        lng: selectedVenue ? null : noVenueLocation?.lng ?? null,
         created_at: new Date(0).toISOString(),
         updated_at: new Date(0).toISOString(),
-        venue: {
-          id: venue.id,
-          name: venue.name,
-          venue_type: venue.venue_type,
-          city: venue.city,
-          address: venue.address,
-          logo_url: venue.logo_url,
-          cover_photo_url: venue.cover_photo_url,
-          lat: venue.lat,
-          lng: venue.lng,
-          phone: venue.phone,
-          rating_avg: venue.rating_avg,
-          rating_count: venue.rating_count,
-        },
+        venue: selectedVenue
+          ? {
+              id: selectedVenue.id,
+              name: selectedVenue.name,
+              venue_type: selectedVenue.venue_type,
+              city: selectedVenue.city,
+              address: selectedVenue.address,
+              logo_url: selectedVenue.logo_url,
+              cover_photo_url: selectedVenue.cover_photo_url,
+              lat: selectedVenue.lat,
+              lng: selectedVenue.lng,
+              phone: selectedVenue.phone,
+              rating_avg: selectedVenue.rating_avg,
+              rating_count: selectedVenue.rating_count,
+            }
+          : null,
+        owner: profile
+          ? {
+              id: profile.id,
+              full_name: profile.full_name,
+              avatar_url: profile.avatar_url,
+              phone: profile.phone,
+            }
+          : null,
       }
     : null;
 
@@ -213,6 +274,42 @@ export function CreateListingScreen() {
         </Text>
         <View className="h-10 w-10" />
       </View>
+
+      {!isEdit && venues.length >= 1 ? (
+        <View className="mt-4 gap-2">
+          <Text className="font-sans-medium text-sm text-text-tertiary">
+            {t("createListing.venueLabel")}
+          </Text>
+          <ChipSlider>
+            {venues.map((v) => (
+              <Chip
+                key={v.id}
+                label={v.name}
+                variant={selectedVenueId === v.id ? "active" : "neutral"}
+                size="lg"
+                onPress={() => setSelectedVenueId(v.id)}
+              />
+            ))}
+            <Chip
+              label={t("createListing.noVenue")}
+              variant={selectedVenueId === null ? "active" : "neutral"}
+              size="lg"
+              onPress={() => setSelectedVenueId(null)}
+            />
+          </ChipSlider>
+        </View>
+      ) : null}
+
+      {!hasVenue ? (
+        <View className="mt-4">
+          <LocationPickerField
+            value={noVenueLocation}
+            onChange={setNoVenueLocation}
+            label={t("createListing.jobLocationLabel")}
+            placeholder={t("auth.chooseOnMap")}
+          />
+        </View>
+      ) : null}
 
       <View className="mt-4 gap-2">
         <Text className="font-sans-medium text-sm text-text-tertiary">
@@ -257,7 +354,7 @@ export function CreateListingScreen() {
           name="employmentType"
           render={({ field }) => (
             <View className="flex-row gap-2">
-              {EMPLOYMENT_TYPES.map(({ value, icon: Icon }) => {
+              {availableEmploymentTypes.map(({ value, icon: Icon }) => {
                 const selected = field.value === value;
                 return (
                   <Pressable
@@ -289,6 +386,11 @@ export function CreateListingScreen() {
             </View>
           )}
         />
+        {!hasVenue ? (
+          <Text className="font-sans text-xs text-text-muted">
+            {t("createListing.noVenueFullTimeHint")}
+          </Text>
+        ) : null}
       </View>
 
       <View className="mt-5 gap-2">

@@ -29,11 +29,14 @@ export type VenueSignUpInput = {
   password: string;
   fullName: string; // contact person
   ownerPhone?: string; // contact person's own phone, distinct from the venue's public phone
-  venueName: string;
-  venueType: VenueType;
-  location: LocationValue;
-  pib: string;
-  phone: string; // venue's own public contact number, not the owner's
+  // False for an owner who never runs a physical venue — they only ever post
+  // venue-less temporary-job listings. The fields below are then all unused.
+  hasVenue: boolean;
+  venueName?: string;
+  venueType?: VenueType;
+  location?: LocationValue;
+  pib?: string;
+  phone?: string; // venue's own public contact number, not the owner's
   description?: string;
   logoUri?: string; // local file picked before the account existed; uploaded after signUp
   coverPhotoUri?: string;
@@ -102,8 +105,9 @@ export async function signUpVenue(input: VenueSignUpInput) {
   if (error) throw error;
 
   // Create the venue record (requires a session — MVP assumes email confirmation is off).
+  // Skipped entirely for an owner who chose not to run a physical venue.
   let venue: Venue | null = null;
-  if (data.session && data.user) {
+  if (data.session && data.user && input.hasVenue) {
     // Upload logo + cover in parallel — sequentially awaiting each one just doubles
     // the wait when a venue picks both photos at sign-up.
     const [logoUrl, coverPhotoUrl] = await Promise.all([
@@ -115,18 +119,19 @@ export async function signUpVenue(input: VenueSignUpInput) {
         : Promise.resolve(null),
     ]);
 
+    // Validated as required by venueSignUpSchema's superRefine whenever hasVenue is true.
     const { data: venueData, error: venueError } = await supabase
       .from("venues")
       .insert({
         owner_id: data.user.id,
-        name: input.venueName,
-        venue_type: input.venueType,
-        address: input.location.address,
-        city: input.location.city,
-        lat: input.location.lat,
-        lng: input.location.lng,
-        pib: input.pib,
-        phone: input.phone,
+        name: input.venueName!,
+        venue_type: input.venueType!,
+        address: input.location!.address,
+        city: input.location!.city,
+        lat: input.location!.lat,
+        lng: input.location!.lng,
+        pib: input.pib!,
+        phone: input.phone!,
         description: input.description ?? null,
         logo_url: logoUrl,
         cover_photo_url: coverPhotoUrl,

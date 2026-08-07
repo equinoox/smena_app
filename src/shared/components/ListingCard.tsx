@@ -63,7 +63,14 @@ export function ListingCard({
   );
   const time = formatTimeRange(listing.start_hour, listing.end_hour, language);
   const title = listing.title || roleLabel;
-  const venueLocation = formatLocation(listing.venue?.address, listing.venue?.city);
+  // A venue-less (temporary-job) listing falls back to the posting profile's own name/
+  // photo/location — there's no venue to show instead.
+  const displayName = listing.venue?.name ?? listing.owner?.full_name ?? "";
+  const displayAvatarUri = listing.venue?.logo_url ?? listing.owner?.avatar_url ?? undefined;
+  const venueLocation = formatLocation(
+    listing.venue?.address ?? listing.address,
+    listing.venue?.city ?? listing.city,
+  );
   const ageLabel = savedAt
     ? formatSavedAt(savedAt, t)
     : formatPostedAt(listing.created_at, t);
@@ -86,7 +93,7 @@ export function ListingCard({
                   className="shrink font-sans-semibold text-xs text-text-tertiary"
                   numberOfLines={1}
                 >
-                  {listing.venue?.name ?? ""}
+                  {displayName}
                 </Text>
                 <StarRatingBadge
                   rating={listing.venue?.rating_avg ?? null}
@@ -179,12 +186,12 @@ export function ListingCard({
       <View className="bg-bg-canvas p-4">
         <View className="flex-row items-center justify-between">
           <View className="min-w-0 flex-1 flex-row items-center gap-2">
-            <Avatar uri={listing.venue?.logo_url} name={listing.venue?.name} size={22} />
+            <Avatar uri={displayAvatarUri} name={displayName} size={22} />
             <Text
               className="shrink font-sans-semibold text-xs text-text-tertiary"
               numberOfLines={1}
             >
-              {listing.venue?.name ?? ""}
+              {displayName}
             </Text>
             <StarRatingBadge
               rating={listing.venue?.rating_avg ?? null}

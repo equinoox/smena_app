@@ -39,7 +39,6 @@ import { LocationViewModal } from "@shared/components/LocationViewModal";
 import { SaveToggle } from "@shared/components/SaveToggle";
 import { SmartCoverImage } from "@shared/components/SmartCoverImage";
 import { useAuth } from "@shared/hooks/useAuth";
-import { useMyVenue } from "@shared/hooks/useMyVenue";
 import { useSavedIds, useToggleSaved } from "@shared/hooks/useSaved";
 import { useThemeColors } from "@shared/hooks/useThemeColors";
 import { useToast } from "@shared/hooks/useToast";
@@ -85,7 +84,6 @@ export function ListingDetailScreen() {
   const toast = useToast();
   const { t, language } = useTranslation();
   const { role, profile } = useUserRole();
-  const { venue: myVenue } = useMyVenue();
 
   const { data: listing, isLoading } = useListing(id ?? "");
   const isVenue = role === "venue";
@@ -98,7 +96,7 @@ export function ListingDetailScreen() {
   const toggleSaved = useToggleSaved();
   const { user } = useAuth();
   const logView = useLogListingView();
-  const deleteListing = useDeleteListing(myVenue?.id);
+  const deleteListing = useDeleteListing(listing?.venue_id ?? undefined);
   const [deleteConfirmVisible, setDeleteConfirmVisible] = useState(false);
   const [locationModalVisible, setLocationModalVisible] = useState(false);
 
@@ -127,8 +125,16 @@ export function ListingDetailScreen() {
   const title = listing.title || roleLabel;
   const hasApplied = !!myApplication.data;
   const isSaved = savedIds.has(listing.id);
-  const venuePhone = listing.venue?.phone;
-  const venueLocation = formatLocation(listing.venue?.address, listing.venue?.city);
+  // A venue-less (temporary-job) listing falls back to the posting profile's own
+  // contact/name/location — there's no venue to show or contact instead.
+  const venuePhone = listing.venue?.phone ?? listing.owner?.phone;
+  const displayName = listing.venue?.name ?? listing.owner?.full_name ?? "";
+  const displayLat = listing.venue?.lat ?? listing.lat;
+  const displayLng = listing.venue?.lng ?? listing.lng;
+  const venueLocation = formatLocation(
+    listing.venue?.address ?? listing.address,
+    listing.venue?.city ?? listing.city,
+  );
 
   const onApply = () =>
     apply.mutate(undefined, {
@@ -202,19 +208,19 @@ export function ListingDetailScreen() {
         <View className="px-4">
           <Pressable
             onPress={
-              !isVenue
+              !isVenue && listing.venue_id
                 ? () =>
                     router.push({
                       pathname: "/venue/[id]",
-                      params: { id: listing.venue_id },
+                      params: { id: listing.venue_id! },
                     })
                 : undefined
             }
             className="-mt-8 flex-row items-center gap-3"
           >
-            {listing.venue?.logo_url ? (
+            {listing.venue?.logo_url ?? listing.owner?.avatar_url ? (
               <Image
-                source={{ uri: listing.venue.logo_url }}
+                source={{ uri: (listing.venue?.logo_url ?? listing.owner?.avatar_url)! }}
                 className="h-16 w-16 rounded-input bg-bg-surface"
               />
             ) : (
@@ -225,13 +231,13 @@ export function ListingDetailScreen() {
             <View className="min-w-0 flex-1 justify-center">
               <View className="self-start rounded-input bg-bg-canvas/80 px-3 py-2">
                 <Text className="font-sans-bold text-lg text-text-primary" numberOfLines={1}>
-                  {listing.venue?.name ?? ""}
+                  {displayName}
                 </Text>
-                {listing.venue?.venue_type ? (
-                  <Text className="mt-0.5 font-sans-semibold text-sm text-text-tertiary">
-                    {t(`venueTypes.${listing.venue.venue_type}` as TranslationKey)}
-                  </Text>
-                ) : null}
+                <Text className="mt-0.5 font-sans-semibold text-sm text-text-tertiary">
+                  {listing.venue?.venue_type
+                    ? t(`venueTypes.${listing.venue.venue_type}` as TranslationKey)
+                    : t("createListing.noVenue")}
+                </Text>
               </View>
             </View>
           </Pressable>
@@ -301,7 +307,7 @@ export function ListingDetailScreen() {
                 label={t("listingDetail.location")}
                 value={venueLocation || "—"}
                 onPress={
-                  listing.venue?.lat != null && listing.venue?.lng != null
+                  displayLat != null && displayLng != null
                     ? () => setLocationModalVisible(true)
                     : undefined
                 }
@@ -413,12 +419,12 @@ export function ListingDetailScreen() {
         onCancel={() => setDeleteConfirmVisible(false)}
       />
 
-      {listing.venue?.lat != null && listing.venue?.lng != null ? (
+      {displayLat != null && displayLng != null ? (
         <LocationViewModal
           visible={locationModalVisible}
           onClose={() => setLocationModalVisible(false)}
           address={venueLocation}
-          target={{ lat: listing.venue.lat, lng: listing.venue.lng }}
+          target={{ lat: displayLat, lng: displayLng }}
           origin={
             !isVenue && profile?.lat != null && profile?.lng != null
               ? { lat: profile.lat, lng: profile.lng }

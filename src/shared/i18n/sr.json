@@ -83,6 +83,10 @@
     "venueDetailsTitle": "Podaci o lokalu",
     "venueContactTitle": "Kontakt i opis",
     "venueDetailsSubtitle": "Ovako će te radnici videti u oglasima.",
+    "hasVenueQuestion": "Da li imaš fizički lokal?",
+    "hasVenueYes": "Da, imam lokal",
+    "hasVenueNo": "Ne, samo privremeni poslovi",
+    "hasVenueNoHint": "Moći ćeš da postavljaš samo privremene oglase (po satu ili dnevnica), koji nisu vezani ni za jedan lokal.",
     "venueLogo": "Logo lokala",
     "addPhoto": "Dodaj fotografiju",
     "changePhoto": "Promeni fotografiju",
@@ -126,6 +130,7 @@
     "greetingAfternoon": "Dobar dan",
     "greetingEvening": "Dobro veče",
     "recommendedNearYou": "Preporučeno blizu tebe",
+    "temporaryJobs": "Privremeni poslovi",
     "urgent": "Hitno",
     "forWorkers": "Smene za tebe",
     "forVenues": "Tvoj lokal",
@@ -148,6 +153,7 @@
   },
   "listings": {
     "title": "Oglasi",
+    "temporaryJobsTitle": "Privremeni poslovi",
     "browse": "Pregledaj smene",
     "filterAll": "Sve",
     "filters": "Filteri",
@@ -275,12 +281,13 @@
   },
   "errors": {
     "network": "Problem sa mrežom. Proverite konekciju.",
-    "auth": "Prijava nije uspela. Proverite podatke.",
+    "auth": "Greška pri prijavi. Proverite podatke ili pokušajte ponovo.",
     "generic": "Nešto je pošlo naopako. Pokušajte ponovo."
   },
   "rating": {
     "overall": "Ocena",
     "noRatingsYet": "Još nema ocena",
+    "notAvailable": "—",
     "count": "{count} ocena",
     "rateWorker": "Oceni radnika",
     "rateVenue": "Oceni lokal",
@@ -323,6 +330,20 @@
     "selectTime": "Izaberi vreme",
     "from": "Od",
     "to": "Do",
-    "publishSuccess": "Oglas je uspešno objavljen!"
+    "publishSuccess": "Oglas je uspešno objavljen!",
+    "venueLabel": "Za koji lokal je ovaj oglas?",
+    "noVenue": "Bez lokala",
+    "noVenueFullTimeHint": "Stalni angažman nije dostupan bez lokala — izaberi lokal za stalnu poziciju.",
+    "jobLocationLabel": "Lokacija posla",
+    "noVenueLocationRequired": "Izaberi lokaciju za ovaj posao."
+  },
+  "myVenues": {
+    "title": "Moji lokali",
+    "active": "Aktivan",
+    "setActive": "Postavi kao aktivan",
+    "addVenue": "Dodaj lokal",
+    "addSuccess": "Lokal je uspešno dodat!",
+    "emptyTitle": "Još nemaš lokal",
+    "emptyHint": "Dodaj lokal, ili nastavi da postavljaš privremene oglase bez njega."
   }
 }

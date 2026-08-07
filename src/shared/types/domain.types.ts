@@ -18,8 +18,11 @@ export type VenueSummary = Pick<
 >;
 
 // A listing joined with its parent venue (as returned by listings queries).
+// `venue` is null for a venue-less (temporary-job) listing — `owner` is the posting
+// profile, used as the display/contact fallback in that case.
 export type ListingWithVenue = Listing & {
   venue: VenueSummary | null;
+  owner: Pick<Profile, "id" | "full_name" | "avatar_url" | "phone"> | null;
 };
 
 // An application joined with the applying worker's profile (venue-facing applicant list).

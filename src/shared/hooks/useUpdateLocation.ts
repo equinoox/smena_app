@@ -31,7 +31,7 @@ export function useUpdateVenueLocation(venueId: string | undefined) {
   return useMutation({
     mutationFn: (location: LocationValue) => updateVenueLocation(venueId!, location),
     onSuccess: () => {
-      return client.invalidateQueries({ queryKey: queryKeys.myVenue(user?.id ?? "anon") });
+      return client.invalidateQueries({ queryKey: queryKeys.myVenues(user?.id ?? "anon") });
     },
   });
 }

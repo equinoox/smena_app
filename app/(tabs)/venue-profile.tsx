@@ -1,6 +1,6 @@
 // Route: /(tabs)/venue-profile — thin wrapper, renders the venue's business profile tab.
-import { VenueProfileScreen } from "@features/profile/screens/VenueProfileScreen";
+import { VenueProfileTabScreen } from "@features/profile/screens/VenueProfileTabScreen";
 
 export default function VenueProfileRoute() {
-  return <VenueProfileScreen />;
+  return <VenueProfileTabScreen />;
 }

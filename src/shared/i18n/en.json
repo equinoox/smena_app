@@ -83,6 +83,10 @@
     "venueDetailsTitle": "Venue details",
     "venueContactTitle": "Contact & description",
     "venueDetailsSubtitle": "This is how workers will see you in listings.",
+    "hasVenueQuestion": "Do you run a physical venue?",
+    "hasVenueYes": "Yes, I have a venue",
+    "hasVenueNo": "No, just temp jobs",
+    "hasVenueNoHint": "You'll only be able to post temporary-job listings (hourly or day-rate), not tied to any venue.",
     "venueLogo": "Venue logo",
     "addPhoto": "Add photo",
     "changePhoto": "Change photo",
@@ -126,6 +130,7 @@
     "greetingAfternoon": "Good afternoon",
     "greetingEvening": "Good evening",
     "recommendedNearYou": "Recommended near you",
+    "temporaryJobs": "Temporary jobs",
     "urgent": "Urgent",
     "forWorkers": "Shifts for you",
     "forVenues": "Your venue",
@@ -148,6 +153,7 @@
   },
   "listings": {
     "title": "Listings",
+    "temporaryJobsTitle": "Temporary jobs",
     "browse": "Browse shifts",
     "filterAll": "All",
     "filters": "Filters",
@@ -275,12 +281,13 @@
   },
   "errors": {
     "network": "Network problem. Check your connection.",
-    "auth": "Could not sign you in. Check your details.",
+    "auth": "Sign-in failed. Check your details or try again.",
     "generic": "Something went wrong. Please try again."
   },
   "rating": {
     "overall": "Rating",
     "noRatingsYet": "No ratings yet",
+    "notAvailable": "—",
     "count": "{count} ratings",
     "rateWorker": "Rate worker",
     "rateVenue": "Rate venue",
@@ -323,6 +330,20 @@
     "selectTime": "Select time",
     "from": "From",
     "to": "To",
-    "publishSuccess": "Listing published successfully!"
+    "publishSuccess": "Listing published successfully!",
+    "venueLabel": "Which venue is this for?",
+    "noVenue": "No venue",
+    "noVenueFullTimeHint": "Full-time isn't available without a venue — pick a venue for a permanent role.",
+    "jobLocationLabel": "Job location",
+    "noVenueLocationRequired": "Pick a location for this job."
+  },
+  "myVenues": {
+    "title": "My venues",
+    "active": "Active",
+    "setActive": "Set as active",
+    "addVenue": "Add venue",
+    "addSuccess": "Venue added successfully!",
+    "emptyTitle": "No venue yet",
+    "emptyHint": "Add a venue, or keep posting temporary-job listings without one."
   }
 }

@@ -6,11 +6,14 @@ export type ListingFilters = {
   city?: string;
   roleNeeded?: WorkerRole;
   search?: string;
+  // Only venue-less (temporary-job) listings — the "Privremeni poslovi" home shelf and
+  // its "See all" view.
+  noVenueOnly?: boolean;
 };
 
 export const queryKeys = {
   profile: (userId: string) => ["profile", userId] as const,
-  myVenue: (userId: string) => ["venue", "owner", userId] as const,
+  myVenues: (userId: string) => ["venues", "owner", userId] as const,
   listings: (filters: ListingFilters) => ["listings", filters] as const,
   listing: (id: string) => ["listing", id] as const,
   venueListings: (venueId: string) => ["listings", "venue", venueId] as const,
